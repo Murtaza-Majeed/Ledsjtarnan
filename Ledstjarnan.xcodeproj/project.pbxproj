@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E5EFAB252F3E723E00A014CD /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB242F3E723E00A014CD /* Auth */; };
+		E5EFAB272F3E723E00A014CD /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB262F3E723E00A014CD /* Functions */; };
+		E5EFAB292F3E723E00A014CD /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB282F3E723E00A014CD /* PostgREST */; };
+		E5EFAB2B2F3E723E00A014CD /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB2A2F3E723E00A014CD /* Realtime */; };
+		E5EFAB2D2F3E723E00A014CD /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB2C2F3E723E00A014CD /* Storage */; };
+		E5EFAB2F2F3E723E00A014CD /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB2E2F3E723E00A014CD /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E5B681522F1F9DFF0008F88F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +36,30 @@
 		E5B681442F1F9DFD0008F88F /* Ledstjarnan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ledstjarnan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5B681512F1F9DFF0008F88F /* LedstjarnanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LedstjarnanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5B6815B2F1F9DFF0008F88F /* LedstjarnanUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LedstjarnanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5EFAB092F3E6DA000A014CD /* SupabaseSchema.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SupabaseSchema.md; sourceTree = "<group>"; };
+		E5EFAB0B2F3E6DB900A014CD /* LSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSButton.swift; sourceTree = "<group>"; };
+		E5EFAB0C2F3E6DC300A014CD /* LSTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSTextField.swift; sourceTree = "<group>"; };
+		E5EFAB0D2F3E6DCA00A014CD /* LSCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSCard.swift; sourceTree = "<group>"; };
+		E5EFAB0E2F3E6DD400A014CD /* LSBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSBadge.swift; sourceTree = "<group>"; };
+		E5EFAB0F2F3E6DDD00A014CD /* LSNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSNavigationBar.swift; sourceTree = "<group>"; };
+		E5EFAB102F3E6DE500A014CD /* LSEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSEmptyState.swift; sourceTree = "<group>"; };
+		E5EFAB122F3E6DF800A014CD /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		E5EFAB132F3E6E0D00A014CD /* Assessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assessment.swift; sourceTree = "<group>"; };
+		E5EFAB142F3E6E1A00A014CD /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
+		E5EFAB152F3E6E2600A014CD /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
+		E5EFAB162F3E6E3A00A014CD /* StaffProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffProfile.swift; sourceTree = "<group>"; };
+		E5EFAB172F3E6E4700A014CD /* LivbojenChapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivbojenChapter.swift; sourceTree = "<group>"; };
+		E5EFAB182F3E6E5300A014CD /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
+		E5EFAB192F3E6E9500A014CD /* PROGRESS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PROGRESS.md; sourceTree = "<group>"; };
+		E5EFAB1A2F3E6EC500A014CD /* SUPABASE_SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUPABASE_SETUP.md; sourceTree = "<group>"; };
+		E5EFAB1C2F3E714100A014CD /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
+		E5EFAB1D2F3E715200A014CD /* ADD_SUPABASE_SDK.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ADD_SUPABASE_SDK.md; sourceTree = "<group>"; };
+		E5EFAB1E2F3E715900A014CD /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
+		E5EFAB1F2F3E716200A014CD /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		E5EFAB202F3E717200A014CD /* StaffService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaffService.swift; sourceTree = "<group>"; };
+		E5EFAB212F3E719200A014CD /* ClientService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientService.swift; sourceTree = "<group>"; };
+		E5EFAB222F3E71C800A014CD /* NEXT_STEPS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = NEXT_STEPS.md; sourceTree = "<group>"; };
+		E5EFAB302F3E745800A014CD /* schema.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = schema.sql; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +85,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5EFAB292F3E723E00A014CD /* PostgREST in Frameworks */,
+				E5EFAB272F3E723E00A014CD /* Functions in Frameworks */,
+				E5EFAB2F2F3E723E00A014CD /* Supabase in Frameworks */,
+				E5EFAB252F3E723E00A014CD /* Auth in Frameworks */,
+				E5EFAB2D2F3E723E00A014CD /* Storage in Frameworks */,
+				E5EFAB2B2F3E723E00A014CD /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +118,10 @@
 				E5B681542F1F9DFF0008F88F /* LedstjarnanTests */,
 				E5B6815E2F1F9DFF0008F88F /* LedstjarnanUITests */,
 				E5B681452F1F9DFD0008F88F /* Products */,
+				E5EFAB082F3E6D5300A014CD /* Database */,
+				E5EFAB0A2F3E6DAB00A014CD /* Components */,
+				E5EFAB112F3E6DE700A014CD /* Models */,
+				E5EFAB1B2F3E713C00A014CD /* Services */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,6 +133,58 @@
 				E5B6815B2F1F9DFF0008F88F /* LedstjarnanUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E5EFAB082F3E6D5300A014CD /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				E5EFAB092F3E6DA000A014CD /* SupabaseSchema.md */,
+				E5EFAB192F3E6E9500A014CD /* PROGRESS.md */,
+				E5EFAB1A2F3E6EC500A014CD /* SUPABASE_SETUP.md */,
+				E5EFAB1D2F3E715200A014CD /* ADD_SUPABASE_SDK.md */,
+				E5EFAB222F3E71C800A014CD /* NEXT_STEPS.md */,
+				E5EFAB302F3E745800A014CD /* schema.sql */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		E5EFAB0A2F3E6DAB00A014CD /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				E5EFAB0B2F3E6DB900A014CD /* LSButton.swift */,
+				E5EFAB0C2F3E6DC300A014CD /* LSTextField.swift */,
+				E5EFAB0D2F3E6DCA00A014CD /* LSCard.swift */,
+				E5EFAB0E2F3E6DD400A014CD /* LSBadge.swift */,
+				E5EFAB0F2F3E6DDD00A014CD /* LSNavigationBar.swift */,
+				E5EFAB102F3E6DE500A014CD /* LSEmptyState.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		E5EFAB112F3E6DE700A014CD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E5EFAB122F3E6DF800A014CD /* Client.swift */,
+				E5EFAB132F3E6E0D00A014CD /* Assessment.swift */,
+				E5EFAB142F3E6E1A00A014CD /* Plan.swift */,
+				E5EFAB152F3E6E2600A014CD /* Schedule.swift */,
+				E5EFAB162F3E6E3A00A014CD /* StaffProfile.swift */,
+				E5EFAB172F3E6E4700A014CD /* LivbojenChapter.swift */,
+				E5EFAB182F3E6E5300A014CD /* Timeline.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E5EFAB1B2F3E713C00A014CD /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E5EFAB1C2F3E714100A014CD /* SupabaseConfig.swift */,
+				E5EFAB1E2F3E715900A014CD /* SupabaseClient.swift */,
+				E5EFAB1F2F3E716200A014CD /* AuthService.swift */,
+				E5EFAB202F3E717200A014CD /* StaffService.swift */,
+				E5EFAB212F3E719200A014CD /* ClientService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +207,12 @@
 			);
 			name = Ledstjarnan;
 			packageProductDependencies = (
+				E5EFAB242F3E723E00A014CD /* Auth */,
+				E5EFAB262F3E723E00A014CD /* Functions */,
+				E5EFAB282F3E723E00A014CD /* PostgREST */,
+				E5EFAB2A2F3E723E00A014CD /* Realtime */,
+				E5EFAB2C2F3E723E00A014CD /* Storage */,
+				E5EFAB2E2F3E723E00A014CD /* Supabase */,
 			);
 			productName = Ledstjarnan;
 			productReference = E5B681442F1F9DFD0008F88F /* Ledstjarnan.app */;
@@ -195,6 +296,9 @@
 			);
 			mainGroup = E5B6813B2F1F9DFD0008F88F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5B681452F1F9DFD0008F88F /* Products */;
 			projectDirPath = "";
@@ -395,6 +499,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32CL46328B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -426,6 +531,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32CL46328B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -570,6 +676,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E5EFAB242F3E723E00A014CD /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		E5EFAB262F3E723E00A014CD /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		E5EFAB282F3E723E00A014CD /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		E5EFAB2A2F3E723E00A014CD /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		E5EFAB2C2F3E723E00A014CD /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		E5EFAB2E2F3E723E00A014CD /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5EFAB232F3E723E00A014CD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E5B6813C2F1F9DFD0008F88F /* Project object */;
 }
