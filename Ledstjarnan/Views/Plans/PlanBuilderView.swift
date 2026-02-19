@@ -10,6 +10,7 @@ struct PlanBuilderView: View {
     let client: Client?
     let plan: Plan?
     let clientName: String?
+    let prefilledFocusDomains: Set<String>
     
     @Environment(\.dismiss) var dismiss
     
@@ -29,10 +30,11 @@ struct PlanBuilderView: View {
     @State private var isLoading = true
     @State private var isProcessing = false
     @State private var errorMessage: String?
-    @State private var step: PlanBuilderStep = .focus
+    @State private var step: PlanBuilderStep
     
     private let planService = PlanService()
     private let livbojenService = LivbojenService()
+    private let assessmentService = AssessmentService()
     
     private var focusOptions: [FocusOption] {
         AssessmentDefinition.domains.map { FocusOption(key: $0.key, title: $0.title, subtitle: $0.subtitle, icon: $0.icon) }
@@ -44,6 +46,22 @@ struct PlanBuilderView: View {
     
     private var clientDisplayName: String {
         client?.displayName ?? clientName ?? "Client"
+    }
+    
+    init(
+        appState: AppState,
+        client: Client?,
+        plan: Plan?,
+        clientName: String?,
+        startStep: PlanBuilderStep = .focus,
+        prefilledFocusDomains: Set<String> = []
+    ) {
+        self.appState = appState
+        self.client = client
+        self.plan = plan
+        self.clientName = clientName
+        self.prefilledFocusDomains = prefilledFocusDomains
+        _step = State(initialValue: startStep)
     }
     
     var body: some View {
@@ -303,6 +321,12 @@ struct PlanBuilderView: View {
             await MainActor.run {
                 self.currentPlan = plan
                 self.titleInput = plan.title ?? ""
+                if self.prefilledFocusDomains.isEmpty == false {
+                    self.selectedFocusDomains = self.prefilledFocusDomains
+                }
+            }
+            if self.prefilledFocusDomains.isEmpty {
+                await autoSelectFocusAreas(from: client.id)
             }
             await loadSupportingData()
         } catch {
@@ -334,6 +358,54 @@ struct PlanBuilderView: View {
                 self.isLoading = false
             }
         }
+    }
+
+    private func autoSelectFocusAreas(from clientId: String) async {
+        do {
+            let assessments = try await assessmentService.getAssessments(clientId: clientId)
+            let latest = assessments
+                .filter { $0.status == "completed" }
+                .sorted {
+                    ($0.completedAt ?? Date.distantPast) > ($1.completedAt ?? Date.distantPast)
+                }
+                .first
+            guard
+                let domainScores = latest?.domainScores,
+                !domainScores.isEmpty
+            else { return }
+
+            let allowedKeys = Set(focusOptions.map { $0.key })
+            var priorities: [(String, Int)] = []
+            for (key, value) in domainScores where allowedKeys.contains(key) {
+                if let dict = value.value as? [String: Any],
+                   let priority = dict["pScore"] as? Int {
+                    priorities.append((key, priority))
+                }
+            }
+            let selection = pickFocusKeys(from: priorities)
+            guard !selection.isEmpty else { return }
+            await MainActor.run {
+                if self.selectedFocusDomains.isEmpty {
+                    self.selectedFocusDomains = selection
+                }
+            }
+        } catch {
+            // Ignore autofill failures; user can still select manually.
+        }
+    }
+
+    private func pickFocusKeys(from priorities: [(String, Int)]) -> Set<String> {
+        guard !priorities.isEmpty else { return [] }
+        let high = priorities.filter { $0.1 <= 1 }
+        if !high.isEmpty {
+            return Set(high.prefix(3).map { $0.0 })
+        }
+        let mediumHigh = priorities.filter { $0.1 <= 2 }
+        if !mediumHigh.isEmpty {
+            return Set(mediumHigh.prefix(3).map { $0.0 })
+        }
+        let sorted = priorities.sorted { $0.1 < $1.1 }
+        return Set(sorted.prefix(3).map { $0.0 })
     }
     
     private func handlePrimaryAction() async {
@@ -503,20 +575,20 @@ private struct FocusChip: View {
                     Spacer()
                     if isSelected {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.onPrimary)
                     }
                 }
                 Text(option.title)
                     .font(.headline)
                 Text(option.subtitle)
                     .font(.caption)
-                    .foregroundColor(isSelected ? .white.opacity(0.8) : AppColors.textSecondary)
+                    .foregroundColor(isSelected ? AppColors.onPrimary.opacity(0.8) : AppColors.textSecondary)
                     .lineLimit(2)
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? AppColors.primary : AppColors.secondarySurface)
-            .foregroundColor(isSelected ? .white : AppColors.textPrimary)
+            .foregroundColor(isSelected ? AppColors.onPrimary : AppColors.textPrimary)
             .cornerRadius(14)
             .shadow(color: isSelected ? AppColors.primary.opacity(0.3) : .clear, radius: 8, y: 4)
         }

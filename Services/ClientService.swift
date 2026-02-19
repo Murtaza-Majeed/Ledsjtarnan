@@ -59,6 +59,20 @@ class ClientService {
         return response
     }
     
+    /// Assign a staff member to a client (staff_client_access upsert)
+    func assignStaffToClient(clientId: String, staffId: String, isPrimary: Bool = false) async throws {
+        let access = [
+            "staff_id": staffId,
+            "client_id": clientId,
+            "is_primary": isPrimary
+        ] as [String : Any]
+        
+        try await supabase.database
+            .from("staff_client_access")
+            .upsert(access)
+            .execute()
+    }
+    
     /// Update client
     func updateClient(clientId: String, nameOrCode: String) async throws -> Client {
         let updates = ["name_or_code": nameOrCode]
@@ -72,6 +86,15 @@ class ClientService {
             .execute()
             .value
         return response
+    }
+
+    /// Delete client and cascade related data
+    func deleteClient(clientId: String) async throws {
+        try await supabase.database
+            .from("clients")
+            .delete()
+            .eq("id", value: clientId)
+            .execute()
     }
     
     // MARK: - Client Details
@@ -96,6 +119,37 @@ class ClientService {
             flags: clientFlags,
             notesCount: notes
         )
+    }
+    
+    /// Aggregated snapshot for the Clients tab list
+    func getClientSummaries(unitId: String, staffId: String?) async throws -> [ClientListSummary] {
+        let clients = try await getClients(unitId: unitId)
+        guard !clients.isEmpty else { return [] }
+        let clientIds = clients.map(\.id)
+        
+        async let baselineIdsTask = getClientsWithCompletedBaseline(clientIds: clientIds)
+        async let activePlansTask = getActivePlansMap(clientIds: clientIds)
+        async let flagsMapTask = getActiveFlagsMap(clientIds: clientIds)
+        async let myClientIdsTask = getAssignedClientIds(staffId: staffId)
+        
+        let (baselineIds, planMap, flagsMap, myClientIds) = try await (
+            baselineIdsTask,
+            activePlansTask,
+            flagsMapTask,
+            myClientIdsTask
+        )
+        
+        return clients.map { client in
+            let plan = planMap[client.id]
+            return ClientListSummary(
+                client: client,
+                hasBaseline: baselineIds.contains(client.id),
+                activePlan: plan,
+                flags: flagsMap[client.id] ?? [],
+                isMyClient: myClientIds.contains(client.id),
+                nextFollowUpDate: plan?.nextFollowUpAt
+            )
+        }
     }
     
     private func checkHasBaseline(clientId: String) async throws -> Bool {
@@ -145,6 +199,69 @@ class ClientService {
             .execute()
             .count ?? 0
         return count
+    }
+    
+    private func getClientsWithCompletedBaseline(clientIds: [String]) async throws -> Set<String> {
+        guard !clientIds.isEmpty else { return [] }
+        let rows: [ClientIdResult] = try await supabase.database
+            .from("assessments")
+            .select("client_id")
+            .eq("assessment_type", value: "baseline")
+            .eq("status", value: "completed")
+            .in("client_id", values: clientIds)
+            .execute()
+            .value
+        return Set(rows.map(\.clientId))
+    }
+    
+    private func getActivePlansMap(clientIds: [String]) async throws -> [String: Plan] {
+        guard !clientIds.isEmpty else { return [:] }
+        let plans: [Plan] = try await supabase.database
+            .from("plans")
+            .select()
+            .eq("status", value: "active")
+            .in("client_id", values: clientIds)
+            .execute()
+            .value
+        return plans.reduce(into: [:]) { partialResult, plan in
+            guard let existing = partialResult[plan.clientId] else {
+                partialResult[plan.clientId] = plan
+                return
+            }
+            let existingDate = existing.updatedAt ?? existing.createdAt
+            let candidateDate = plan.updatedAt ?? plan.createdAt
+            if let candidateDate, let existingDate {
+                if candidateDate > existingDate {
+                    partialResult[plan.clientId] = plan
+                }
+            } else {
+                // If timestamps are missing, prefer the most recently iterated plan
+                partialResult[plan.clientId] = plan
+            }
+        }
+    }
+    
+    private func getActiveFlagsMap(clientIds: [String]) async throws -> [String: [ClientFlag]] {
+        guard !clientIds.isEmpty else { return [:] }
+        let flags: [ClientFlag] = try await supabase.database
+            .from("client_flags")
+            .select()
+            .eq("is_on", value: true)
+            .in("client_id", values: clientIds)
+            .execute()
+            .value
+        return Dictionary(grouping: flags, by: \.clientId)
+    }
+    
+    private func getAssignedClientIds(staffId: String?) async throws -> Set<String> {
+        guard let staffId else { return [] }
+        let rows: [ClientIdResult] = try await supabase.database
+            .from("staff_client_access")
+            .select("client_id")
+            .eq("staff_id", value: staffId)
+            .execute()
+            .value
+        return Set(rows.map(\.clientId))
     }
     
     // MARK: - Client Linking
@@ -328,5 +445,13 @@ class ClientService {
             .from("client_timeline_events")
             .insert(event)
             .execute()
+    }
+}
+
+private struct ClientIdResult: Decodable {
+    let clientId: String
+    
+    enum CodingKeys: String, CodingKey {
+        case clientId = "client_id"
     }
 }

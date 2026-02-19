@@ -2,141 +2,236 @@
 //  CreateClientView.swift
 //  Ledstjarnan
 //
-//  Created by Murtaza Majeed on 2026-01-29.
+//  New client flow for Ledstjärnan staff app.
 //
 
 import SwiftUI
 
 struct CreateClientView: View {
     @ObservedObject var appState: AppState
-    @Environment(\.dismiss) var dismiss
-    var onCreated: (() -> Void)?
+    @Environment(\.dismiss) private var dismiss
+    var onCreated: ((Client) -> Void)?
     
-    @State private var firstName = ""
-    @State private var lastName = ""
-    @State private var dateOfBirth = Date()
+    @State private var nameOrCode: String = ""
+    @State private var availableUnits: [Unit] = []
+    @State private var selectedUnitId: String?
+    @State private var staffOptions: [StaffProfile] = []
+    @State private var responsibleStaffId: String?
+    @State private var creationError: String?
+    @State private var staffLoadError: String?
     @State private var isCreating = false
-    @State private var errorMessage: String?
+    @State private var isLoadingStaff = false
     
     private let clientService = ClientService()
+    private let staffService = StaffService()
+    
+    private var trimmedName: String {
+        nameOrCode.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    private var isCreateDisabled: Bool {
+        trimmedName.isEmpty || selectedUnitId == nil || responsibleStaffId == nil || isCreating || isLoadingStaff
+    }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
-                // Top bar
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(AppColors.primary)
-                    }
-                    
-                    Text("Create client")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(AppColors.textPrimary)
-                    
-                    Spacer()
-                }
-                .padding()
-                .background(AppColors.mainSurface)
-                
+                header
                 ScrollView {
-                    VStack(spacing: 20) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("First name")
-                                .font(.subheadline)
-                                .foregroundColor(AppColors.textSecondary)
-                            TextField("", text: $firstName)
+                    VStack(spacing: 24) {
+                        FormFieldContainer(title: "Name/Code") {
+                            TextField("e.g., A12 • Noor", text: $nameOrCode)
                                 .textFieldStyle(.plain)
-                                .padding()
-                                .background(AppColors.secondarySurface)
-                                .cornerRadius(8)
+                                .padding(.vertical, 8)
                         }
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Last name")
-                                .font(.subheadline)
-                                .foregroundColor(AppColors.textSecondary)
-                            TextField("", text: $lastName)
-                                .textFieldStyle(.plain)
-                                .padding()
-                                .background(AppColors.secondarySurface)
-                                .cornerRadius(8)
+                        FormFieldContainer(title: "Unit") {
+                            if availableUnits.isEmpty {
+                                Text("No unit available")
+                                    .foregroundColor(AppColors.textSecondary)
+                            } else {
+                                Picker("", selection: $selectedUnitId) {
+                                    ForEach(availableUnits) { unit in
+                                        Text(unit.displayName).tag(Optional(unit.id))
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .labelsHidden()
+                            }
                         }
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Date of birth")
-                                .font(.subheadline)
-                                .foregroundColor(AppColors.textSecondary)
-                            DatePicker("", selection: $dateOfBirth, displayedComponents: .date)
-                                .datePickerStyle(.compact)
-                                .padding()
-                                .background(AppColors.secondarySurface)
-                                .cornerRadius(8)
+                        FormFieldContainer(title: "Responsible staff") {
+                            if isLoadingStaff {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .tint(AppColors.primary)
+                            } else if staffOptions.isEmpty {
+                                Text("No staff in unit")
+                                    .foregroundColor(AppColors.textSecondary)
+                            } else {
+                                Picker("", selection: $responsibleStaffId) {
+                                    ForEach(staffOptions) { staff in
+                                        Text(staff.fullName)
+                                            .tag(Optional(staff.id))
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .labelsHidden()
+                            }
+                        }
+                        
+                        if let staffLoadError {
+                            Text(staffLoadError)
+                                .font(.caption)
+                                .foregroundColor(AppColors.danger)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 24)
                 }
                 
-                if let error = errorMessage {
-                    Text(error)
-                        .font(.caption)
+                if let creationError {
+                    Text(creationError)
+                        .font(.footnote)
                         .foregroundColor(AppColors.danger)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
                 }
                 
-                // Actions
-                Button(action: {
-                    createClient()
-                }) {
-                    HStack {
+                Button(action: createClient) {
+                    HStack(spacing: 8) {
                         if isCreating {
                             ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        } else {
-                            Text("Create")
-                                .font(.headline)
+                                .progressViewStyle(.circular)
+                                .tint(AppColors.onPrimary)
                         }
+                        Text("Create")
+                            .font(.headline)
                     }
-                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(AppColors.primary)
-                    .cornerRadius(12)
+                    .background(isCreateDisabled ? AppColors.mutedNeutral : AppColors.primary)
+                    .foregroundColor(isCreateDisabled ? AppColors.textPrimary : AppColors.onPrimary)
+                    .cornerRadius(16)
                 }
-                .padding()
+                .disabled(isCreateDisabled)
+                .padding(20)
                 .background(AppColors.mainSurface)
-                .disabled(isCreating || firstName.isEmpty || lastName.isEmpty)
             }
-            .background(AppColors.background)
+            .background(AppColors.background.ignoresSafeArea())
+            .task {
+                await bootstrap()
+            }
+            .onChange(of: selectedUnitId) { _, newValue in
+                guard let unitId = newValue else {
+                    staffOptions = []
+                    responsibleStaffId = nil
+                    return
+                }
+                Task {
+                    await loadStaff(for: unitId)
+                }
+            }
+        }
+    }
+    
+    private var header: some View {
+        HStack {
+            Button(action: { dismiss() }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(AppColors.primary)
+            }
+            Spacer()
+            Text("New client")
+                .font(.title2.weight(.bold))
+                .foregroundColor(AppColors.textPrimary)
+            Spacer()
+            // Spacer button to keep layout balanced
+            Color.clear.frame(width: 44, height: 44)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(AppColors.mainSurface)
+    }
+    
+    private func bootstrap() async {
+        await MainActor.run {
+            if let unit = appState.currentUnit {
+                availableUnits = [unit]
+                selectedUnitId = unit.id
+            }
+        }
+        if let unitId = selectedUnitId {
+            await loadStaff(for: unitId)
+        }
+    }
+    
+    private func loadStaff(for unitId: String) async {
+        await MainActor.run {
+            isLoadingStaff = true
+            staffLoadError = nil
+        }
+        
+        do {
+            let staff = try await staffService.getStaffInUnit(unitId: unitId)
+            await MainActor.run {
+                staffOptions = staff
+                if let myId = appState.currentStaffProfile?.id, staffOptions.contains(where: { $0.id == myId }) {
+                    responsibleStaffId = myId
+                } else {
+                    responsibleStaffId = staffOptions.first?.id
+                }
+                isLoadingStaff = false
+            }
+        } catch {
+            await MainActor.run {
+                staffLoadError = "Couldn't load staff list: \(error.localizedDescription)"
+                isLoadingStaff = false
+            }
         }
     }
     
     private func createClient() {
-        guard let unitId = appState.currentUnit?.id else {
-            errorMessage = "No unit. Complete your profile first."
+        guard !trimmedName.isEmpty else {
+            creationError = "Name/Code is required."
             return
         }
-        guard let staffId = appState.currentStaffProfile?.id else {
-            errorMessage = "Staff profile not loaded."
+        guard let unitId = selectedUnitId else {
+            creationError = "Select a unit."
             return
         }
-        let nameOrCode = "\(firstName.trimmingCharacters(in: .whitespaces)) \(lastName.trimmingCharacters(in: .whitespaces))".trimmingCharacters(in: .whitespaces)
-        guard !nameOrCode.isEmpty else { return }
+        guard let staffId = responsibleStaffId else {
+            creationError = "Select responsible staff."
+            return
+        }
+        guard let creatorId = appState.currentStaffProfile?.id else {
+            creationError = "Staff profile not loaded."
+            return
+        }
         
-        errorMessage = nil
+        creationError = nil
         isCreating = true
+        
         Task {
             do {
-                _ = try await clientService.createClient(unitId: unitId, nameOrCode: nameOrCode, createdByStaffId: staffId)
+                let client = try await clientService.createClient(
+                    unitId: unitId,
+                    nameOrCode: trimmedName,
+                    createdByStaffId: creatorId
+                )
+                try await clientService.assignStaffToClient(clientId: client.id, staffId: staffId, isPrimary: true)
+                
                 await MainActor.run {
                     isCreating = false
-                    onCreated?()
+                    onCreated?(client)
                     dismiss()
                 }
             } catch {
                 await MainActor.run {
-                    errorMessage = error.localizedDescription
+                    creationError = "Couldn't create client. \(error.localizedDescription)"
                     isCreating = false
                 }
             }
@@ -144,6 +239,55 @@ struct CreateClientView: View {
     }
 }
 
+private struct FormFieldContainer<Content: View>: View {
+    let title: String
+    @ViewBuilder var content: Content
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(AppColors.textPrimary)
+            content
+                .padding(.horizontal, 12)
+                .padding(.vertical, 14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColors.secondarySurface)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(AppColors.border, lineWidth: 1)
+                )
+                .cornerRadius(16)
+        }
+    }
+}
+
 #Preview {
-    CreateClientView(appState: AppState(), onCreated: nil)
+    let appState = AppState()
+    appState.currentUnit = Unit(
+        id: "unit-123",
+        name: "Västerbo HVB Malmö",
+        code: "VHM",
+        city: "Malmö",
+        joinCode: "ABC123",
+        joinCodeExpiresAt: nil,
+        isActive: true,
+        createdAt: Date(),
+        updatedAt: Date()
+    )
+    appState.currentStaffProfile = StaffProfile(
+        id: "staff-1",
+        email: "staff@example.com",
+        fullName: "Sara Staff",
+        role: "Behandlingsassistent",
+        unitId: "unit-123",
+        unitJoinedAt: Date(),
+        notificationsEnabled: true,
+        notificationPrefs: nil,
+        privacyAckAt: nil,
+        onboardingCompletedAt: Date(),
+        createdAt: Date(),
+        updatedAt: Date()
+    )
+    return CreateClientView(appState: appState, onCreated: nil)
 }

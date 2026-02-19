@@ -103,6 +103,17 @@ class StaffService {
             .eq("id", value: staffId)
             .execute()
     }
+    
+    /// Fetch colleagues in the same unit (used for responsible staff picker).
+    func getStaffInUnit(unitId: String) async throws -> [StaffProfile] {
+        try await supabase.database
+            .from("staff_profiles")
+            .select()
+            .eq("unit_id", value: unitId)
+            .order("full_name", ascending: true)
+            .execute()
+            .value
+    }
 }
 
 enum StaffServiceError: LocalizedError {

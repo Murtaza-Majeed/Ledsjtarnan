@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Client: Identifiable, Codable {
+struct Client: Identifiable, Codable, Hashable {
     let id: String
     let unitId: String
     /// From DB column `name_or_code` – this is the real client name/code we display.
@@ -80,6 +80,50 @@ struct ClientDetail {
     }()
 }
 
+struct ClientListSummary: Identifiable {
+    let client: Client
+    var hasBaseline: Bool
+    var activePlan: Plan?
+    var flags: [ClientFlag]
+    var isMyClient: Bool
+    var nextFollowUpDate: Date?
+    
+    var id: String { client.id }
+    var isLinked: Bool { client.isLinked }
+    var hasPlan: Bool { activePlan != nil }
+    var hasFlags: Bool { !flags.isEmpty }
+    var isNotLinked: Bool { !client.isLinked }
+    
+    var baselineStatusLabel: String {
+        hasBaseline ? "Baseline" : "No baseline"
+    }
+    
+    var planStatusLabel: String {
+        hasPlan ? "Plan" : "No plan"
+    }
+    
+    var linkStatusLabel: String {
+        isLinked ? "Linked" : "Not linked"
+    }
+    
+    var flagTypes: [ClientFlagType] {
+        flags.map(\.type)
+    }
+    
+    var isDueSoon: Bool {
+        guard let nextFollowUpDate else { return false }
+        let daysUntil = Calendar.current.dateComponents([.day], from: Date(), to: nextFollowUpDate).day ?? .max
+        return (0...Self.dueSoonThresholdDays).contains(daysUntil)
+    }
+    
+    var isOverdue: Bool {
+        guard let nextFollowUpDate else { return false }
+        return nextFollowUpDate < Date()
+    }
+    
+    static let dueSoonThresholdDays = 14
+}
+
 struct ClientFlag: Identifiable, Codable {
     let id: String
     let clientId: String
@@ -132,7 +176,7 @@ enum ClientFlagType: String, CaseIterable {
     }
 }
 
-struct ClientNote: Identifiable, Codable {
+struct ClientNote: Identifiable, Codable, Equatable, Hashable {
     let id: String
     let clientId: String
     let staffId: String

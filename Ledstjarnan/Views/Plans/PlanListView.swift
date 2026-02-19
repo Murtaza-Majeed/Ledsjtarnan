@@ -86,10 +86,10 @@ struct PlanListView: View {
                                     Text(plan.status)
                                         .font(.caption)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(plan.status == "active" ? AppColors.onSuccess : AppColors.textPrimary)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
-                                        .background(plan.status == "active" ? AppColors.success : AppColors.mutedNeutral)
+                                        .background(plan.status == "active" ? AppColors.success : AppColors.secondarySurface)
                                         .cornerRadius(6)
                                 }
                                 .padding(.vertical, 4)
@@ -146,7 +146,6 @@ struct PlanListView: View {
     }
 }
 
-/// Picker to select a client, then create a new plan and open builder.
 struct PlanClientPickerView: View {
     @ObservedObject var appState: AppState
     @State private var clients: [Client] = []

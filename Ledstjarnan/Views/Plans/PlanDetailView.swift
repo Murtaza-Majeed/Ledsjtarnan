@@ -30,7 +30,7 @@ struct PlanDetailView: View {
                         .foregroundColor(AppColors.textSecondary)
                     Text(plan.status)
                         .font(.caption)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.onPrimary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(AppColors.primary)

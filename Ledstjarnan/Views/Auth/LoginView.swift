@@ -29,20 +29,20 @@ struct LoginView: View {
                     VStack(spacing: 32) {
                         VStack(spacing: 12) {
                             Circle()
-                                .fill(.white.opacity(0.2))
+                                .fill(AppColors.onPrimary.opacity(0.2))
                                 .frame(width: 90, height: 90)
                                 .overlay(
                                     Image(systemName: "sparkles")
                                         .font(.system(size: 36, weight: .medium))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(AppColors.onPrimary)
                                 )
                                 .padding(.top, 40)
                             Text("Ledstjärnan")
                                 .font(.largeTitle.bold())
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.onPrimary)
                             Text("Structure, clarity and calm for every contact moment.")
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(AppColors.onPrimary.opacity(0.8))
                                 .multilineTextAlignment(.center)
                         }
                         
@@ -77,7 +77,7 @@ struct LoginView: View {
                         .padding(24)
                         .background(.regularMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                        .shadow(color: .black.opacity(0.08), radius: 20, y: 10)
+                        .shadow(color: AppColors.shadow(0.08), radius: 20, y: 10)
                         .padding(.horizontal)
                         
                         if let error = errorMessage {
@@ -91,13 +91,13 @@ struct LoginView: View {
                             HStack {
                                 if isLoading {
                                     ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                 } else {
                                     Text("Sign in")
                                         .font(.headline)
                                 }
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.onPrimary)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(AppColors.primary)
@@ -109,7 +109,7 @@ struct LoginView: View {
                         
                         Text("Need access? Contact your unit admin.")
                             .font(.footnote)
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(AppColors.onPrimary.opacity(0.8))
                             .padding(.bottom, 40)
                     }
                 }

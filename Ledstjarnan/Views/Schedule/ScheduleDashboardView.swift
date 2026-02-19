@@ -180,7 +180,7 @@ private struct EmptyScheduleState: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
                 .background(AppColors.primary)
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.onPrimary)
                 .cornerRadius(12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

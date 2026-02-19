@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Client: Identifiable, Codable {
+struct Client: Identifiable, Codable, Hashable {
     let id: String
     let unitId: String
     let nameOrCode: String

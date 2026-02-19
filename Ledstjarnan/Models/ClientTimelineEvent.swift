@@ -83,6 +83,32 @@ struct AnyCodable: Codable {
         case let v as Int: try container.encode(v)
         case let v as Double: try container.encode(v)
         case let v as String: try container.encode(v)
+        case let v as [Any]:
+            try container.encode(v.map(AnyCodable.init))
+        case let v as [String]:
+            try container.encode(v.map(AnyCodable.init))
+        case let v as [Int]:
+            try container.encode(v.map(AnyCodable.init))
+        case let v as [Double]:
+            try container.encode(v.map(AnyCodable.init))
+        case let v as [Bool]:
+            try container.encode(v.map(AnyCodable.init))
+        case let v as [AnyCodable]:
+            try container.encode(v)
+        case let v as [String: Any]:
+            try container.encode(v.mapValues(AnyCodable.init))
+        case let v as [String: AnyCodable]:
+            try container.encode(v)
+        case let v as [String: String]:
+            try container.encode(v.mapValues(AnyCodable.init))
+        case let v as [String: Int]:
+            try container.encode(v.mapValues(AnyCodable.init))
+        case let v as [String: Double]:
+            try container.encode(v.mapValues(AnyCodable.init))
+        case let v as [String: Bool]:
+            try container.encode(v.mapValues(AnyCodable.init))
+        case is NSNull:
+            try container.encodeNil()
         default: try container.encodeNil()
         }
     }

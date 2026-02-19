@@ -18,6 +18,10 @@ struct Assessment: Identifiable, Codable {
     let assessmentDate: String?
     let domainScores: [String: AnyCodable]?
     let notes: String?
+    let ptsdTotalScore: Int?
+    let ptsdProbable: Bool?
+    let safetyFlags: [[String: AnyCodable]]?
+    let interventionSummary: [String: AnyCodable]?
     let createdAt: Date?
     let updatedAt: Date?
 
@@ -36,6 +40,10 @@ struct Assessment: Identifiable, Codable {
         case assessmentDate = "assessment_date"
         case domainScores = "domain_scores"
         case notes
+        case ptsdTotalScore = "ptsd_total_score"
+        case ptsdProbable = "ptsd_probable"
+        case safetyFlags = "safety_flags"
+        case interventionSummary = "intervention_summary"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
@@ -54,6 +62,10 @@ struct Assessment: Identifiable, Codable {
         createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt)
         updatedAt = try c.decodeIfPresent(Date.self, forKey: .updatedAt)
         domainScores = try? c.decodeIfPresent([String: AnyCodable].self, forKey: .domainScores)
+        ptsdTotalScore = try c.decodeIfPresent(Int.self, forKey: .ptsdTotalScore)
+        ptsdProbable = try c.decodeIfPresent(Bool.self, forKey: .ptsdProbable)
+        safetyFlags = try? c.decodeIfPresent([[String: AnyCodable]].self, forKey: .safetyFlags)
+        interventionSummary = try? c.decodeIfPresent([String: AnyCodable].self, forKey: .interventionSummary)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -70,6 +82,10 @@ struct Assessment: Identifiable, Codable {
         try c.encodeIfPresent(createdAt, forKey: .createdAt)
         try c.encodeIfPresent(updatedAt, forKey: .updatedAt)
         try c.encodeIfPresent(domainScores, forKey: .domainScores)
+        try c.encodeIfPresent(ptsdTotalScore, forKey: .ptsdTotalScore)
+        try c.encodeIfPresent(ptsdProbable, forKey: .ptsdProbable)
+        try c.encodeIfPresent(safetyFlags, forKey: .safetyFlags)
+        try c.encodeIfPresent(interventionSummary, forKey: .interventionSummary)
     }
 }
 

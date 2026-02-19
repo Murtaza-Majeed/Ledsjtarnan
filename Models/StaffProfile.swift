@@ -177,7 +177,7 @@ enum ClientFlagType: String, CaseIterable {
     }
 }
 
-struct ClientNote: Identifiable, Codable {
+struct ClientNote: Identifiable, Codable, Hashable {
     let id: String
     let clientId: String
     let staffId: String

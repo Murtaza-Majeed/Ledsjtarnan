@@ -34,14 +34,14 @@ struct FirstLaunchView: View {
                         VStack(spacing: 10) {
                             Text("Hej!")
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(AppColors.onPrimary.opacity(0.8))
                             Text("Welcome to Ledstjärnan")
                                 .font(.largeTitle.bold())
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.onPrimary)
                                 .multilineTextAlignment(.center)
                             Text("A structured operating system for HVB teams and support apartments.")
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.85))
+                                .foregroundColor(AppColors.onPrimary.opacity(0.85))
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
                         }
@@ -86,14 +86,16 @@ struct FirstLaunchView: View {
                                 HStack(spacing: 10) {
                                     if isSubmitting {
                                         ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                     } else {
                                         Image(systemName: "sparkles")
                                             .font(.headline)
+                                            .foregroundColor(AppColors.onPrimary)
                                     }
-                                    Text("Let’s get started")
+                                    Text("Let's get started")
                                         .font(.headline)
                                 }
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.onPrimary)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(AppColors.primary)
@@ -106,7 +108,7 @@ struct FirstLaunchView: View {
                                 Task { await appState.markOnboardingComplete() }
                             }
                             .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(AppColors.onPrimary.opacity(0.8))
                         }
                         .padding(.horizontal)
                         .padding(.bottom, 32)
@@ -153,7 +155,7 @@ struct FeatureCard: View {
         .padding(20)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.05), radius: 15, y: 8)
+        .shadow(color: AppColors.shadow(), radius: 15, y: 8)
     }
 }
 

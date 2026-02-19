@@ -13,13 +13,11 @@ struct AboutView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Logo placeholder
                 Image(systemName: "star.fill")
                     .font(.system(size: 60))
                     .foregroundColor(AppColors.primary)
                     .padding(.top, 40)
                 
-                // App info card
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Ledstjarnan")
                         .font(.title2)
@@ -55,7 +53,6 @@ struct AboutView: View {
                 .cornerRadius(12)
                 .padding(.horizontal)
                 
-                // Links
                 VStack(spacing: 0) {
                     NavigationLink(destination: Text("Privacy Policy")) {
                         SettingsRow(icon: "lock.shield.fill", title: "Privacy policy", color: AppColors.primary)

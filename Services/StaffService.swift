@@ -159,4 +159,16 @@ class StaffService {
             .value
         return response
     }
+    
+    /// Fetch staff members that belong to a given unit.
+    func getStaffInUnit(unitId: String) async throws -> [StaffProfile] {
+        let response: [StaffProfile] = try await supabase.database
+            .from("staff_profiles")
+            .select()
+            .eq("unit_id", value: unitId)
+            .order("full_name", ascending: true)
+            .execute()
+            .value
+        return response
+    }
 }

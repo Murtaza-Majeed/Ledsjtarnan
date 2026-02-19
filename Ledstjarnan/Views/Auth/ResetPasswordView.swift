@@ -97,7 +97,7 @@ struct ResetPasswordView: View {
                         Button(action: { dismiss() }) {
                             Text("Back to login")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.onPrimary)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(AppColors.primary)
@@ -110,13 +110,13 @@ struct ResetPasswordView: View {
                             HStack {
                                 if isSending {
                                     ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                 } else {
                                     Text("Send reset link")
                                         .font(.headline)
                                 }
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.onPrimary)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(AppColors.primary)

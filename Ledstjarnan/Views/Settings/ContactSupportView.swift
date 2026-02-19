@@ -136,7 +136,7 @@ private struct SuccessCard: View {
                 .foregroundColor(AppColors.success)
             Text("Ticket submitted")
                 .font(.title2.weight(.semibold))
-            Text("Our team will reply to your email as soon as we’ve reviewed the issue.")
+            Text("Our team will reply to your email as soon as we've reviewed the issue.")
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)

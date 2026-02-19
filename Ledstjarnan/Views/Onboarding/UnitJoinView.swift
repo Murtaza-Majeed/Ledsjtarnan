@@ -71,13 +71,13 @@ struct UnitJoinView: View {
                             HStack {
                                 if isLoading {
                                     ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                 } else {
                                     Text("Join unit")
                                         .font(.headline)
                                 }
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.onPrimary)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(AppColors.primary)

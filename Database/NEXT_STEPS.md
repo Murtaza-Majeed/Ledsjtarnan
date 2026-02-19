@@ -59,6 +59,8 @@ Follow the instructions in `ADD_SUPABASE_SDK.md`:
 4. Click **Create user**
 5. **Copy the User ID** (it's a UUID like `123e4567-e89b-12d3-a456-426614174000`)
 
+57c96a4e-b03c-4b72-a04f-ae163126c098
+
 ---
 
 ## 🏢 Step 4: Create Test Unit and Link User
@@ -71,6 +73,7 @@ INSERT INTO units (name, code, city, join_code, is_active)
 VALUES ('Villa Hilleröd HVB', 'VHH-001', 'Malmö', '123456', true)
 RETURNING id;
 ```
+ce66ae1f-c359-48f5-81a9-84d06dc8e41f
 
 **Copy the returned `id`** - this is your `unit_id`
 
@@ -157,6 +160,24 @@ Once the Supabase SDK is added:
 - ✅ Login succeeds
 - ✅ Shows main tabs
 - ✅ Can see clients (if you created test data)
+
+---
+
+## 🧭 2026-02-19 — Assessment Flow Update
+
+We now have the Ledstjärnan assessment logic implemented across the app. Key notes:
+
+- **Single source of truth** for all 11 capitals (6 salutogenic + 5 pathogenic) lives in `Ledstjarnan/Models/AssessmentDefinition.swift`. Each module knows its copy, icon, score direction (inverted for salutogenes), and whether it uses the standard I/M/P scoring block.
+- **Prioritisation**: every domain, including the problem areas and STRESS/trauma module, captures a High / Medium / Low priority score (`priorityScore`). These values feed the plan builder, Insatskarta, and follow-up reviews.
+- **Trauma aggregation**: the STRESS view keeps the detailed Q1–52 inputs, but we now convert the PTSD evaluation into a synthetic `DomainScore` so the Insatskarta and summaries can compare trauma severity just like the other domains.
+- **Summary sheets**: `AssessmentSummaryView` renders two sections (“Domain results” + “Problem areas”), matching the wireframes.
+- **Follow-up dashboard**: `FollowUpDomainsView` pulls the same module metadata so staff see the real domain titles/subtitles, along with baseline vs. current scores and delta summaries.
+
+Remaining assessment todos:
+
+1. Hook the new priority scores into the plan builder defaults (auto-select High priority focus areas).
+2. Extend the radar/bar charts in `AssessmentComparisonView` to consume the shared module metadata and show problem area deltas when available.
+3. Add Supabase migrations to persist the priority defaults / trauma snapshots for analytics exports.
 
 ---
 
@@ -271,5 +292,4 @@ Login and clients list work. Next to build:
 - Ensure Settings tab hosts “change unit” + logout modals with the confirmation copy from Flow `7.26`.
 
 ---
-
 

@@ -13,12 +13,18 @@ struct AppColors {
     static let mainSurface = Color(hex: "F9EDF3")
     static let secondarySurface = Color(hex: "F3E3E9")
     static let primary = Color(hex: "C9699C")
+    static let onPrimary = Color.white
     static let textPrimary = Color(hex: "181613")
     static let textSecondary = Color(hex: "7C5B63")
     static let border = Color(hex: "E6D1D9")
     static let danger = Color(hex: "FF3B30")
+    static let onDanger = Color.white
     static let success = Color(hex: "34C759")
+    static let onSuccess = Color.white
     static let mutedNeutral = Color(hex: "B7A8AF")
+    static func shadow(_ opacity: Double = 0.05) -> Color {
+        Color.black.opacity(opacity)
+    }
     
     // Category Colors
     struct Category {
