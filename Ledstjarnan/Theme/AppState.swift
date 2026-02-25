@@ -22,6 +22,11 @@ class AppState: ObservableObject {
     @Published var currentStaffProfile: StaffProfile? = nil
     @Published var currentUnit: Unit? = nil
     @Published var isLoading: Bool = false
+    @Published var languageCode: String {
+        didSet {
+            UserDefaults.standard.set(languageCode, forKey: "app_language")
+        }
+    }
     
     private let authService = AuthService()
     private let staffService = StaffService()
@@ -29,6 +34,8 @@ class AppState: ObservableObject {
     
     init() {
         self.hasSeenOnboarding = UserDefaults.standard.bool(forKey: "has_seen_onboarding")
+        self.languageCode = UserDefaults.standard.string(forKey: "app_language") ?? "sv"
+        print("🌍 AppState initialized with language: \(self.languageCode)")
         
         // Listen for auth state changes
         Task {
@@ -109,5 +116,10 @@ class AppState: ObservableObject {
         } catch {
             print("Error signing out: \(error)")
         }
+    }
+
+    func setLanguage(_ code: String) {
+        print("🌍 Setting language to: \(code)")
+        languageCode = code
     }
 }

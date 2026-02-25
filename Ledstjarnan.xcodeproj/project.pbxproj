@@ -13,6 +13,7 @@
 		E5EFAB2B2F3E723E00A014CD /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB2A2F3E723E00A014CD /* Realtime */; };
 		E5EFAB2D2F3E723E00A014CD /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB2C2F3E723E00A014CD /* Storage */; };
 		E5EFAB2F2F3E723E00A014CD /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E5EFAB2E2F3E723E00A014CD /* Supabase */; };
+		E6D20A032F4B74A8001A07F5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E6D20A002F4B74A8001A07F5 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,8 @@
 		E5EFAB212F3E719200A014CD /* ClientService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientService.swift; sourceTree = "<group>"; };
 		E5EFAB222F3E71C800A014CD /* NEXT_STEPS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = NEXT_STEPS.md; sourceTree = "<group>"; };
 		E5EFAB302F3E745800A014CD /* schema.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = schema.sql; sourceTree = "<group>"; };
+		E6D20A012F4B74A8001A07F5 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = Localization/sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E6D20A022F4B74A8001A07F5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localization/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -122,6 +125,7 @@
 				E5EFAB0A2F3E6DAB00A014CD /* Components */,
 				E5EFAB112F3E6DE700A014CD /* Models */,
 				E5EFAB1B2F3E713C00A014CD /* Services */,
+				E6D20A002F4B74A8001A07F5 /* Localizable.strings */,
 			);
 			sourceTree = "<group>";
 		};
@@ -293,6 +297,7 @@
 			knownRegions = (
 				en,
 				Base,
+				sv,
 			);
 			mainGroup = E5B6813B2F1F9DFD0008F88F;
 			minimizedProjectReferenceProxies = 1;
@@ -316,6 +321,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6D20A032F4B74A8001A07F5 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,6 +377,18 @@
 			targetProxy = E5B6815C2F1F9DFF0008F88F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E6D20A002F4B74A8001A07F5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E6D20A012F4B74A8001A07F5 /* sv */,
+				E6D20A022F4B74A8001A07F5 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		E5B681632F1F9DFF0008F88F /* Debug */ = {

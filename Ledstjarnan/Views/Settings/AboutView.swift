@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AboutView: View {
     @ObservedObject var appState: AppState
+    @Environment(\.languageCode) var languageCode
     
     var body: some View {
         ScrollView {
@@ -84,7 +85,7 @@ struct AboutView: View {
             .padding(.bottom, 20)
         }
         .background(AppColors.background)
-        .navigationTitle("About")
+        .navigationTitle(LocalizedString("settings_about", languageCode))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

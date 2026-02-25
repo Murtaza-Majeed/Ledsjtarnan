@@ -283,12 +283,12 @@ struct AssessmentComparisonView: View {
     }
 
     private var problemComparisons: [AssessmentDomainComparison] {
-        AssessmentDefinition.allProblemDomains.map { domain in
-            let baseScore = baselineAnswers["\(domain.key).staffNeedScore"]?.value as? Int ?? 1
-            let currScore = currentAnswers["\(domain.key).staffNeedScore"]?.value as? Int ?? 1
+        AssessmentDefinition.pathogenicModules.map { module in
+            let baseScore = baselineAnswers["\(module.key).staffNeedScore"]?.value as? Int ?? 1
+            let currScore = currentAnswers["\(module.key).staffNeedScore"]?.value as? Int ?? 1
             return AssessmentDomainComparison(
-                domainKey: domain.key,
-                domainTitle: domain.title,
+                domainKey: module.key,
+                domainTitle: module.title,
                 baselineScore: baseScore,
                 currentScore: currScore,
                 isSalutogenic: false

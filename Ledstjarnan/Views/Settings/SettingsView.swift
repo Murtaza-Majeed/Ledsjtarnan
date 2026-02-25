@@ -13,6 +13,7 @@ struct SettingsView: View {
     @State private var showChangeUnit = false
 
     var body: some View {
+        let lang = appState.languageCode
         NavigationView {
             List {
                 Section {
@@ -40,15 +41,15 @@ struct SettingsView: View {
                         }
                         .padding(.vertical, 8)
                         NavigationLink(destination: EditProfileView(appState: appState)) {
-                            SettingsRow(icon: "person.crop.circle", title: "Edit profile", color: AppColors.primary)
+                            SettingsRow(icon: "person.crop.circle", title: LocalizedString("settings_edit_profile", lang), color: AppColors.primary)
                         }
                         NavigationLink(destination: NotificationPreferencesView(appState: appState)) {
-                            SettingsRow(icon: "bell", title: "Notifications", color: AppColors.primary)
+                            SettingsRow(icon: "bell", title: LocalizedString("settings_notifications", lang), color: AppColors.primary)
                         }
                     }
                 }
 
-                Section("Unit") {
+                Section(header: Text(LocalizedString("settings_section_unit", lang))) {
                     if let unit = appState.currentUnit {
                         HStack {
                             Text(unit.displayName)
@@ -57,47 +58,64 @@ struct SettingsView: View {
                         }
                     }
                     Button(action: { showChangeUnit = true }) {
-                        SettingsRow(icon: "building.2", title: "Change unit", color: AppColors.primary)
+                        SettingsRow(icon: "building.2", title: LocalizedString("settings_change_unit", lang), color: AppColors.primary)
                     }
                 }
 
-                Section("Security & Privacy") {
+                Section(header: Text(LocalizedString("settings_section_security", lang))) {
                     NavigationLink(destination: PrivacyAccessView()) {
-                        SettingsRow(icon: "lock.shield", title: "Privacy & Access", color: AppColors.primary)
+                        SettingsRow(icon: "lock.shield", title: LocalizedString("settings_privacy_access", lang), color: AppColors.primary)
                     }
                 }
 
-                Section("Help & Support") {
+                Section(header: Text(LocalizedString("settings_section_help", lang))) {
                     NavigationLink(destination: HelpView(appState: appState)) {
-                        SettingsRow(icon: "questionmark.circle.fill", title: "Help", color: AppColors.primary)
+                        SettingsRow(icon: "questionmark.circle.fill", title: LocalizedString("settings_help", lang), color: AppColors.primary)
+                    }
+
+                    NavigationLink(destination: AboutView(appState: appState)) {
+                        SettingsRow(icon: "info.circle.fill", title: LocalizedString("settings_about", lang), color: AppColors.primary)
                     }
                     
-                    NavigationLink(destination: AboutView(appState: appState)) {
-                        SettingsRow(icon: "info.circle.fill", title: "About", color: AppColors.primary)
+                    NavigationLink(destination: LocalizationDebugView(appState: appState)) {
+                        SettingsRow(icon: "ant.fill", title: "Debug Localization", color: AppColors.danger)
                     }
+                }
+
+                Section(header: Text(LocalizedString("settings_section_language", lang))) {
+                    Picker(LocalizedString("language_picker_label", lang), selection: Binding(
+                        get: { appState.languageCode },
+                        set: { appState.setLanguage($0) }
+                    )) {
+                        Text(LocalizedString("language_option_sv", lang))
+                            .tag("sv")
+                        Text(LocalizedString("language_option_en", lang))
+                            .tag("en")
+                    }
+                    .pickerStyle(.segmented)
                 }
                 
                 Section {
                     Button(action: {
                         showLogoutConfirmation = true
                     }) {
-                        SettingsRow(icon: "arrow.right.square.fill", title: "Log out", color: AppColors.danger)
+                        SettingsRow(icon: "arrow.right.square.fill", title: LocalizedString("settings_logout", lang), color: AppColors.danger)
                     }
                 }
             }
             .listStyle(.insetGrouped)
             .background(AppColors.background)
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.large)
-            .confirmationDialog("Log out?", isPresented: $showLogoutConfirmation) {
-                Button("Log out", role: .destructive) {
+            .navigationTitle(LocalizedString("settings_nav_title", lang))
+            .navigationBarTitleDisplayMode(.inline)
+            .confirmationDialog(LocalizedString("settings_logout_prompt", lang), isPresented: $showLogoutConfirmation) {
+                Button(LocalizedString("settings_logout", lang), role: .destructive) {
                     Task {
                         await appState.signOut()
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(LocalizedString("general_cancel", lang), role: .cancel) {}
             } message: {
-                Text("You will need to sign in again with your email and password.")
+                Text(LocalizedString("settings_logout_detail", lang))
             }
             .sheet(isPresented: $showChangeUnit) {
                 ChangeUnitSheet(appState: appState) {
@@ -118,10 +136,11 @@ struct ChangeUnitSheet: View {
     private let staffService = StaffService()
 
     var body: some View {
+        let lang = appState.languageCode
         NavigationView {
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Unit code")
+                    Text(LocalizedString("settings_unit_code_label", lang))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                     TextField("", text: $joinCode)
@@ -147,7 +166,7 @@ struct ChangeUnitSheet: View {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                         } else {
-                            Text("Join unit")
+                    Text(LocalizedString("settings_join_unit_button", lang))
                                 .font(.headline)
                         }
                     }
@@ -164,11 +183,11 @@ struct ChangeUnitSheet: View {
             }
             .padding(.top, 24)
             .background(AppColors.background)
-            .navigationTitle("Change unit")
+            .navigationTitle(LocalizedString("settings_join_unit_title", lang))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { onDismiss() }
+                    Button(LocalizedString("general_cancel", lang)) { onDismiss() }
                 }
             }
         }

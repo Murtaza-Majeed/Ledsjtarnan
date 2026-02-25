@@ -12,6 +12,7 @@ struct AssessmentFormView: View {
     let client: Client
     let assessmentType: String
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject private var logicStore: LogicReferenceStore
     @State private var assessment: Assessment?
     @State private var answers: [String: AnyCodable] = [:]
     @State private var notes = ""
@@ -31,21 +32,23 @@ struct AssessmentFormView: View {
     @State private var planBuilderStartStep: PlanBuilderView.PlanBuilderStep = .focus
     @State private var planBuilderFocusSelection: Set<String> = []
     @State private var navigateToPlanBuilder = false
+    @Environment(\.languageCode) var lang
     private let assessmentService = AssessmentService()
     private let clientService = ClientService()
     private let chapterSuggestionMap: [String: [String]] = [
-        "health": ["Kropp & Hälsa – KrisKlar", "Sömn & rutiner"],
-        "education": ["Utbildning & arbete – Startplan", "Struktur i vardagen"],
-        "social": ["Relationer & kommunikation", "DBT-färdigheter"],
-        "independence": ["Självständighet – Budget basics", "Vardag & ADL"],
-        "relationships": ["Nätverk & stödpersoner", "Familjekarta"],
-        "identity": ["Identitet & framtidstro", "Min berättelse"],
-        "substance": ["Livlinan – Återfallsprevention", "Motivationsplan A-CRA"],
-        "attachment": ["Trygga relationer", "Signs of Safety"],
-        "mentalHealth": ["Må bra-plan", "Känslohantering"],
-        "severeMentalHealth": ["Krisplan & säkerhet", "Psykologkontakt"],
-        "trauma": ["Traumasäker start", "Livlinan – PTSD-stöd"]
+        "KROPP_HÄLSA": ["Kropp & Hälsa – KrisKlar", "Sömn & rutiner"],
+        "UTBILDNING_ARBETE": ["Utbildning & arbete – Startplan", "Struktur i vardagen"],
+        "SOCIAL_KOMPETENS": ["Relationer & kommunikation", "DBT-färdigheter"],
+        "SJALVSTANDIGHET_VARDAG": ["Självständighet – Budget basics", "Vardag & ADL"],
+        "RELATIONER_NATVERK": ["Nätverk & stödpersoner", "Familjekarta"],
+        "IDENTITET_UTVECKLING": ["Identitet & framtidstro", "Min berättelse"],
+        "ALKOHOL_DROGER": ["Livlinan – Återfallsprevention", "Motivationsplan A-CRA"],
+        "ANKNYTNING_RELATIONER": ["Trygga relationer", "Signs of Safety"],
+        "PSYKISK_OHALSA": ["Må bra-plan", "Känslohantering"],
+        "ALLVARLIG_PSYKISK_OHALSA": ["Krisplan & säkerhet", "Psykologkontakt"],
+        "TRAUMA": ["Traumasäker start", "Livlinan – PTSD-stöd"]
     ]
+
     private var requiredSalutogenicScaleKeys: [String] {
         AssessmentDefinition.domains.flatMap { domain in
             domain.questions.compactMap { question -> String? in
@@ -161,7 +164,7 @@ struct AssessmentFormView: View {
                 .padding(.horizontal)
         }
         if isLoading {
-            ProgressView("Loading…")
+            ProgressView(LocalizedString("assessment_loading", lang))
                 .frame(maxWidth: .infinity)
                 .padding()
         } else {
@@ -212,7 +215,7 @@ struct AssessmentFormView: View {
                 Button {
                     Task { await presentSummary() }
                 } label: {
-                    Label("Summary", systemImage: "chart.bar")
+                    Label(LocalizedString("assessment_summary_button", lang), systemImage: "chart.bar")
                         .font(.subheadline)
                 }
             }
@@ -223,40 +226,37 @@ struct AssessmentFormView: View {
     private var salutogenicSection: some View {
         VStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Del 1: Salutogena livsområden")
+                Text(LocalizedString("assessment_section_salutogenic_title", lang))
                     .font(.title2.bold())
                     .foregroundColor(AppColors.textPrimary)
-                Text("Skala: 1 = stort behov av stöd, 5 = inget behov av stöd")
+                Text(LocalizedString("assessment_section_salutogenic_scale", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
             .padding(.horizontal)
 
             ForEach(AssessmentDefinition.domains, id: \.key) { domain in
+                let logicDomain = logicStore.domain(forAppKey: domain.key)
+                let questionList = questionsForDomain(domain)
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: domain.icon)
                             .foregroundColor(AppColors.primary)
                             .font(.title3)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(domain.title)
+                            Text(logicDomain?.label ?? domain.title)
                                 .font(.headline)
                                 .foregroundColor(AppColors.textPrimary)
-                            Text(domain.subtitle)
+                            Text(logicDomain?.description ?? domain.subtitle)
                                 .font(.subheadline)
                                 .foregroundColor(AppColors.textSecondary)
                         }
                         Spacer()
                     }
 
-                    ForEach(domain.questions, id: \.key) { q in
+                    ForEach(questionList, id: \.key) { q in
                         questionView(domainKey: domain.key, question: q)
                     }
-                    priorityPicker(
-                        storageKey: "\(domain.key).\(DomainQuestionKeys.priority)",
-                        title: "Prioritering",
-                        helpText: "Styr vilka områden som bör prioriteras i planen."
-                    )
                 }
                 .padding()
                 .background(AppColors.secondarySurface)
@@ -270,19 +270,28 @@ struct AssessmentFormView: View {
     private var problemAreasSection: some View {
         VStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Del 2: Problemområden")
+                Text(LocalizedString("assessment_section_problem_title", lang))
                     .font(.title2.bold())
                     .foregroundColor(AppColors.textPrimary)
                     .padding(.top, 20)
-                Text("Skala: 1 = inget problem, 5 = allvarligt problem")
+                Text(LocalizedString("assessment_section_problem_scale", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
             .padding(.horizontal)
 
-            ForEach(AssessmentDefinition.allProblemDomains, id: \.key) { domain in
-                ProblemAreaFormView(domain: domain, answers: $answers, missingKeys: missingKeys)
-                    .padding([.top, .bottom], 8)
+            let logicDomains = logicStore.problemDomains
+            if logicDomains.isEmpty {
+                Text(LocalizedString("assessment_section_problem_loading", lang))
+                    .font(.footnote)
+                    .foregroundColor(AppColors.textSecondary)
+                    .padding(.horizontal)
+            } else {
+                ForEach(logicDomains, id: \.code) { logicDomain in
+                    let mapped = logicDomain.asExtendedDomain()
+                    ProblemAreaFormView(domain: mapped, answers: $answers, missingKeys: missingKeys)
+                        .padding([.top, .bottom], 8)
+                }
             }
         }
     }
@@ -290,11 +299,11 @@ struct AssessmentFormView: View {
     private var traumaSection: some View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Del 3: Traumabedömning (STRESS)")
+                Text(LocalizedString("assessment_section_trauma_title", lang))
                     .font(.title2.bold())
                     .foregroundColor(AppColors.textPrimary)
                     .padding(.top, 20)
-                Text("Strukturerad intervju om traumatiska erfarenheter och PTSD-symtom")
+                Text(LocalizedString("assessment_section_trauma_subtitle", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -304,15 +313,15 @@ struct AssessmentFormView: View {
                 .padding([.top, .bottom], 8)
             priorityPicker(
                 storageKey: "trauma.\(ProblemQuestionKeys.priority)",
-                title: "Prioritering (trauma)",
-                helpText: "Sätt prioritet för traumarelaterade insatser."
+                title: LocalizedString("assessment_trauma_priority_title", lang),
+                helpText: LocalizedString("assessment_trauma_priority_help", lang)
             )
         }
     }
 
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Anteckningar")
+            Text(LocalizedString("assessment_notes", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
             TextField("", text: $notes, axis: .vertical)
@@ -329,7 +338,7 @@ struct AssessmentFormView: View {
     private var saveCompleteButtons: some View {
         HStack(spacing: 12) {
             Button(action: { Task { await saveDraft() } }) {
-                Text("Save draft")
+                Text(LocalizedString("assessment_save_draft", lang))
                     .font(.headline)
                     .foregroundColor(AppColors.primary)
                     .frame(maxWidth: .infinity)
@@ -339,7 +348,7 @@ struct AssessmentFormView: View {
             }
             .disabled(isSaving)
             Button(action: { Task { await presentSummary() } }) {
-                Text("Complete")
+                Text(LocalizedString("assessment_complete", lang))
                     .font(.headline)
                     .foregroundColor(AppColors.onPrimary)
                     .frame(maxWidth: .infinity)
@@ -384,8 +393,24 @@ struct AssessmentFormView: View {
             }
         }
         .background(AppColors.background)
-        .navigationTitle(isBaseline ? "Baseline Assessment" : "Follow-up")
+        .navigationTitle(isBaseline ? LocalizedString("assessment_nav_title_baseline", lang) : LocalizedString("assessment_nav_title_followup", lang))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    Task { await logicStore.refreshReference() }
+                } label: {
+                    if logicStore.isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+                .disabled(logicStore.isLoading)
+                .accessibilityLabel(LocalizedString("assessment_refresh_accessibility", lang))
+            }
+        }
         .task {
             await loadOrCreateAssessment()
         }
@@ -462,6 +487,50 @@ struct AssessmentFormView: View {
         }
     }
 
+    private func questionsForDomain(_ domain: AssessmentDomainDefinition) -> [AssessmentQuestion] {
+        let slots = logicStore.scoreSlots(forAppKey: domain.key)
+        guard !slots.isEmpty else { return domain.questions }
+        return slots.compactMap { slot in
+            question(from: slot)
+        }
+    }
+
+    private func question(from slot: LogicDomainScoreSlot) -> AssessmentQuestion? {
+        let helpText = slot.description
+        switch slot.slotCode {
+        case "I":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.clientScore,
+                label: slot.label,
+                helpText: helpText,
+                type: .scale(slot.scaleMin, slot.scaleMax)
+            )
+        case "I_STAFF":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.staffAssessment,
+                label: slot.label,
+                helpText: helpText,
+                type: .scale(slot.scaleMin, slot.scaleMax)
+            )
+        case "M":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.importance,
+                label: slot.label,
+                helpText: helpText,
+                type: .scale(slot.scaleMin, slot.scaleMax)
+            )
+        case "P":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.priority,
+                label: slot.label,
+                helpText: helpText ?? "Styr vilka områden som prioriteras i planen.",
+                type: .priority
+            )
+        default:
+            return nil
+        }
+    }
+
     @ViewBuilder
     private func questionView(domainKey: String, question: AssessmentQuestion) -> some View {
         let key = "\(domainKey).\(question.key)"
@@ -482,6 +551,11 @@ struct AssessmentFormView: View {
                 Text(question.label)
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
+                if let help = question.helpText, !help.isEmpty {
+                    Text(help)
+                        .font(.caption)
+                        .foregroundColor(AppColors.textSecondary.opacity(0.8))
+                }
                 HStack(spacing: 8) {
                     ForEach(options, id: \.self) { n in
                         let isSelected = binding.wrappedValue == n
@@ -523,6 +597,11 @@ struct AssessmentFormView: View {
                 Text(question.label)
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
+                if let help = question.helpText, !help.isEmpty {
+                    Text(help)
+                        .font(.caption)
+                        .foregroundColor(AppColors.textSecondary.opacity(0.8))
+                }
                 TextField("", text: binding)
                     .textFieldStyle(.plain)
                     .padding()
@@ -533,7 +612,7 @@ struct AssessmentFormView: View {
             priorityPicker(
                 storageKey: key,
                 title: question.label,
-                helpText: "Hög = direkt fokus, Låg = kan avvakta."
+                helpText: question.helpText ?? "Hög = direkt fokus, Låg = kan avvakta."
             )
         }
     }
@@ -593,7 +672,7 @@ struct AssessmentFormView: View {
 
     private func loadOrCreateAssessment() async {
         guard let unitId = appState.currentUnit?.id else {
-            await MainActor.run { errorMessage = "No unit."; isLoading = false }
+            await MainActor.run { errorMessage = LocalizedString("assessment_error_no_unit", lang); isLoading = false }
             return
         }
         let staffId = appState.currentStaffProfile?.id
@@ -673,7 +752,7 @@ struct AssessmentFormView: View {
         guard let a = assessment else { return }
         updateValidationState()
         guard missingKeys.isEmpty else {
-            errorMessage = "Complete all required fields before submitting."
+            errorMessage = LocalizedString("assessment_validation_missing", lang)
             return
         }
         await MainActor.run {
@@ -687,8 +766,8 @@ struct AssessmentFormView: View {
 
             if let unitId = appState.currentUnit?.id,
                let staffId = appState.currentStaffProfile?.id {
-                let title = assessmentType == "baseline" ? "Baseline completed" : "Follow-up completed"
-                let description = "Completed \(completedDomainCount)/\(summaryDomains.count) domains."
+                let title = assessmentType == "baseline" ? LocalizedString("assessment_timeline_title_baseline", lang) : LocalizedString("assessment_timeline_title_followup", lang)
+                let description = String(format: LocalizedString("assessment_timeline_description", lang), completedDomainCount, summaryDomains.count)
                 try? await clientService.createTimelineEvent(
                     clientId: client.id,
                     unitId: unitId,

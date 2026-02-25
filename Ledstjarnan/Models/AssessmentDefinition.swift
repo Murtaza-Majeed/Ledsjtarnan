@@ -51,8 +51,8 @@ struct AssessmentModule {
         self.usesStandardIMPScores = usesStandardIMPScores
     }
 
-    fileprivate func asAssessmentDomain() -> AssessmentDomain {
-        AssessmentDomain(
+    fileprivate func asAssessmentDomain() -> AssessmentDomainDefinition {
+        AssessmentDomainDefinition(
             key: key,
             title: title,
             subtitle: subtitle,
@@ -100,7 +100,7 @@ enum ProblemQuestionKeys {
 }
 
 struct AssessmentDefinition {
-    static let domains: [AssessmentDomain] = salutogenicModules.map { $0.asAssessmentDomain() }
+    static let domains: [AssessmentDomainDefinition] = salutogenicModules.map { $0.asAssessmentDomain() }
     
     static func scores(from answers: [String: AnyCodable]) -> [AssessmentDomainScore] {
         domains.map { domain in
@@ -265,7 +265,7 @@ struct AssessmentDefinition {
     }
 }
 
-struct AssessmentDomain {
+struct AssessmentDomainDefinition {
     let key: String
     let title: String
     let subtitle: String
@@ -273,13 +273,13 @@ struct AssessmentDomain {
     let questions: [AssessmentQuestion]
 }
 
-extension AssessmentDomain: Identifiable {
+extension AssessmentDomainDefinition: Identifiable {
     var id: String { key }
 }
 
 struct AssessmentDomainScore: Identifiable {
     let id = UUID()
-    let domain: AssessmentDomain
+    let domain: AssessmentDomainDefinition
     let average: Double?
     let answeredCount: Int
     
@@ -302,7 +302,15 @@ struct AssessmentDomainScore: Identifiable {
 struct AssessmentQuestion {
     let key: String
     let label: String
+    let helpText: String?
     let type: QuestionType
+
+    init(key: String, label: String, helpText: String? = nil, type: QuestionType) {
+        self.key = key
+        self.label = label
+        self.helpText = helpText
+        self.type = type
+    }
 
     enum QuestionType {
         case scale(Int, Int)

@@ -200,11 +200,14 @@ enum BaselineDomainFlowConfig {
 enum DomainCompletionStatus {
     case notStarted, inProgress, completed
 
-    var label: String {
+    var localizedLabel: String {
         switch self {
-        case .notStarted: return "Not started"
-        case .inProgress: return "In progress"
-        case .completed: return "Completed"
+        case .notStarted:
+            return LocalizedString("domain_status_not_started", "sv")
+        case .inProgress:
+            return LocalizedString("domain_status_in_progress", "sv")
+        case .completed:
+            return LocalizedString("domain_status_completed", "sv")
         }
     }
 
@@ -222,6 +225,16 @@ enum DomainAnswerKey {
     static func notes(_ domainKey: String) -> String { "\(domainKey).notes" }
     static func needs(_ domainKey: String) -> String { "\(domainKey).needs" }
     static func status(_ domainKey: String) -> String { "\(domainKey).__status" }
+    static func interviewQuestion(_ domainKey: String, questionKey: String) -> String { "\(domainKey).\(questionKey)" }
+
+    static let specialSuffixes: Set<String> = ["readiness", "notes", "needs", "__status"]
+
+    static func isSpecialKey(_ key: String, forDomain domainKey: String) -> Bool {
+        let prefix = "\(domainKey)."
+        guard key.hasPrefix(prefix) else { return false }
+        let suffix = String(key.dropFirst(prefix.count))
+        return specialSuffixes.contains(suffix)
+    }
 }
 
 enum AssessmentAnswerPayloadBuilder {

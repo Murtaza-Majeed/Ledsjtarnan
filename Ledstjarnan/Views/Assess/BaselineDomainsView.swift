@@ -11,6 +11,9 @@ struct BaselineDomainsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var appState: AppState
     let client: Client
+    @EnvironmentObject private var logicStore: LogicReferenceStore
+    
+    private var lang: String { appState.languageCode }
 
     @State private var assessment: Assessment?
     @State private var answers: [String: AnyCodable] = [:]
@@ -21,8 +24,6 @@ struct BaselineDomainsView: View {
     @State private var selectedDomain: BaselineDomain?
 
     private let assessmentService = AssessmentService()
-    private let salutogenicDomains = BaselineDomainFlowConfig.salutogenicDomains
-    private let pathogenicDomains = BaselineDomainFlowConfig.pathogenicDomains
 
     private var completedCount: Int {
         BaselineDomainFlowConfig.allDomains.filter { status(for: $0) == .completed }.count
@@ -34,7 +35,7 @@ struct BaselineDomainsView: View {
         VStack(spacing: 0) {
             topBar
             if isLoading {
-                ProgressView("Loading baseline…")
+                ProgressView(LocalizedString("baseline_loading", lang))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let loadError {
                 ErrorStateView(message: loadError) {
@@ -50,8 +51,8 @@ struct BaselineDomainsView: View {
                                 .padding(.horizontal)
                         }
                         progressCard
-                        domainSection(title: "Salutogena kapital", domains: salutogenicDomains)
-                        domainSection(title: "Patogena kapital", domains: pathogenicDomains)
+                        domainSection(title: LocalizedString("baseline_section_salutogenic", lang), domains: displayDomains(in: BaselineDomainFlowConfig.salutogenicDomains))
+                        domainSection(title: LocalizedString("baseline_section_pathogenic", lang), domains: displayDomains(in: BaselineDomainFlowConfig.pathogenicDomains))
                     }
                     .padding(.vertical, 16)
                 }
@@ -79,14 +80,14 @@ struct BaselineDomainsView: View {
             Button {
                 dismiss()
             } label: {
-                Label("Back", systemImage: "chevron.left")
+                Label(LocalizedString("general_back", lang), systemImage: "chevron.left")
                     .font(.subheadline.weight(.semibold))
             }
             .tint(AppColors.textPrimary)
 
             Spacer()
             VStack(spacing: 2) {
-                Text("Baseline domains")
+            Text(LocalizedString("baseline_title", lang))
                     .font(.headline)
                 Text(client.displayName)
                     .font(.caption)
@@ -102,16 +103,16 @@ struct BaselineDomainsView: View {
 
     private var progressCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Progress: \(completedCount)/\(totalCount) completed")
+            Text(String(format: LocalizedString("baseline_progress", lang), completedCount, totalCount))
                 .font(.subheadline.weight(.semibold))
             ProgressView(value: Double(completedCount), total: Double(totalCount))
                 .accentColor(AppColors.primary)
             if let assessment, assessment.status == "completed" {
-                Label("Baseline completed \(formattedDate(assessment.completedAt))", systemImage: "checkmark.seal.fill")
+                Label(String(format: LocalizedString("baseline_completed_label", lang), formattedDate(assessment.completedAt)), systemImage: "checkmark.seal.fill")
                     .font(.caption)
                     .foregroundColor(AppColors.success)
             } else {
-                Text("Baseline stays in draft until all domains are completed.")
+                Text(LocalizedString("baseline_draft_notice", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -123,7 +124,7 @@ struct BaselineDomainsView: View {
         .padding(.horizontal)
     }
 
-    private func domainSection(title: String, domains: [BaselineDomain]) -> some View {
+    private func domainSection(title: String, domains: [BaselineDisplayDomain]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.title3.bold())
@@ -132,7 +133,7 @@ struct BaselineDomainsView: View {
                 ForEach(domains) { domain in
                     Button {
                         if assessment != nil {
-                            selectedDomain = domain
+                            selectedDomain = domain.base
                         }
                     } label: {
                         HStack(spacing: 16) {
@@ -149,9 +150,14 @@ struct BaselineDomainsView: View {
                                 Text(domain.subtitle)
                                     .font(.caption)
                                     .foregroundColor(AppColors.textSecondary)
-                                Text(status(for: domain).label)
+                                if domain.questionCount > 0 {
+                                Text(String(format: LocalizedString("domain_question_count_short", lang), domain.questionCount))
+                                        .font(.caption2)
+                                        .foregroundColor(AppColors.textSecondary)
+                                }
+                                Text(status(for: domain.base).localizedLabel)
                                     .font(.caption2)
-                                    .foregroundColor(color(for: status(for: domain)))
+                                    .foregroundColor(color(for: status(for: domain.base)))
                             }
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -177,7 +183,7 @@ struct BaselineDomainsView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: AppColors.primary))
                     }
-                    Text("Finish later")
+                    Text(LocalizedString("baseline_finish_later", lang))
                         .font(.headline)
                         .foregroundColor(AppColors.primary)
                 }
@@ -187,7 +193,7 @@ struct BaselineDomainsView: View {
                 .cornerRadius(16)
             }
             .disabled(isSavingDraft)
-            Text("Saves your progress and returns to Assess dashboard.")
+            Text(LocalizedString("baseline_finish_later_subtext", lang))
                 .font(.caption)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -290,6 +296,21 @@ struct BaselineDomainsView: View {
             }
         }
     }
+
+    private func displayDomains(in domains: [BaselineDomain]) -> [BaselineDisplayDomain] {
+        domains.map { domain in
+            let logic = logicStore.domain(forAppKey: domain.key)
+            let sections = logicStore.interviewSections(forAppKey: domain.key)
+            let questionCount = sections.reduce(0) { result, section in
+                result + (section.questions?.count ?? 0)
+            }
+            return BaselineDisplayDomain(
+                base: domain,
+                logic: logic,
+                questionCount: questionCount > 0 ? questionCount : domain.questionCount
+            )
+        }
+    }
 }
 
 private struct ErrorStateView: View {
@@ -308,4 +329,15 @@ private struct ErrorStateView: View {
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+}
+
+private struct BaselineDisplayDomain: Identifiable {
+    let base: BaselineDomain
+    let logic: LogicAssessmentDomain?
+    let questionCount: Int
+
+    var id: String { base.id }
+    var title: String { logic?.label ?? base.title }
+    var subtitle: String { logic?.description ?? base.subtitle }
+    var icon: String { base.icon }
 }
