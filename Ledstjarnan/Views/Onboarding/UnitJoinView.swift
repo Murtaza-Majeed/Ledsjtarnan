@@ -13,6 +13,8 @@ struct UnitJoinView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     private let staffService = StaffService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         NavigationView {
@@ -26,11 +28,11 @@ struct UnitJoinView: View {
 
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
-                        Text("Connect to your home")
+                        Text(LocalizedString("onboarding_join_unit_title", lang))
                             .font(.title.bold())
                             .foregroundColor(AppColors.textPrimary)
                             .multilineTextAlignment(.center)
-                        Text("Ask your unit lead for the current 6-digit join code.")
+                        Text(LocalizedString("onboarding_join_unit_subtitle", lang))
                             .font(.subheadline)
                             .foregroundColor(AppColors.textSecondary)
                             .multilineTextAlignment(.center)
@@ -42,7 +44,7 @@ struct UnitJoinView: View {
                         HStack {
                             Image(systemName: "number.circle")
                                 .foregroundColor(AppColors.primary)
-                            Text("Unit join code")
+                            Text(LocalizedString("onboarding_unit_code", lang))
                                 .font(.headline)
                                 .foregroundColor(AppColors.textPrimary)
                             Spacer()
@@ -73,7 +75,7 @@ struct UnitJoinView: View {
                                     ProgressView()
                                         .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                 } else {
-                                    Text("Join unit")
+                                    Text(LocalizedString("onboarding_join_button", lang))
                                         .font(.headline)
                                 }
                             }

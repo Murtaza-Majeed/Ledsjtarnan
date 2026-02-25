@@ -24,6 +24,7 @@ struct CreateClientView: View {
     
     private let clientService = ClientService()
     private let staffService = StaffService()
+    private var lang: String { appState.languageCode }
     
     private var trimmedName: String {
         nameOrCode.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -39,8 +40,8 @@ struct CreateClientView: View {
                 header
                 ScrollView {
                     VStack(spacing: 24) {
-                        FormFieldContainer(title: "Name/Code") {
-                            TextField("e.g., A12 • Noor", text: $nameOrCode)
+                        FormFieldContainer(title: LocalizedString("create_client_name", lang)) {
+                            TextField(LocalizedString("create_client_name_placeholder", lang), text: $nameOrCode)
                                 .textFieldStyle(.plain)
                                 .padding(.vertical, 8)
                         }
@@ -104,7 +105,7 @@ struct CreateClientView: View {
                                 .progressViewStyle(.circular)
                                 .tint(AppColors.onPrimary)
                         }
-                        Text("Create")
+                        Text(LocalizedString("create_client_button", lang))
                             .font(.headline)
                     }
                     .frame(maxWidth: .infinity)
@@ -139,13 +140,13 @@ struct CreateClientView: View {
             Button(action: { dismiss() }) {
                 HStack(spacing: 6) {
                     Image(systemName: "chevron.left")
-                    Text("Back")
+                    Text(LocalizedString("general_back", lang))
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(AppColors.primary)
             }
             Spacer()
-            Text("New client")
+            Text(LocalizedString("create_client_title", lang))
                 .font(.title2.weight(.bold))
                 .foregroundColor(AppColors.textPrimary)
             Spacer()
@@ -196,7 +197,7 @@ struct CreateClientView: View {
     
     private func createClient() {
         guard !trimmedName.isEmpty else {
-            creationError = "Name/Code is required."
+            creationError = LocalizedString("create_client_validation_name", lang)
             return
         }
         guard let unitId = selectedUnitId else {
@@ -231,7 +232,7 @@ struct CreateClientView: View {
                 }
             } catch {
                 await MainActor.run {
-                    creationError = "Couldn't create client. \(error.localizedDescription)"
+                    creationError = "\(LocalizedString("create_client_error", lang)). \(error.localizedDescription)"
                     isCreating = false
                 }
             }

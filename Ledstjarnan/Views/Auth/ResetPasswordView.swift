@@ -14,6 +14,8 @@ struct ResetPasswordView: View {
     @State private var isSending = false
     @State private var showSuccess = false
     
+    private var lang: String { appState.languageCode }
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -24,7 +26,7 @@ struct ResetPasswordView: View {
                             .foregroundColor(AppColors.primary)
                     }
                     
-                    Text("Reset password")
+                    Text(LocalizedString("auth_reset_title", lang))
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(AppColors.textPrimary)
@@ -47,7 +49,7 @@ struct ResetPasswordView: View {
                                     .fontWeight(.semibold)
                                     .foregroundColor(AppColors.textPrimary)
                                 
-                                Text("Check your inbox for a reset link.")
+                                Text(LocalizedString("auth_reset_success", lang))
                                     .font(.subheadline)
                                     .foregroundColor(AppColors.textSecondary)
                                     .multilineTextAlignment(.center)
@@ -55,13 +57,13 @@ struct ResetPasswordView: View {
                             .padding(.top, 60)
                         } else {
                             VStack(alignment: .leading, spacing: 16) {
-                                Text("Enter your email and we will send a reset link.")
+                                Text(LocalizedString("auth_reset_subtitle", lang))
                                     .font(.body)
                                     .foregroundColor(AppColors.textPrimary)
                                     .padding(.top, 40)
                                 
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("Email")
+                                    Text(LocalizedString("auth_reset_email", lang))
                                         .font(.subheadline)
                                         .foregroundColor(AppColors.textSecondary)
                                     TextField("", text: $email)
@@ -95,7 +97,7 @@ struct ResetPasswordView: View {
                 VStack(spacing: 12) {
                     if showSuccess {
                         Button(action: { dismiss() }) {
-                            Text("Back to login")
+                            Text(LocalizedString("auth_reset_back_to_login", lang))
                                 .font(.headline)
                                 .foregroundColor(AppColors.onPrimary)
                                 .frame(maxWidth: .infinity)
@@ -112,7 +114,7 @@ struct ResetPasswordView: View {
                                     ProgressView()
                                         .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                 } else {
-                                    Text("Send reset link")
+                                    Text(LocalizedString("auth_reset_button", lang))
                                         .font(.headline)
                                 }
                             }
@@ -125,7 +127,7 @@ struct ResetPasswordView: View {
                         .disabled(isSending || email.isEmpty)
                         
                         Button(action: { dismiss() }) {
-                            Text("Back to login")
+                            Text(LocalizedString("auth_reset_back_to_login", lang))
                                 .font(.subheadline)
                                 .foregroundColor(AppColors.primary)
                                 .frame(maxWidth: .infinity)

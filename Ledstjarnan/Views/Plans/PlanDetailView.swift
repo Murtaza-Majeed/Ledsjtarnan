@@ -16,6 +16,8 @@ struct PlanDetailView: View {
     @State private var loading = true
     private let planService = PlanService()
     private let livbojenService = LivbojenService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         ScrollView {
@@ -48,7 +50,7 @@ struct PlanDetailView: View {
                         .padding()
                 } else {
                     if !goals.isEmpty {
-                        sectionTitle("Goals")
+                        sectionTitle(LocalizedString("plan_detail_goals", lang))
                         VStack(alignment: .leading, spacing: 8) {
                             ForEach(goals) { g in
                                 Text(g.goalText)
@@ -64,7 +66,7 @@ struct PlanDetailView: View {
                         .padding(.horizontal)
                     }
                     if !actions.isEmpty {
-                        sectionTitle("Actions")
+                        sectionTitle(LocalizedString("plan_detail_interventions", lang))
                         VStack(alignment: .leading, spacing: 8) {
                             ForEach(actions) { a in
                                 HStack {
@@ -104,12 +106,12 @@ struct PlanDetailView: View {
             .padding(.vertical, 20)
         }
         .background(AppColors.background)
-        .navigationTitle("Plan")
+        .navigationTitle(LocalizedString("plan_detail_title", lang))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 NavigationLink(destination: PlanBuilderView(appState: appState, client: nil, plan: plan, clientName: clientName)) {
-                    Text("Edit")
+                    Text(LocalizedString("general_edit", lang))
                         .foregroundColor(AppColors.primary)
                 }
             }

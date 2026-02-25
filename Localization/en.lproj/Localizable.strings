@@ -1,22 +1,150 @@
+// MARK: - General / Common
 "general_back" = "Back";
 "general_save" = "Save";
 "general_cancel" = "Cancel";
 "general_discard" = "Discard";
 "general_yes" = "Yes";
 "general_no" = "No";
+"general_ok" = "OK";
 "general_required" = "Required";
 "general_loading" = "Loading";
+"general_error" = "Error";
+"general_retry" = "Retry";
+"general_delete" = "Delete";
+"general_edit" = "Edit";
+"general_done" = "Done";
+"general_close" = "Close";
+"general_continue" = "Continue";
+"general_next" = "Next";
+"general_previous" = "Previous";
+"general_finish" = "Finish";
+"general_optional" = "Optional";
+"general_search" = "Search";
+"general_filter" = "Filter";
+"general_all" = "All";
+"general_none" = "None";
+"general_success" = "Success";
+"general_failed" = "Failed";
+"general_unknown" = "Unknown";
 
+// MARK: - Tabs
+"tab_clients" = "Clients";
+"tab_assess" = "Assess";
+"tab_plans" = "Plans";
+"tab_schedule" = "Schedule";
+"tab_settings" = "Settings";
+
+// MARK: - Authentication
+"auth_login_title" = "Ledstjärnan";
+"auth_login_subtitle" = "Structure, clarity and calm for every contact moment.";
+"auth_login_signin" = "Sign in to continue";
+"auth_login_email" = "Email";
+"auth_login_password" = "Password";
+"auth_login_forgot_password" = "Forgot password?";
+"auth_login_button" = "Sign in";
+"auth_login_need_access" = "Need access? Contact your unit admin.";
+"auth_login_error_invalid" = "Incorrect email or password";
+"auth_reset_title" = "Reset password";
+"auth_reset_subtitle" = "Enter your email to receive reset instructions";
+"auth_reset_email" = "Email";
+"auth_reset_button" = "Send reset link";
+"auth_reset_success" = "Check your email for reset instructions";
+"auth_reset_back_to_login" = "Back to login";
+
+// MARK: - Onboarding
+"onboarding_welcome_title" = "Welcome to Ledstjärnan";
+"onboarding_welcome_subtitle" = "A structured approach to youth care";
+"onboarding_step1_title" = "Assess holistically";
+"onboarding_step1_text" = "Use evidence-based tools like Ledstjärnan logic and STRESS trauma screening";
+"onboarding_step2_title" = "Build plans collaboratively";
+"onboarding_step2_text" = "Create treatment plans based on assessment insights";
+"onboarding_step3_title" = "Track progress";
+"onboarding_step3_text" = "Follow-ups help you see what's working and adjust as needed";
+"onboarding_get_started" = "Get started";
+"onboarding_join_unit_title" = "Join your unit";
+"onboarding_join_unit_subtitle" = "Enter your unit code to get started";
+"onboarding_unit_code" = "Unit code";
+"onboarding_join_button" = "Join unit";
+"onboarding_join_error" = "Invalid unit code";
+"onboarding_skip" = "Skip for now";
+
+// MARK: - Clients
+"clients_title" = "Clients";
+"clients_search_placeholder" = "Search name / code";
+"clients_filter_all" = "All";
+"clients_filter_my_clients" = "My clients";
+"clients_filter_due_soon" = "Due soon";
+"clients_filter_not_linked" = "Not linked";
+"clients_filter_flags" = "Flags";
+"clients_empty_no_unit_title" = "No unit selected";
+"clients_empty_no_unit_message" = "Select a unit in Settings to see your caseload.";
+"clients_empty_no_clients_title" = "No clients yet";
+"clients_empty_no_clients_message" = "Tap the + button to add your first client.";
+"clients_empty_no_match_title" = "No clients match";
+"clients_empty_no_match_message" = "Try a different search or reset the filters.";
+"clients_empty_action_new" = "New client";
+"clients_empty_action_reset" = "Reset filters";
+"clients_loading" = "Loading clients…";
+"clients_error_load" = "Couldn't load clients";
+"clients_error_no_unit" = "No unit selected. Complete your staff profile to choose a unit.";
+"clients_new_button" = "New client";
+"clients_status_baseline" = "Baseline";
+"clients_status_plan" = "Plan";
+"clients_status_linked" = "Linked";
+"clients_status_not_linked" = "Not linked";
+"clients_next_followup" = "Next: Follow-up %@";
+"clients_next_followup_none" = "Next: Follow-up —";
+
+// MARK: - Client Detail/Profile
+"client_profile_title" = "Client profile";
+"client_profile_overview" = "Overview";
+"client_profile_assessments" = "Assessments";
+"client_profile_plans" = "Plans";
+"client_profile_timeline" = "Timeline";
+"client_profile_edit" = "Edit client";
+"client_profile_delete" = "Delete client";
+"client_profile_delete_confirm" = "Are you sure you want to delete this client?";
+"client_profile_delete_warning" = "This will permanently delete all data for this client.";
+"client_profile_basic_info" = "Basic information";
+"client_profile_name" = "Name";
+"client_profile_personal_number" = "Personal number";
+"client_profile_code" = "Client code";
+"client_profile_staff_link" = "Linked staff";
+"client_profile_no_staff" = "No staff linked";
+"client_profile_created" = "Created %@";
+
+// MARK: - Create Client
+"create_client_title" = "New client";
+"create_client_name" = "Full name";
+"create_client_name_placeholder" = "Enter name";
+"create_client_personal_number" = "Personal number (YYYYMMDD-XXXX)";
+"create_client_personal_number_placeholder" = "YYYYMMDD-XXXX";
+"create_client_code" = "Client code (optional)";
+"create_client_code_placeholder" = "e.g., CLI-001";
+"create_client_button" = "Create client";
+"create_client_success" = "Client created successfully";
+"create_client_error" = "Failed to create client";
+"create_client_validation_name" = "Name is required";
+"create_client_validation_personal_number" = "Personal number is required";
+"create_client_validation_format" = "Invalid personal number format";
+
+// MARK: - Baseline
 "baseline_loading" = "Loading baseline…";
 "baseline_title" = "Baseline domains";
 "baseline_progress" = "Progress: %1$d/%2$d completed";
-"baseline_completed_label" = "Baseline completed %1$@";
+"baseline_completed_label" = "Baseline completed %@";
 "baseline_draft_notice" = "Baseline stays in draft until all domains are completed.";
 "baseline_finish_later" = "Finish later";
 "baseline_finish_later_subtext" = "Saves your progress and returns to the Assess dashboard.";
 "baseline_retry" = "Retry";
 "baseline_error_no_unit" = "No unit connected.";
+"baseline_section_salutogenic" = "Salutogenic capital";
+"baseline_section_pathogenic" = "Pathogenic capital";
+"baseline_start" = "Start baseline";
+"baseline_continue" = "Continue baseline";
+"baseline_view" = "View baseline";
 
+// MARK: - Domain
 "domain_nav_title" = "Domain";
 "domain_loading_questions" = "Loading questions…";
 "domain_no_questions" = "No interview questions available yet.";
@@ -28,8 +156,17 @@
 "domain_status_not_started" = "Not started";
 "domain_status_in_progress" = "In progress";
 "domain_status_completed" = "Completed";
-"baseline_section_salutogenic" = "Salutogenic capital";
-"baseline_section_pathogenic" = "Pathogenic capital";
+"domain_readiness_title" = "Readiness (1–5)";
+"domain_readiness_help" = "1 = high need for support, 5 = independent";
+"domain_needs_title" = "Needs / risks (multi-select)";
+"domain_notes_optional" = "Notes (optional)";
+"domain_mark_completed" = "Mark as completed";
+"domain_mark_completed_subtext" = "You can always come back and edit later.";
+"domain_error_fill_readiness" = "Fill readiness before marking as complete.";
+"domain_placeholder_describe" = "Describe";
+"domain_placeholder_describe_optional" = "Describe (optional)";
+
+// MARK: - Assessment
 "assessment_loading" = "Loading…";
 "assessment_insats_button" = "View Insatskarta";
 "assessment_domains_header" = "Domains";
@@ -54,12 +191,28 @@
 "assessment_timeline_title_followup" = "Follow-up completed";
 "assessment_timeline_description" = "Completed %1$d/%2$d domains.";
 "assessment_refresh_accessibility" = "Refresh Ledstjärnan data";
+"assessment_dashboard_title" = "Assess";
+"assessment_select_client" = "Select a client";
+"assessment_no_assessments" = "No assessments yet";
+"assessment_start_baseline" = "Start baseline assessment";
+
+// MARK: - Problem Areas
 "problem_priority_title" = "Priority";
-"problem_priority_help" = "Guides the treatment plan for %1$@.";
+"problem_priority_help" = "Guides the treatment plan for %@.";
 "problem_scoring_section" = "Scoring";
+"problem_score_1" = "1 - No problem";
+"problem_score_2" = "2 - Minor problem";
+"problem_score_3" = "3 - Moderate problem";
+"problem_score_4" = "4 - Significant problem";
+"problem_score_5" = "5 - Severe problem";
+
+// MARK: - Priority
 "priority_high" = "High";
 "priority_medium" = "Medium";
 "priority_low" = "Low";
+"priority_none" = "None";
+
+// MARK: - Trauma (STRESS)
 "trauma_tab_events" = "Events";
 "trauma_tab_symptoms" = "Symptoms Q22–46";
 "trauma_tab_function" = "Function Q47–52";
@@ -73,27 +226,101 @@
 "trauma_symptoms_header" = "Symptoms (0 = Never, 1 = Once, 2 = 2–3 times, 3 = Most days)";
 "trauma_function_header" = "Functional impairment (Yes/No)";
 "trauma_function_question" = "Function question %1$d";
-"dialog_discard_title" = "Discard changes?";
-"readiness_title" = "Readiness (1–5)";
-"readiness_help" = "1 = high need for support, 5 = independent";
-"notes_optional" = "Notes (optional)";
-"needs_title" = "Needs / risks (multi-select)";
-"mark_completed" = "Mark as completed";
-"mark_completed_subtext" = "You can always come back and edit later.";
-"error_fill_readiness" = "Fill readiness before marking as complete.";
-"placeholder_describe" = "Describe";
-"placeholder_describe_optional" = "Describe (optional)";
 
+// MARK: - Follow-up
+"followup_title" = "Follow-up";
+"followup_start" = "Start follow-up";
+"followup_continue" = "Continue follow-up";
+"followup_comparison_title" = "Comparison";
+"followup_summary_title" = "Follow-up summary";
+"followup_domains_title" = "Follow-up domains";
+"followup_no_baseline" = "Complete baseline first";
+
+// MARK: - Plans
+"plans_title" = "Plans";
+"plans_empty_title" = "No plans yet";
+"plans_empty_message" = "Create a treatment plan based on assessment insights";
+"plans_new_button" = "New plan";
+"plans_search_placeholder" = "Search plans";
+"plans_filter_active" = "Active";
+"plans_filter_draft" = "Draft";
+"plans_filter_completed" = "Completed";
+"plans_status_active" = "Active";
+"plans_status_draft" = "Draft";
+"plans_status_completed" = "Completed";
+"plans_for_client" = "Plan for %@";
+"plans_loading" = "Loading plans…";
+"plans_error_load" = "Failed to load plans";
+
+// MARK: - Plan Detail
+"plan_detail_title" = "Plan details";
+"plan_detail_overview" = "Overview";
+"plan_detail_goals" = "Goals";
+"plan_detail_interventions" = "Interventions";
+"plan_detail_progress" = "Progress";
+"plan_detail_edit" = "Edit plan";
+"plan_detail_delete" = "Delete plan";
+"plan_detail_delete_confirm" = "Delete this plan?";
+"plan_detail_complete_plan" = "Complete plan";
+"plan_detail_activate_plan" = "Activate plan";
+"plan_detail_created" = "Created %@";
+"plan_detail_updated" = "Updated %@";
+"plan_detail_no_goals" = "No goals yet";
+"plan_detail_no_interventions" = "No interventions yet";
+"plan_detail_add_goal" = "Add goal";
+"plan_detail_add_intervention" = "Add intervention";
+
+// MARK: - Plan Builder
+"plan_builder_title" = "Build plan";
+"plan_builder_new_plan" = "New plan";
+"plan_builder_plan_name" = "Plan name";
+"plan_builder_plan_name_placeholder" = "Enter plan name";
+"plan_builder_description" = "Description";
+"plan_builder_description_placeholder" = "Describe the plan";
+"plan_builder_goals_section" = "Goals";
+"plan_builder_interventions_section" = "Interventions";
+"plan_builder_add_goal" = "Add goal";
+"plan_builder_add_intervention" = "Add intervention";
+"plan_builder_save" = "Save plan";
+"plan_builder_publish" = "Publish plan";
+"plan_builder_validation_name" = "Plan name is required";
+"plan_builder_validation_goals" = "Add at least one goal";
+
+// MARK: - Schedule
+"schedule_title" = "Schedule";
+"schedule_today" = "Today";
+"schedule_week" = "Week";
+"schedule_month" = "Month";
+"schedule_no_events" = "No events scheduled";
+"schedule_new_event" = "New event";
+"schedule_event_title" = "Event title";
+"schedule_event_date" = "Date";
+"schedule_event_time" = "Time";
+"schedule_event_client" = "Client";
+"schedule_event_type" = "Event type";
+"schedule_event_notes" = "Notes";
+"schedule_event_save" = "Save event";
+"schedule_event_delete" = "Delete event";
+"schedule_loading" = "Loading schedule…";
+"schedule_filter_all_clients" = "All clients";
+"schedule_filter_my_clients" = "My clients";
+
+// MARK: - Settings
 "settings_nav_title" = "Settings";
+"settings_section_profile" = "Profile";
 "settings_section_unit" = "Unit";
+"settings_section_preferences" = "Preferences";
 "settings_section_security" = "Security & Privacy";
 "settings_section_help" = "Help & Support";
 "settings_section_language" = "Language";
+"settings_section_about" = "About";
 "settings_edit_profile" = "Edit profile";
 "settings_notifications" = "Notifications";
 "settings_change_unit" = "Change unit";
 "settings_privacy_access" = "Privacy & Access";
 "settings_help" = "Help";
+"settings_faq" = "FAQ";
+"settings_contact_support" = "Contact support";
 "settings_about" = "About";
 "settings_logout" = "Log out";
 "settings_logout_prompt" = "Log out?";
@@ -101,19 +328,125 @@
 "settings_join_unit_button" = "Join unit";
 "settings_unit_code_label" = "Unit code";
 "settings_join_unit_title" = "Change unit";
+"settings_current_unit" = "Current unit";
+"settings_no_unit" = "No unit";
+"settings_version" = "Version";
+"settings_build" = "Build";
 
+// MARK: - Language
 "language_picker_label" = "App language";
 "language_option_sv" = "Swedish";
 "language_option_en" = "English";
 
+// MARK: - Edit Profile
+"edit_profile_title" = "Edit profile";
+"edit_profile_name" = "Name";
+"edit_profile_email" = "Email";
+"edit_profile_role" = "Role";
+"edit_profile_phone" = "Phone";
+"edit_profile_save" = "Save changes";
+"edit_profile_success" = "Profile updated successfully";
+"edit_profile_error" = "Failed to update profile";
+
+// MARK: - Notifications
+"notifications_title" = "Notifications";
+"notifications_enable_all" = "Enable all notifications";
+"notifications_assessments" = "Assessment reminders";
+"notifications_followups" = "Follow-up reminders";
+"notifications_plans" = "Plan updates";
+"notifications_schedule" = "Schedule reminders";
+
+// MARK: - Privacy & Access
+"privacy_title" = "Privacy & Access";
+"privacy_data_usage" = "Data usage";
+"privacy_permissions" = "Permissions";
+"privacy_camera" = "Camera";
+"privacy_notifications" = "Notifications";
+"privacy_data_export" = "Export my data";
+"privacy_data_delete" = "Delete my data";
+
+// MARK: - Help & Support
+"help_title" = "Help";
+"help_getting_started" = "Getting started";
+"help_assessments" = "About assessments";
+"help_plans" = "About plans";
+"help_faq" = "Frequently asked questions";
+"help_contact_support" = "Contact support";
+"help_user_guide" = "User guide";
+
+"faq_title" = "FAQ";
+"faq_empty" = "No frequently asked questions available";
+
+"contact_support_title" = "Contact support";
+"contact_support_subject" = "Subject";
+"contact_support_message" = "Message";
+"contact_support_send" = "Send message";
+"contact_support_success" = "Message sent successfully";
+"contact_support_error" = "Failed to send message";
+
+"support_ticket_title" = "Support";
+"support_ticket_new" = "New ticket";
+"support_ticket_my_tickets" = "My tickets";
+"support_ticket_status_open" = "Open";
+"support_ticket_status_resolved" = "Resolved";
+
+// MARK: - About
+"about_title" = "About Ledstjärnan";
+"about_version" = "Version %@";
+"about_description" = "Ledstjärnan is a structured approach to youth care, combining evidence-based assessment tools with collaborative treatment planning.";
+"about_developed_by" = "Developed by";
+"about_privacy_policy" = "Privacy policy";
+"about_terms_of_service" = "Terms of service";
+"about_licenses" = "Open source licenses";
+
+// MARK: - Change Unit
+"change_unit_title" = "Change unit";
 "change_unit_placeholder" = "Enter code";
 "change_unit_join" = "Join";
+"change_unit_current" = "Current unit: %@";
+"change_unit_success" = "Successfully joined unit";
+"change_unit_error" = "Invalid unit code";
 
+// MARK: - Dialogs
+"dialog_discard_title" = "Discard changes?";
+"dialog_discard_message" = "Your unsaved changes will be lost.";
+"dialog_delete_title" = "Delete?";
+"dialog_delete_message" = "This action cannot be undone.";
+"dialog_confirm" = "Confirm";
+
+// MARK: - Buttons & Actions
 "button_retry" = "Retry";
-"label_saved" = "Saved";
+"button_refresh" = "Refresh";
+"button_add" = "Add";
+"button_create" = "Create";
+"button_update" = "Update";
+"button_submit" = "Submit";
 
-"tab_clients" = "Clients";
-"tab_assess" = "Assess";
-"tab_plans" = "Plans";
-"tab_schedule" = "Schedule";
-"tab_settings" = "Settings";
+// MARK: - Labels & Status
+"label_saved" = "Saved";
+"label_draft" = "Draft";
+"label_active" = "Active";
+"label_completed" = "Completed";
+"label_pending" = "Pending";
+"label_overdue" = "Overdue";
+"label_due_soon" = "Due soon";
+
+// MARK: - Errors
+"error_generic" = "Something went wrong";
+"error_network" = "Network error. Check your connection.";
+"error_unauthorized" = "You are not authorized to perform this action";
+"error_not_found" = "Resource not found";
+"error_server" = "Server error. Please try again later.";
+
+// MARK: - Empty States
+"empty_state_no_data" = "No data available";
+"empty_state_no_results" = "No results found";
+"empty_state_try_again" = "Try again";
+
+// MARK: - Accessibility
+"accessibility_new_client" = "New client";
+"accessibility_close" = "Close";
+"accessibility_back" = "Back";
+"accessibility_menu" = "Menu";
+"accessibility_search" = "Search";
+"accessibility_filter" = "Filter";

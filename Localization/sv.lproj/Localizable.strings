@@ -1,22 +1,150 @@
+// MARK: - General / Common
 "general_back" = "Tillbaka";
 "general_save" = "Spara";
 "general_cancel" = "Avbryt";
 "general_discard" = "Kasta";
 "general_yes" = "Ja";
 "general_no" = "Nej";
+"general_ok" = "OK";
 "general_required" = "Obligatoriskt";
 "general_loading" = "Laddar";
+"general_error" = "Fel";
+"general_retry" = "Försök igen";
+"general_delete" = "Ta bort";
+"general_edit" = "Redigera";
+"general_done" = "Klar";
+"general_close" = "Stäng";
+"general_continue" = "Fortsätt";
+"general_next" = "Nästa";
+"general_previous" = "Föregående";
+"general_finish" = "Slutför";
+"general_optional" = "Valfritt";
+"general_search" = "Sök";
+"general_filter" = "Filtrera";
+"general_all" = "Alla";
+"general_none" = "Ingen";
+"general_success" = "Lyckades";
+"general_failed" = "Misslyckades";
+"general_unknown" = "Okänd";
 
+// MARK: - Tabs
+"tab_clients" = "Klienter";
+"tab_assess" = "Kartläggning";
+"tab_plans" = "Planer";
+"tab_schedule" = "Schema";
+"tab_settings" = "Inställningar";
+
+// MARK: - Authentication
+"auth_login_title" = "Ledstjärnan";
+"auth_login_subtitle" = "Struktur, tydlighet och lugn i varje kontaktmoment.";
+"auth_login_signin" = "Logga in för att fortsätta";
+"auth_login_email" = "E-post";
+"auth_login_password" = "Lösenord";
+"auth_login_forgot_password" = "Glömt lösenordet?";
+"auth_login_button" = "Logga in";
+"auth_login_need_access" = "Behöver tillgång? Kontakta din enhetsadministratör.";
+"auth_login_error_invalid" = "Fel e-post eller lösenord";
+"auth_reset_title" = "Återställ lösenord";
+"auth_reset_subtitle" = "Ange din e-post för att få instruktioner för återställning";
+"auth_reset_email" = "E-post";
+"auth_reset_button" = "Skicka återställningslänk";
+"auth_reset_success" = "Kolla din e-post för instruktioner";
+"auth_reset_back_to_login" = "Tillbaka till inloggning";
+
+// MARK: - Onboarding
+"onboarding_welcome_title" = "Välkommen till Ledstjärnan";
+"onboarding_welcome_subtitle" = "Ett strukturerat arbetssätt för ungdomsvård";
+"onboarding_step1_title" = "Kartlägg helhetligt";
+"onboarding_step1_text" = "Använd evidensbaserade verktyg som Ledstjärnan-logiken och STRESS traumascreening";
+"onboarding_step2_title" = "Bygg planer tillsammans";
+"onboarding_step2_text" = "Skapa behandlingsplaner baserade på kartläggningens insikter";
+"onboarding_step3_title" = "Följ upp framsteg";
+"onboarding_step3_text" = "Uppföljningar hjälper dig se vad som fungerar och justera vid behov";
+"onboarding_get_started" = "Kom igång";
+"onboarding_join_unit_title" = "Gå med i din enhet";
+"onboarding_join_unit_subtitle" = "Ange din enhetskod för att komma igång";
+"onboarding_unit_code" = "Enhetskod";
+"onboarding_join_button" = "Gå med i enhet";
+"onboarding_join_error" = "Ogiltig enhetskod";
+"onboarding_skip" = "Hoppa över nu";
+
+// MARK: - Clients
+"clients_title" = "Klienter";
+"clients_search_placeholder" = "Sök namn / kod";
+"clients_filter_all" = "Alla";
+"clients_filter_my_clients" = "Mina klienter";
+"clients_filter_due_soon" = "Snart dags";
+"clients_filter_not_linked" = "Ej länkad";
+"clients_filter_flags" = "Flaggor";
+"clients_empty_no_unit_title" = "Ingen enhet vald";
+"clients_empty_no_unit_message" = "Välj en enhet i Inställningar för att se din arbetsbörda.";
+"clients_empty_no_clients_title" = "Inga klienter ännu";
+"clients_empty_no_clients_message" = "Tryck på +-knappen för att lägga till din första klient.";
+"clients_empty_no_match_title" = "Inga matchande klienter";
+"clients_empty_no_match_message" = "Prova en annan sökning eller återställ filtren.";
+"clients_empty_action_new" = "Ny klient";
+"clients_empty_action_reset" = "Återställ filter";
+"clients_loading" = "Laddar klienter…";
+"clients_error_load" = "Kunde inte ladda klienter";
+"clients_error_no_unit" = "Ingen enhet vald. Slutför din personalprofil för att välja en enhet.";
+"clients_new_button" = "Ny klient";
+"clients_status_baseline" = "Baslinje";
+"clients_status_plan" = "Plan";
+"clients_status_linked" = "Länkad";
+"clients_status_not_linked" = "Ej länkad";
+"clients_next_followup" = "Nästa: Uppföljning %@";
+"clients_next_followup_none" = "Nästa: Uppföljning —";
+
+// MARK: - Client Detail/Profile
+"client_profile_title" = "Klientprofil";
+"client_profile_overview" = "Översikt";
+"client_profile_assessments" = "Kartläggningar";
+"client_profile_plans" = "Planer";
+"client_profile_timeline" = "Tidslinje";
+"client_profile_edit" = "Redigera klient";
+"client_profile_delete" = "Ta bort klient";
+"client_profile_delete_confirm" = "Är du säker på att du vill ta bort denna klient?";
+"client_profile_delete_warning" = "Detta tar permanent bort all data för denna klient.";
+"client_profile_basic_info" = "Grundläggande information";
+"client_profile_name" = "Namn";
+"client_profile_personal_number" = "Personnummer";
+"client_profile_code" = "Klientkod";
+"client_profile_staff_link" = "Länkad personal";
+"client_profile_no_staff" = "Ingen personal länkad";
+"client_profile_created" = "Skapad %@";
+
+// MARK: - Create Client
+"create_client_title" = "Ny klient";
+"create_client_name" = "Fullständigt namn";
+"create_client_name_placeholder" = "Ange namn";
+"create_client_personal_number" = "Personnummer (ÅÅÅÅMMDD-XXXX)";
+"create_client_personal_number_placeholder" = "ÅÅÅÅMMDD-XXXX";
+"create_client_code" = "Klientkod (valfritt)";
+"create_client_code_placeholder" = "t.ex. KLI-001";
+"create_client_button" = "Skapa klient";
+"create_client_success" = "Klient skapad";
+"create_client_error" = "Kunde inte skapa klient";
+"create_client_validation_name" = "Namn krävs";
+"create_client_validation_personal_number" = "Personnummer krävs";
+"create_client_validation_format" = "Ogiltigt personnummerformat";
+
+// MARK: - Baseline
 "baseline_loading" = "Laddar baslinje…";
 "baseline_title" = "Baslinjedomäner";
 "baseline_progress" = "Framdrift: %1$d/%2$d klara";
-"baseline_completed_label" = "Baseline klar %1$@";
+"baseline_completed_label" = "Baslinje klar %@";
 "baseline_draft_notice" = "Baslinjen ligger kvar som utkast tills alla domäner är klara.";
 "baseline_finish_later" = "Spara och fortsätt senare";
-"baseline_finish_later_subtext" = "Sparar dina svar och tar dig tillbaka till Assess.";
+"baseline_finish_later_subtext" = "Sparar dina svar och tar dig tillbaka till Kartläggning.";
 "baseline_retry" = "Försök igen";
 "baseline_error_no_unit" = "Ingen enhet kopplad.";
+"baseline_section_salutogenic" = "Salutogena kapital";
+"baseline_section_pathogenic" = "Patogena kapital";
+"baseline_start" = "Starta baslinje";
+"baseline_continue" = "Fortsätt baslinje";
+"baseline_view" = "Visa baslinje";
 
+// MARK: - Domain
 "domain_nav_title" = "Domän";
 "domain_loading_questions" = "Laddar frågor…";
 "domain_no_questions" = "Inga intervjufrågor upplagda ännu.";
@@ -28,8 +156,17 @@
 "domain_status_not_started" = "Inte påbörjad";
 "domain_status_in_progress" = "Pågår";
 "domain_status_completed" = "Klar";
-"baseline_section_salutogenic" = "Salutogena kapital";
-"baseline_section_pathogenic" = "Patogena kapital";
+"domain_readiness_title" = "Beredskap (1–5)";
+"domain_readiness_help" = "1 = stort behov av stöd, 5 = självständig";
+"domain_needs_title" = "Behov / risker (flerval)";
+"domain_notes_optional" = "Anteckningar (valfritt)";
+"domain_mark_completed" = "Markera som klar";
+"domain_mark_completed_subtext" = "Du kan alltid gå tillbaka och ändra senare.";
+"domain_error_fill_readiness" = "Välj ett beredskapsvärde innan du markerar klart.";
+"domain_placeholder_describe" = "Beskriv";
+"domain_placeholder_describe_optional" = "Beskriv (valfritt)";
+
+// MARK: - Assessment
 "assessment_loading" = "Laddar…";
 "assessment_insats_button" = "Visa Insatskarta";
 "assessment_domains_header" = "Domäner";
@@ -54,12 +191,28 @@
 "assessment_timeline_title_followup" = "Uppföljning klar";
 "assessment_timeline_description" = "Klarade %1$d/%2$d domäner.";
 "assessment_refresh_accessibility" = "Hämta Ledstjärnan-data igen";
+"assessment_dashboard_title" = "Kartläggning";
+"assessment_select_client" = "Välj en klient";
+"assessment_no_assessments" = "Inga kartläggningar ännu";
+"assessment_start_baseline" = "Starta baslinjekartläggning";
+
+// MARK: - Problem Areas
 "problem_priority_title" = "Prioritering";
-"problem_priority_help" = "Styr behandlingsplanen för %1$@.";
+"problem_priority_help" = "Styr behandlingsplanen för %@.";
 "problem_scoring_section" = "Skattning";
+"problem_score_1" = "1 - Inget problem";
+"problem_score_2" = "2 - Mindre problem";
+"problem_score_3" = "3 - Måttligt problem";
+"problem_score_4" = "4 - Betydande problem";
+"problem_score_5" = "5 - Allvarligt problem";
+
+// MARK: - Priority
 "priority_high" = "Hög";
 "priority_medium" = "Medel";
 "priority_low" = "Låg";
+"priority_none" = "Ingen";
+
+// MARK: - Trauma (STRESS)
 "trauma_tab_events" = "Händelser";
 "trauma_tab_symptoms" = "Symtom Q22–46";
 "trauma_tab_function" = "Funktion Q47–52";
@@ -73,27 +226,101 @@
 "trauma_symptoms_header" = "Symtom (0 = Aldrig, 1 = 1 gång, 2 = 2–3 gånger, 3 = De flesta dagarna)";
 "trauma_function_header" = "Funktionsnedsättning (Ja/Nej)";
 "trauma_function_question" = "Funktionsfråga %1$d";
-"dialog_discard_title" = "Vill du kasta ändringarna?";
-"readiness_title" = "Beredskap (1–5)";
-"readiness_help" = "1 = stort behov av stöd, 5 = självständig";
-"notes_optional" = "Anteckningar (valfritt)";
-"needs_title" = "Behov / risker (flerval)";
-"mark_completed" = "Markera som klar";
-"mark_completed_subtext" = "Du kan alltid gå tillbaka och ändra senare.";
-"error_fill_readiness" = "Välj ett beredskapsvärde innan du markerar klart.";
-"placeholder_describe" = "Beskriv";
-"placeholder_describe_optional" = "Beskriv (valfritt)";
 
+// MARK: - Follow-up
+"followup_title" = "Uppföljning";
+"followup_start" = "Starta uppföljning";
+"followup_continue" = "Fortsätt uppföljning";
+"followup_comparison_title" = "Jämförelse";
+"followup_summary_title" = "Uppföljningssammanfattning";
+"followup_domains_title" = "Uppföljningsdomäner";
+"followup_no_baseline" = "Slutför baslinje först";
+
+// MARK: - Plans
+"plans_title" = "Planer";
+"plans_empty_title" = "Inga planer ännu";
+"plans_empty_message" = "Skapa en behandlingsplan baserad på kartläggningens insikter";
+"plans_new_button" = "Ny plan";
+"plans_search_placeholder" = "Sök planer";
+"plans_filter_active" = "Aktiv";
+"plans_filter_draft" = "Utkast";
+"plans_filter_completed" = "Klar";
+"plans_status_active" = "Aktiv";
+"plans_status_draft" = "Utkast";
+"plans_status_completed" = "Klar";
+"plans_for_client" = "Plan för %@";
+"plans_loading" = "Laddar planer…";
+"plans_error_load" = "Kunde inte ladda planer";
+
+// MARK: - Plan Detail
+"plan_detail_title" = "Plandetaljer";
+"plan_detail_overview" = "Översikt";
+"plan_detail_goals" = "Mål";
+"plan_detail_interventions" = "Insatser";
+"plan_detail_progress" = "Framsteg";
+"plan_detail_edit" = "Redigera plan";
+"plan_detail_delete" = "Ta bort plan";
+"plan_detail_delete_confirm" = "Ta bort denna plan?";
+"plan_detail_complete_plan" = "Slutför plan";
+"plan_detail_activate_plan" = "Aktivera plan";
+"plan_detail_created" = "Skapad %@";
+"plan_detail_updated" = "Uppdaterad %@";
+"plan_detail_no_goals" = "Inga mål ännu";
+"plan_detail_no_interventions" = "Inga insatser ännu";
+"plan_detail_add_goal" = "Lägg till mål";
+"plan_detail_add_intervention" = "Lägg till insats";
+
+// MARK: - Plan Builder
+"plan_builder_title" = "Bygg plan";
+"plan_builder_new_plan" = "Ny plan";
+"plan_builder_plan_name" = "Plannamn";
+"plan_builder_plan_name_placeholder" = "Ange plannamn";
+"plan_builder_description" = "Beskrivning";
+"plan_builder_description_placeholder" = "Beskriv planen";
+"plan_builder_goals_section" = "Mål";
+"plan_builder_interventions_section" = "Insatser";
+"plan_builder_add_goal" = "Lägg till mål";
+"plan_builder_add_intervention" = "Lägg till insats";
+"plan_builder_save" = "Spara plan";
+"plan_builder_publish" = "Publicera plan";
+"plan_builder_validation_name" = "Plannamn krävs";
+"plan_builder_validation_goals" = "Lägg till minst ett mål";
+
+// MARK: - Schedule
+"schedule_title" = "Schema";
+"schedule_today" = "Idag";
+"schedule_week" = "Vecka";
+"schedule_month" = "Månad";
+"schedule_no_events" = "Inga schemalagda händelser";
+"schedule_new_event" = "Ny händelse";
+"schedule_event_title" = "Händelsetitel";
+"schedule_event_date" = "Datum";
+"schedule_event_time" = "Tid";
+"schedule_event_client" = "Klient";
+"schedule_event_type" = "Händelsetyp";
+"schedule_event_notes" = "Anteckningar";
+"schedule_event_save" = "Spara händelse";
+"schedule_event_delete" = "Ta bort händelse";
+"schedule_loading" = "Laddar schema…";
+"schedule_filter_all_clients" = "Alla klienter";
+"schedule_filter_my_clients" = "Mina klienter";
+
+// MARK: - Settings
 "settings_nav_title" = "Inställningar";
+"settings_section_profile" = "Profil";
 "settings_section_unit" = "Enhet";
+"settings_section_preferences" = "Preferenser";
 "settings_section_security" = "Säkerhet & sekretess";
 "settings_section_help" = "Hjälp & support";
 "settings_section_language" = "Språk";
+"settings_section_about" = "Om";
 "settings_edit_profile" = "Redigera profil";
 "settings_notifications" = "Notiser";
 "settings_change_unit" = "Byt enhet";
 "settings_privacy_access" = "Integritet & åtkomst";
 "settings_help" = "Hjälp";
+"settings_faq" = "Vanliga frågor";
+"settings_contact_support" = "Kontakta support";
 "settings_about" = "Om";
 "settings_logout" = "Logga ut";
 "settings_logout_prompt" = "Vill du logga ut?";
@@ -101,19 +328,125 @@
 "settings_join_unit_button" = "Gå med i enhet";
 "settings_unit_code_label" = "Enhetskod";
 "settings_join_unit_title" = "Byt enhet";
+"settings_current_unit" = "Nuvarande enhet";
+"settings_no_unit" = "Ingen enhet";
+"settings_version" = "Version";
+"settings_build" = "Build";
 
+// MARK: - Language
 "language_picker_label" = "Appspråk";
 "language_option_sv" = "Svenska";
 "language_option_en" = "English";
 
+// MARK: - Edit Profile
+"edit_profile_title" = "Redigera profil";
+"edit_profile_name" = "Namn";
+"edit_profile_email" = "E-post";
+"edit_profile_role" = "Roll";
+"edit_profile_phone" = "Telefon";
+"edit_profile_save" = "Spara ändringar";
+"edit_profile_success" = "Profil uppdaterad";
+"edit_profile_error" = "Kunde inte uppdatera profil";
+
+// MARK: - Notifications
+"notifications_title" = "Notiser";
+"notifications_enable_all" = "Aktivera alla notiser";
+"notifications_assessments" = "Kartläggningspåminnelser";
+"notifications_followups" = "Uppföljningspåminnelser";
+"notifications_plans" = "Planuppdateringar";
+"notifications_schedule" = "Schemapåminnelser";
+
+// MARK: - Privacy & Access
+"privacy_title" = "Integritet & åtkomst";
+"privacy_data_usage" = "Dataanvändning";
+"privacy_permissions" = "Behörigheter";
+"privacy_camera" = "Kamera";
+"privacy_notifications" = "Notiser";
+"privacy_data_export" = "Exportera min data";
+"privacy_data_delete" = "Ta bort min data";
+
+// MARK: - Help & Support
+"help_title" = "Hjälp";
+"help_getting_started" = "Kom igång";
+"help_assessments" = "Om kartläggningar";
+"help_plans" = "Om planer";
+"help_faq" = "Vanliga frågor";
+"help_contact_support" = "Kontakta support";
+"help_user_guide" = "Användarguide";
+
+"faq_title" = "Vanliga frågor";
+"faq_empty" = "Inga vanliga frågor tillgängliga";
+
+"contact_support_title" = "Kontakta support";
+"contact_support_subject" = "Ämne";
+"contact_support_message" = "Meddelande";
+"contact_support_send" = "Skicka meddelande";
+"contact_support_success" = "Meddelande skickat";
+"contact_support_error" = "Kunde inte skicka meddelande";
+
+"support_ticket_title" = "Support";
+"support_ticket_new" = "Ny biljett";
+"support_ticket_my_tickets" = "Mina biljetter";
+"support_ticket_status_open" = "Öppen";
+"support_ticket_status_resolved" = "Löst";
+
+// MARK: - About
+"about_title" = "Om Ledstjärnan";
+"about_version" = "Version %@";
+"about_description" = "Ledstjärnan är ett strukturerat arbetssätt för ungdomsvård, som kombinerar evidensbaserade kartläggningsverktyg med kollaborativ behandlingsplanering.";
+"about_developed_by" = "Utvecklad av";
+"about_privacy_policy" = "Integritetspolicy";
+"about_terms_of_service" = "Användarvillkor";
+"about_licenses" = "Open source-licenser";
+
+// MARK: - Change Unit
+"change_unit_title" = "Byt enhet";
 "change_unit_placeholder" = "Skriv koden";
 "change_unit_join" = "Gå med";
+"change_unit_current" = "Nuvarande enhet: %@";
+"change_unit_success" = "Gick med i enhet";
+"change_unit_error" = "Ogiltig enhetskod";
 
+// MARK: - Dialogs
+"dialog_discard_title" = "Vill du kasta ändringarna?";
+"dialog_discard_message" = "Dina osparade ändringar kommer att gå förlorade.";
+"dialog_delete_title" = "Ta bort?";
+"dialog_delete_message" = "Den här åtgärden kan inte ångras.";
+"dialog_confirm" = "Bekräfta";
+
+// MARK: - Buttons & Actions
 "button_retry" = "Försök igen";
-"label_saved" = "Sparat";
+"button_refresh" = "Uppdatera";
+"button_add" = "Lägg till";
+"button_create" = "Skapa";
+"button_update" = "Uppdatera";
+"button_submit" = "Skicka";
 
-"tab_clients" = "Klienter";
-"tab_assess" = "Kartläggning";
-"tab_plans" = "Planer";
-"tab_schedule" = "Schema";
-"tab_settings" = "Inställningar";
+// MARK: - Labels & Status
+"label_saved" = "Sparat";
+"label_draft" = "Utkast";
+"label_active" = "Aktiv";
+"label_completed" = "Klar";
+"label_pending" = "Väntande";
+"label_overdue" = "Försenad";
+"label_due_soon" = "Snart dags";
+
+// MARK: - Errors
+"error_generic" = "Något gick fel";
+"error_network" = "Nätverksfel. Kontrollera din anslutning.";
+"error_unauthorized" = "Du har inte behörighet att utföra denna åtgärd";
+"error_not_found" = "Resursen hittades inte";
+"error_server" = "Serverfel. Försök igen senare.";
+
+// MARK: - Empty States
+"empty_state_no_data" = "Ingen data tillgänglig";
+"empty_state_no_results" = "Inga resultat hittades";
+"empty_state_try_again" = "Försök igen";
+
+// MARK: - Accessibility
+"accessibility_new_client" = "Ny klient";
+"accessibility_close" = "Stäng";
+"accessibility_back" = "Tillbaka";
+"accessibility_menu" = "Meny";
+"accessibility_search" = "Sök";
+"accessibility_filter" = "Filtrera";

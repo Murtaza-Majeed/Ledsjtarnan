@@ -17,12 +17,14 @@ struct ScheduleDashboardView: View {
     private let plannerService = PlannerService()
     private let clientService = ClientService()
     
+    private var lang: String { appState.languageCode }
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
                 header
                 if loading {
-                    ProgressView("Loading…")
+                    ProgressView(LocalizedString("schedule_loading", lang))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = loadError {
                     Text(error)
@@ -39,7 +41,7 @@ struct ScheduleDashboardView: View {
                 }
             }
             .background(AppColors.background)
-            .navigationTitle("Schedule")
+            .navigationTitle(LocalizedString("schedule_title", lang))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

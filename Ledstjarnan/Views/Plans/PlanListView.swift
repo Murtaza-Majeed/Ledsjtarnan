@@ -15,10 +15,19 @@ struct PlanListView: View {
     @State private var searchText = ""
     private let planService = PlanService()
     private let clientService = ClientService()
+    
+    private var lang: String { appState.languageCode }
 
-    enum PlanTab: String, CaseIterable {
-        case active = "Active"
-        case past = "Past"
+    enum PlanTab: CaseIterable {
+        case active
+        case past
+        
+        func label(lang: String) -> String {
+            switch self {
+            case .active: return LocalizedString("plans_filter_active", lang)
+            case .past: return LocalizedString("plans_filter_completed", lang)
+            }
+        }
     }
 
     var filteredPlans: [Plan] {
@@ -37,7 +46,7 @@ struct PlanListView: View {
         NavigationView {
             VStack(spacing: 0) {
                 HStack {
-                    Text("Plans")
+                    Text(LocalizedString("plans_title", lang))
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(AppColors.textPrimary)
@@ -49,7 +58,7 @@ struct PlanListView: View {
                 HStack(spacing: 0) {
                     ForEach(PlanTab.allCases, id: \.self) { tab in
                         Button(action: { selectedTab = tab }) {
-                            Text(tab.rawValue)
+                            Text(tab.label(lang: lang))
                                 .font(.subheadline)
                                 .fontWeight(selectedTab == tab ? .semibold : .regular)
                                 .foregroundColor(selectedTab == tab ? AppColors.primary : AppColors.textSecondary)
@@ -61,7 +70,7 @@ struct PlanListView: View {
                 .padding(.bottom, 8)
 
                 if loading {
-                    ProgressView("Loading…")
+                    ProgressView(LocalizedString("plans_loading", lang))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = loadError {
                     Text(error)

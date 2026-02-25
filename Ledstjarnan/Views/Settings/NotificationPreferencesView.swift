@@ -16,13 +16,15 @@ struct NotificationPreferencesView: View {
     @State private var isSaving = false
     @State private var errorMessage: String?
     private let staffService = StaffService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         Form {
             Section {
-                Toggle("Follow-ups due", isOn: $followupsDue)
+                Toggle(LocalizedString("notifications_followups", lang), isOn: $followupsDue)
                 Toggle("Sessions", isOn: $sessions)
-                Toggle("Schedule changes", isOn: $scheduleChanges)
+                Toggle(LocalizedString("schedule_event_type", lang), isOn: $scheduleChanges)
             }
             Section("Quiet hours") {
                 TextField("Start (e.g. 22:00)", text: $quietStart)
@@ -37,11 +39,11 @@ struct NotificationPreferencesView: View {
                 }
             }
         }
-        .navigationTitle("Notifications")
+        .navigationTitle(LocalizedString("notifications_title", lang))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") { Task { await save() } }
+                Button(LocalizedString("general_save", lang)) { Task { await save() } }
                     .disabled(isSaving)
             }
         }

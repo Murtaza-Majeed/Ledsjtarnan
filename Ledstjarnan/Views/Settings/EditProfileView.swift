@@ -13,12 +13,14 @@ struct EditProfileView: View {
     @State private var isSaving = false
     @State private var errorMessage: String?
     private let staffService = StaffService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         Form {
             Section {
-                TextField("Full name", text: $fullName)
-                TextField("Role", text: $role)
+                TextField(LocalizedString("edit_profile_name", lang), text: $fullName)
+                TextField(LocalizedString("edit_profile_role", lang), text: $role)
             }
             if let error = errorMessage {
                 Section {
@@ -27,11 +29,11 @@ struct EditProfileView: View {
                 }
             }
         }
-        .navigationTitle("Edit profile")
+        .navigationTitle(LocalizedString("edit_profile_title", lang))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") { Task { await save() } }
+                Button(LocalizedString("general_save", lang)) { Task { await save() } }
                     .disabled(isSaving || fullName.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }

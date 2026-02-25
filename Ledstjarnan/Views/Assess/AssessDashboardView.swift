@@ -24,6 +24,8 @@ struct AssessDashboardView: View {
 
     private let clientService = ClientService()
     private let assessmentService = AssessmentService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         NavigationStack {
@@ -40,7 +42,7 @@ struct AssessDashboardView: View {
                 .padding(.bottom, 40)
             }
             .background(AppColors.background.ignoresSafeArea())
-            .navigationTitle("Assess")
+            .navigationTitle(LocalizedString("assessment_dashboard_title", lang))
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showClientPicker) {
                 clientPickerSheet
@@ -94,7 +96,7 @@ struct AssessDashboardView: View {
 
     private var clientSelectorSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Select client")
+            Text(LocalizedString("assessment_select_client", lang))
                 .font(.callout)
                 .foregroundColor(AppColors.textSecondary)
             Button {

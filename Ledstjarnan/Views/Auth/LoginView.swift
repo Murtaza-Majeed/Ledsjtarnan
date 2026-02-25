@@ -15,6 +15,8 @@ struct LoginView: View {
     @State private var errorMessage: String?
     @State private var showResetPassword = false
     
+    private var lang: String { appState.languageCode }
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -37,29 +39,29 @@ struct LoginView: View {
                                         .foregroundColor(AppColors.onPrimary)
                                 )
                                 .padding(.top, 40)
-                            Text("Ledstjärnan")
+                            Text(LocalizedString("auth_login_title", lang))
                                 .font(.largeTitle.bold())
                                 .foregroundColor(AppColors.onPrimary)
-                            Text("Structure, clarity and calm for every contact moment.")
+                            Text(LocalizedString("auth_login_subtitle", lang))
                                 .font(.subheadline)
                                 .foregroundColor(AppColors.onPrimary.opacity(0.8))
                                 .multilineTextAlignment(.center)
                         }
                         
                         VStack(spacing: 20) {
-                            Text("Sign in to continue")
+                            Text(LocalizedString("auth_login_signin", lang))
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundColor(AppColors.textPrimary)
                             floatingField(
-                                title: "Email",
+                                title: LocalizedString("auth_login_email", lang),
                                 text: $email,
                                 isSecure: false,
                                 keyboard: .emailAddress,
                                 icon: "envelope"
                             )
                             floatingField(
-                                title: "Password",
+                                title: LocalizedString("auth_login_password", lang),
                                 text: $password,
                                 isSecure: true,
                                 keyboard: .default,
@@ -67,7 +69,7 @@ struct LoginView: View {
                             )
                             HStack {
                                 Spacer()
-                                Button("Forgot password?") {
+                                Button(LocalizedString("auth_login_forgot_password", lang)) {
                                     showResetPassword = true
                                 }
                                 .font(.subheadline)
@@ -93,7 +95,7 @@ struct LoginView: View {
                                     ProgressView()
                                         .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                                 } else {
-                                    Text("Sign in")
+                                    Text(LocalizedString("auth_login_button", lang))
                                         .font(.headline)
                                 }
                             }
@@ -107,7 +109,7 @@ struct LoginView: View {
                         .disabled(isLoading || email.isEmpty || password.isEmpty)
                         .padding(.horizontal)
                         
-                        Text("Need access? Contact your unit admin.")
+                        Text(LocalizedString("auth_login_need_access", lang))
                             .font(.footnote)
                             .foregroundColor(AppColors.onPrimary.opacity(0.8))
                             .padding(.bottom, 40)
@@ -137,7 +139,7 @@ struct LoginView: View {
                 }
             } catch {
                 await MainActor.run {
-                    errorMessage = "Incorrect email or password"
+                    errorMessage = LocalizedString("auth_login_error_invalid", lang)
                     isLoading = false
                 }
             }

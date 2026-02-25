@@ -19,6 +19,7 @@ struct ClientsListView: View {
     @State private var navigationClient: Client?
     
     private let clientService = ClientService()
+    private var lang: String { appState.languageCode }
     
     private var filteredClients: [ClientListSummary] {
         var list = clientSummaries
@@ -66,7 +67,7 @@ struct ClientsListView: View {
                 .padding(.bottom, 32)
             }
             .background(AppColors.background.ignoresSafeArea())
-            .navigationTitle("Clients")
+            .navigationTitle(LocalizedString("clients_title", lang))
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showCreateClient) {
                 CreateClientView(appState: appState) { newClient in
@@ -96,7 +97,7 @@ struct ClientsListView: View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(AppColors.textSecondary)
-            TextField("Search name / code", text: $searchText)
+            TextField(LocalizedString("clients_search_placeholder", lang), text: $searchText)
                 .textFieldStyle(.plain)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -117,7 +118,7 @@ struct ClientsListView: View {
                 ForEach(ClientListFilter.allCases) { filter in
                     let isDisabled = (filter == .myClients && appState.currentStaffProfile == nil)
                     FilterChip(
-                        label: filter.label,
+                        label: filter.label(lang: lang),
                         isSelected: selectedFilter == filter,
                         isDisabled: isDisabled
                     ) {
@@ -135,27 +136,27 @@ struct ClientsListView: View {
     @ViewBuilder
     private var contentState: some View {
         if isLoading {
-            LoadingStateView(text: "Loading clients…")
+            LoadingStateView(text: LocalizedString("clients_loading", lang))
         } else if let error = loadError {
-            ErrorStateView(message: error) {
+            ErrorStateView(message: error, lang: lang) {
                 loadClients()
             }
         } else if clientSummaries.isEmpty {
             let message = appState.currentUnit == nil
-            ? "Select a unit in Settings to see your caseload."
-            : "Tap the + button to add your first client."
+            ? LocalizedString("clients_empty_no_unit_message", lang)
+            : LocalizedString("clients_empty_no_clients_message", lang)
             EmptyClientsState(
-                title: appState.currentUnit == nil ? "No unit selected" : "No clients yet",
+                title: appState.currentUnit == nil ? LocalizedString("clients_empty_no_unit_title", lang) : LocalizedString("clients_empty_no_clients_title", lang),
                 message: message,
-                actionTitle: appState.currentUnit == nil ? nil : "New client"
+                actionTitle: appState.currentUnit == nil ? nil : LocalizedString("clients_empty_action_new", lang)
             ) {
                 showCreateClient = true
             }
         } else if filteredClients.isEmpty {
             EmptyClientsState(
-                title: "No clients match",
-                message: "Try a different search or reset the filters.",
-                actionTitle: "Reset filters"
+                title: LocalizedString("clients_empty_no_match_title", lang),
+                message: LocalizedString("clients_empty_no_match_message", lang),
+                actionTitle: LocalizedString("clients_empty_action_reset", lang)
             ) {
                 searchText = ""
                 selectedFilter = .all
@@ -186,7 +187,7 @@ struct ClientsListView: View {
     
     private func loadClients() {
         guard let unitId = appState.currentUnit?.id else {
-            loadError = "No unit selected. Complete your staff profile to choose a unit."
+            loadError = LocalizedString("clients_error_no_unit", lang)
             clientSummaries = []
             isLoading = false
             return
@@ -224,7 +225,7 @@ private struct ClientListCard: View {
     
     private var followUpText: String {
         guard let date = summary.nextFollowUpDate else {
-            return "Next: Follow-up —"
+            return "Next: Follow-up —"  // This will need appState to localize properly
         }
         return "Next: Follow-up " + Self.followUpFormatter.string(from: date)
     }
@@ -371,6 +372,7 @@ private struct LoadingStateView: View {
 
 private struct ErrorStateView: View {
     let message: String
+    let lang: String
     var retry: () -> Void
     
     var body: some View {
@@ -378,7 +380,7 @@ private struct ErrorStateView: View {
             Image(systemName: "exclamationmark.octagon.fill")
                 .font(.system(size: 40))
                 .foregroundColor(AppColors.danger)
-            Text("Couldn't load clients")
+            Text(LocalizedString("clients_error_load", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
             Text(message)
@@ -386,7 +388,7 @@ private struct ErrorStateView: View {
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            Button("Retry", action: retry)
+            Button(LocalizedString("button_retry", lang), action: retry)
                 .buttonStyle(.borderedProminent)
                 .tint(AppColors.primary)
         }
@@ -481,7 +483,7 @@ private struct FloatingAddButton: View {
         }
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.4 : 1.0)
-        .accessibilityLabel("New client")
+        .accessibilityLabel(LocalizedString("accessibility_new_client", "en"))  // Accessibility uses fixed language
     }
 }
 
@@ -494,13 +496,13 @@ private enum ClientListFilter: String, CaseIterable, Identifiable {
     
     var id: String { rawValue }
     
-    var label: String {
+    func label(lang: String) -> String {
         switch self {
-        case .all: return "All"
-        case .myClients: return "My clients"
-        case .dueSoon: return "Due soon"
-        case .notLinked: return "Not linked"
-        case .flags: return "Flags"
+        case .all: return LocalizedString("clients_filter_all", lang)
+        case .myClients: return LocalizedString("clients_filter_my_clients", lang)
+        case .dueSoon: return LocalizedString("clients_filter_due_soon", lang)
+        case .notLinked: return LocalizedString("clients_filter_not_linked", lang)
+        case .flags: return LocalizedString("clients_filter_flags", lang)
         }
     }
 }

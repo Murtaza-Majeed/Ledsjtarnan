@@ -36,6 +36,8 @@ struct PlanBuilderView: View {
     private let livbojenService = LivbojenService()
     private let assessmentService = AssessmentService()
     
+    private var lang: String { appState.languageCode }
+    
     private var focusOptions: [FocusOption] {
         AssessmentDefinition.domains.map { FocusOption(key: $0.key, title: $0.title, subtitle: $0.subtitle, icon: $0.icon) }
     }
@@ -75,7 +77,7 @@ struct PlanBuilderView: View {
                     .padding()
             }
             if isLoading {
-                ProgressView("Loading plan…")
+                ProgressView(LocalizedString("plans_loading", lang))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
@@ -92,7 +94,7 @@ struct PlanBuilderView: View {
                 .background(AppColors.mainSurface)
         }
         .background(AppColors.background.ignoresSafeArea())
-        .navigationTitle(plan != nil ? "Edit plan" : "New plan")
+        .navigationTitle(plan != nil ? LocalizedString("plan_detail_edit", lang) : LocalizedString("plan_builder_new_plan", lang))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await setupPlan()
@@ -122,7 +124,7 @@ struct PlanBuilderView: View {
                 .foregroundColor(AppColors.textSecondary)
             Text("Name the plan and choose what to focus on.")
                 .font(.title3.weight(.semibold))
-            TextField("Plan title", text: $titleInput)
+            TextField(LocalizedString("plan_builder_plan_name", lang), text: $titleInput)
                 .textFieldStyle(.plain)
                 .padding()
                 .background(AppColors.mainSurface)
@@ -154,7 +156,7 @@ struct PlanBuilderView: View {
             Text("Define goals to reach the desired outcome.")
                 .font(.title3.weight(.semibold))
             if goals.isEmpty {
-                Text("No goals yet. Add the first goal below.")
+                Text(LocalizedString("plan_detail_no_goals", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
             } else {
@@ -177,7 +179,7 @@ struct PlanBuilderView: View {
                     .padding()
                     .background(AppColors.mainSurface)
                     .cornerRadius(14)
-                Button("Add") {
+                Button(LocalizedString("button_add", lang)) {
                     Task { await addGoal() }
                 }
                 .disabled(newGoalText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -193,7 +195,7 @@ struct PlanBuilderView: View {
             Text("Break goals into actionable steps.")
                 .font(.title3.weight(.semibold))
             if actions.isEmpty {
-                Text("No actions yet. Add tasks or sessions below.")
+                Text(LocalizedString("plan_detail_no_interventions", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
             } else {
@@ -213,7 +215,7 @@ struct PlanBuilderView: View {
                     Text("Shared").tag("shared")
                 }
                 .pickerStyle(.segmented)
-                Button("Add action") {
+                Button(LocalizedString("plan_detail_add_intervention", lang)) {
                     Task { await addAction() }
                 }
                 .disabled(newActionTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -266,7 +268,7 @@ struct PlanBuilderView: View {
     private var footer: some View {
         HStack {
             if step != .focus {
-                Button("Back") {
+                Button(LocalizedString("general_back", lang)) {
                     step = step.previous ?? step
                 }
                 .buttonStyle(.bordered)
@@ -282,10 +284,10 @@ struct PlanBuilderView: View {
     
     private var primaryButtonTitle: String {
         switch step {
-        case .focus: return "Continue"
-        case .goals: return "Continue"
-        case .actions: return "Continue"
-        case .chapters: return "Activate plan"
+        case .focus: return LocalizedString("general_continue", lang)
+        case .goals: return LocalizedString("general_continue", lang)
+        case .actions: return LocalizedString("general_continue", lang)
+        case .chapters: return LocalizedString("plan_detail_activate_plan", lang)
         }
     }
     

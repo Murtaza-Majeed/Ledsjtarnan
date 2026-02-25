@@ -12,12 +12,17 @@ struct FirstLaunchView: View {
     @State private var notificationsEnabled = true
     @State private var isSubmitting = false
     @State private var errorMessage: String?
-    private let features: [(icon: String, title: String, detail: String)] = [
-        ("doc.text.fill", "Structured baseline & follow-up", "Assess each domain with the Ledstjärnan scale."),
-        ("list.bullet.clipboard.fill", "Plans that connect to Livbojen", "Assign goals, chapters and locked sessions."),
-        ("calendar", "Joint schedule", "Plan sessions and tasks with one calm view."),
-        ("bell.badge", "Gentle reminders", "Keep contact persons ahead of follow-ups.")
-    ]
+    
+    private var lang: String { appState.languageCode }
+    
+    private var features: [(icon: String, title: String, detail: String)] {
+        [
+            ("doc.text.fill", LocalizedString("onboarding_step1_title", lang), LocalizedString("onboarding_step1_text", lang)),
+            ("list.bullet.clipboard.fill", LocalizedString("onboarding_step2_title", lang), LocalizedString("onboarding_step2_text", lang)),
+            ("calendar", LocalizedString("onboarding_step3_title", lang), LocalizedString("onboarding_step3_text", lang)),
+            ("bell.badge", "Gentle reminders", "Keep contact persons ahead of follow-ups.")
+        ]
+    }
     
     var body: some View {
         NavigationView {
@@ -35,11 +40,11 @@ struct FirstLaunchView: View {
                             Text("Hej!")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundColor(AppColors.onPrimary.opacity(0.8))
-                            Text("Welcome to Ledstjärnan")
+                            Text(LocalizedString("onboarding_welcome_title", lang))
                                 .font(.largeTitle.bold())
                                 .foregroundColor(AppColors.onPrimary)
                                 .multilineTextAlignment(.center)
-                            Text("A structured operating system for HVB teams and support apartments.")
+                            Text(LocalizedString("onboarding_welcome_subtitle", lang))
                                 .font(.subheadline)
                                 .foregroundColor(AppColors.onPrimary.opacity(0.85))
                                 .multilineTextAlignment(.center)
@@ -92,7 +97,7 @@ struct FirstLaunchView: View {
                                             .font(.headline)
                                             .foregroundColor(AppColors.onPrimary)
                                     }
-                                    Text("Let's get started")
+                                    Text(LocalizedString("onboarding_get_started", lang))
                                         .font(.headline)
                                 }
                                 .foregroundColor(AppColors.onPrimary)
@@ -104,7 +109,7 @@ struct FirstLaunchView: View {
                             }
                             .disabled(isSubmitting)
                             
-                            Button("Maybe later") {
+                            Button(LocalizedString("onboarding_skip", lang)) {
                                 Task { await appState.markOnboardingComplete() }
                             }
                             .font(.subheadline)
