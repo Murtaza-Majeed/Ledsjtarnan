@@ -57,7 +57,7 @@ struct FollowUpDomainsView: View {
             let now = currentScore(for: domain.key)
             return AssessmentSummaryDomain(
                 domainKey: domain.key,
-                title: moduleLookup[domain.key]?.title ?? domain.title,
+                title: moduleLookup[domain.key]?.title ?? domain.title(lang: appState.languageCode),
                 valueText: now.map { "\($0)/5" } ?? "—",
                 isCompleted: now != nil
             )
@@ -67,7 +67,7 @@ struct FollowUpDomainsView: View {
     private var summaryComparisonDomains: [FollowUpSummaryDomain] {
         domains.map { domain in
             FollowUpSummaryDomain(
-                title: moduleLookup[domain.key]?.title ?? domain.title,
+                title: moduleLookup[domain.key]?.title ?? domain.title(lang: appState.languageCode),
                 previousScore: baselineScores[domain.key],
                 currentScore: currentScore(for: domain.key)
             )
@@ -84,10 +84,10 @@ struct FollowUpDomainsView: View {
         VStack(spacing: 0) {
             topBar
             if isLoading {
-                ProgressView("Loading follow-up…")
+                ProgressView(LocalizedString("followup_domains_loading", appState.languageCode))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let loadError {
-                ErrorStateView(message: loadError) {
+                ErrorStateView(message: loadError, lang: appState.languageCode) {
                     Task { await loadData() }
                 }
             } else {
@@ -141,21 +141,21 @@ struct FollowUpDomainsView: View {
             let notesKey = DomainAnswerKey.notes(domain.key)
             if let note = answers[notesKey]?.value as? String,
                !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                collected.append("\(domain.title): \(note)")
+                collected.append("\(domain.title(lang: appState.languageCode)): \(note)")
             }
         }
-        return collected.isEmpty ? "No notes yet." : collected.joined(separator: "\n")
+        return collected.isEmpty ? LocalizedString("summary_no_notes", appState.languageCode) : collected.joined(separator: "\n")
     }
 
     private var topBar: some View {
         HStack {
             Button { dismiss() } label: {
-                Label("Back", systemImage: "chevron.left")
+                Label(LocalizedString("general_back", appState.languageCode), systemImage: "chevron.left")
                     .font(.subheadline.weight(.semibold))
             }
             .tint(AppColors.textPrimary)
             Spacer()
-            Text("Follow-up Assessment")
+            Text(LocalizedString("followup_domains_assessment_title", appState.languageCode))
                 .font(.headline)
             Spacer()
             Spacer().frame(width: 44)
@@ -168,10 +168,10 @@ struct FollowUpDomainsView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(client.displayName)
                 .font(.title3.bold())
-            Text("Baseline: \(baselineDateText)")
+            Text(String(format: LocalizedString("followup_domains_baseline_date", appState.languageCode), baselineDateText))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
-            Text("Follow-up: \(followupDateText)")
+            Text(String(format: LocalizedString("followup_domains_followup_date", appState.languageCode), followupDateText))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -184,9 +184,9 @@ struct FollowUpDomainsView: View {
 
     private var instructions: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Update the domains (same as baseline).")
+            Text(LocalizedString("followup_domains_update_instruction", appState.languageCode))
                 .font(.subheadline)
-            Text("You can see the previous score for comparison.")
+            Text(LocalizedString("followup_domains_previous_score_hint", appState.languageCode))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -195,7 +195,7 @@ struct FollowUpDomainsView: View {
 
     private var domainList: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Domains")
+            Text(LocalizedString("followup_domains_section_title", appState.languageCode))
                 .font(.headline)
                 .padding(.horizontal)
             ForEach(domains) { domain in
@@ -204,14 +204,14 @@ struct FollowUpDomainsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(moduleLookup[domain.key]?.title ?? domain.title)
+                            Text(moduleLookup[domain.key]?.title ?? domain.title(lang: appState.languageCode))
                                 .font(.headline)
                             if let subtitle = moduleLookup[domain.key]?.subtitle {
                                 Text(subtitle)
                                     .font(.caption)
                                     .foregroundColor(AppColors.textSecondary)
                             }
-                            Text("Prev: \(formattedScore(baselineScores[domain.key]))   Now: \(formattedScore(currentScore(for: domain.key)))")
+                            Text(String(format: LocalizedString("followup_domains_score_comparison", appState.languageCode), formattedScore(baselineScores[domain.key]), formattedScore(currentScore(for: domain.key))))
                                 .font(.caption)
                                 .foregroundColor(AppColors.textSecondary)
                         }
@@ -234,7 +234,7 @@ struct FollowUpDomainsView: View {
             Button {
                 showSummary = true
             } label: {
-                Text("Review summary")
+                Text(LocalizedString("followup_domains_review_summary", appState.languageCode))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -244,7 +244,7 @@ struct FollowUpDomainsView: View {
             }
             .disabled(missingDomainCount > 0)
             if missingDomainCount > 0 {
-                Text("\(missingDomainCount) domains missing")
+                Text(String(format: LocalizedString("followup_domains_missing_count", appState.languageCode), missingDomainCount))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -270,7 +270,7 @@ struct FollowUpDomainsView: View {
     private func loadData() async {
         guard let unitId = appState.currentUnit?.id else {
             await MainActor.run {
-                loadError = "Select a unit first."
+                loadError = LocalizedString("followup_domains_error", appState.languageCode)
                 isLoading = false
             }
             return
@@ -362,7 +362,7 @@ private func parseDomainScores(from assessment: Assessment?) -> [String: Int] {
                     clientId: client.id,
                     unitId: unitId,
                     eventType: "followup_completed",
-                    title: "Follow-up completed",
+                    title: LocalizedString("assessment_timeline_title_followup", appState.languageCode),
                     description: "Follow-up recorded \(Self.dateFormatter.string(from: now)).",
                     staffId: staffId
                 )
@@ -383,6 +383,7 @@ private func parseDomainScores(from assessment: Assessment?) -> [String: Int] {
 
 private struct ErrorStateView: View {
     let message: String
+    let lang: String
     let retry: () -> Void
 
     var body: some View {
@@ -391,7 +392,7 @@ private struct ErrorStateView: View {
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(AppColors.textSecondary)
-            Button("Retry", action: retry)
+            Button(LocalizedString("general_retry", lang), action: retry)
                 .buttonStyle(.borderedProminent)
         }
         .padding()

@@ -8,6 +8,8 @@ struct AssessmentComparisonView: View {
     @State private var currentAnswers: [String: AnyCodable] = [:]
     @State private var isLoading = true
     @State private var errorMessage: String?
+    
+    @Environment(\.languageCode) var lang
 
     private let assessmentService = AssessmentService()
 
@@ -36,7 +38,7 @@ struct AssessmentComparisonView: View {
             .padding(.vertical)
         }
         .background(AppColors.background)
-        .navigationTitle("Progress: \(client.displayName)")
+        .navigationTitle(String(format: LocalizedString("comparison_progress_title", lang), client.displayName))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadData()
@@ -49,7 +51,7 @@ struct AssessmentComparisonView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Baslinje")
+                    Text(LocalizedString("comparison_baseline", lang))
                         .font(.caption.bold())
                         .foregroundColor(AppColors.textSecondary)
                     Text(baselineAssessment.assessmentDate ?? "—")
@@ -60,7 +62,7 @@ struct AssessmentComparisonView: View {
                     .foregroundColor(AppColors.textSecondary)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("Uppföljning")
+                    Text(LocalizedString("comparison_followup", lang))
                         .font(.caption.bold())
                         .foregroundColor(AppColors.textSecondary)
                     Text(currentAssessment.assessmentDate ?? "—")
@@ -73,7 +75,7 @@ struct AssessmentComparisonView: View {
                 end: currentAssessment.completedAt
             )
             if let days = daysBetween {
-                Text("\(days) dagar mellan bedömningar")
+                Text(String(format: LocalizedString("comparison_days_between", lang), days))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -91,15 +93,16 @@ struct AssessmentComparisonView: View {
             if let baseScore = baselineAssessment.ptsdTotalScore,
                let currScore = currentAssessment.ptsdTotalScore {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("PTSD Symtompoäng (STRESS)")
+                    Text(LocalizedString("comparison_ptsd_title", lang))
                         .font(.headline)
                         .padding(.horizontal)
 
                     HStack(spacing: 20) {
                         AssessmentPTSDScoreCard(
-                            label: "Baslinje",
+                            label: LocalizedString("comparison_baseline", lang),
                             score: baseScore,
-                            isProbable: baselineAssessment.ptsdProbable ?? false
+                            isProbable: baselineAssessment.ptsdProbable ?? false,
+                            lang: lang
                         )
 
                         Image(systemName: scoreChangeIcon(old: baseScore, new: currScore))
@@ -107,9 +110,10 @@ struct AssessmentComparisonView: View {
                             .font(.title2)
 
                         AssessmentPTSDScoreCard(
-                            label: "Uppföljning",
+                            label: LocalizedString("comparison_followup", lang),
                             score: currScore,
-                            isProbable: currentAssessment.ptsdProbable ?? false
+                            isProbable: currentAssessment.ptsdProbable ?? false,
+                            lang: lang
                         )
 
                         Spacer()
@@ -118,7 +122,7 @@ struct AssessmentComparisonView: View {
                             Text(scoreDelta(old: baseScore, new: currScore))
                                 .font(.title3.bold())
                                 .foregroundColor(scoreChangeColor(old: baseScore, new: currScore))
-                            Text("förändring")
+                            Text(LocalizedString("comparison_change", lang))
                                 .font(.caption2)
                                 .foregroundColor(AppColors.textSecondary)
                         }
@@ -139,7 +143,7 @@ struct AssessmentComparisonView: View {
             let currentFlags = parseSafetyFlags(currentAssessment.safetyFlags)
             if !currentFlags.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("Aktiva säkerhetsvarningar", systemImage: "exclamationmark.triangle.fill")
+                    Label(LocalizedString("comparison_safety_warnings", lang), systemImage: "exclamationmark.triangle.fill")
                         .font(.headline)
                         .foregroundColor(.red)
                         .padding(.horizontal)
@@ -166,25 +170,25 @@ struct AssessmentComparisonView: View {
 
     private var domainComparisonSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Livsområden – Förändring")
+            Text(LocalizedString("comparison_domains_change", lang))
                 .font(.headline)
                 .padding(.horizontal)
 
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    Text("Område")
+                    Text(LocalizedString("comparison_domain_header", lang))
                         .font(.caption.bold())
                         .foregroundColor(AppColors.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("Bas")
+                    Text(LocalizedString("comparison_baseline_short", lang))
                         .font(.caption.bold())
                         .foregroundColor(AppColors.textSecondary)
                         .frame(width: 40)
-                    Text("Nu")
+                    Text(LocalizedString("comparison_current_short", lang))
                         .font(.caption.bold())
                         .foregroundColor(AppColors.textSecondary)
                         .frame(width: 40)
-                    Text("Δ")
+                    Text(LocalizedString("comparison_delta", lang))
                         .font(.caption.bold())
                         .foregroundColor(AppColors.textSecondary)
                         .frame(width: 50)
@@ -195,12 +199,12 @@ struct AssessmentComparisonView: View {
                 Divider()
 
                 ForEach(salutogenicComparisons, id: \.domainKey) { comp in
-                    AssessmentDomainComparisonRow(comparison: comp)
+                    AssessmentDomainComparisonRow(comparison: comp, lang: lang)
                     Divider()
                 }
 
                 ForEach(problemComparisons, id: \.domainKey) { comp in
-                    AssessmentDomainComparisonRow(comparison: comp)
+                    AssessmentDomainComparisonRow(comparison: comp, lang: lang)
                     Divider()
                 }
             }
@@ -217,13 +221,13 @@ struct AssessmentComparisonView: View {
             if let summary = currentAssessment.interventionSummary,
                !summary.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Rekommenderade insatser")
+                    Text(LocalizedString("comparison_recommendations", lang))
                         .font(.headline)
                         .padding(.horizontal)
 
                     ForEach(Array(summary.keys.sorted()), id: \.self) { key in
                         if let recDict = summary[key]?.value as? [String: Any] {
-                            AssessmentRecommendationSummaryCard(domainKey: key, data: recDict)
+                            AssessmentRecommendationSummaryCard(domainKey: key, data: recDict, lang: lang)
                         }
                     }
                 }
@@ -338,6 +342,7 @@ struct AssessmentPTSDScoreCard: View {
     let label: String
     let score: Int
     let isProbable: Bool
+    let lang: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -348,7 +353,7 @@ struct AssessmentPTSDScoreCard: View {
                 .font(.title.bold())
                 .foregroundColor(isProbable ? .red : AppColors.textPrimary)
             if isProbable {
-                Text("Sannolik PTSD")
+                Text(LocalizedString("comparison_probable_ptsd", lang))
                     .font(.caption2.bold())
                     .foregroundColor(.red)
             }
@@ -394,6 +399,7 @@ struct AssessmentDomainComparison: Identifiable {
 
 struct AssessmentDomainComparisonRow: View {
     let comparison: AssessmentDomainComparison
+    let lang: String
 
     var body: some View {
         HStack(spacing: 0) {
@@ -406,11 +412,11 @@ struct AssessmentDomainComparisonRow: View {
                         Text("⚠︎")
                             .font(.caption.bold())
                             .foregroundColor(.red)
-                            .accessibilityLabel("Försämring två eller fler poäng")
+                            .accessibilityLabel(LocalizedString("comparison_worsened_warning", lang))
                     }
                 }
                 if comparison.needsAttentionNow {
-                    Text("Behöver extra uppmärksamhet")
+                    Text(LocalizedString("comparison_needs_attention", lang))
                         .font(.caption2)
                         .foregroundColor(.red)
                 }
@@ -446,6 +452,7 @@ struct AssessmentDomainComparisonRow: View {
 struct AssessmentRecommendationSummaryCard: View {
     let domainKey: String
     let data: [String: Any]
+    let lang: String
 
     private var interventions: [String] {
         data["interventions"] as? [String] ?? []
@@ -488,17 +495,17 @@ struct AssessmentRecommendationSummaryCard: View {
 
     private var domainTitle: String {
         switch domainKey {
-        case "health": return "Kropp & Hälsa"
-        case "education": return "Utbildning & Arbete"
-        case "social": return "Social Kompetens"
-        case "independence": return "Självständighet"
-        case "relationships": return "Relationer & Nätverk"
-        case "identity": return "Identitet & Utveckling"
-        case "substance": return "Alkohol & Droganvändning"
-        case "attachment": return "Anknytning & Relationer"
-        case "mentalHealth": return "Psykisk Ohälsa"
-        case "severeMentalHealth": return "Allvarlig Psykisk Ohälsa"
-        case "trauma": return "Trauma (STRESS)"
+        case "health": return LocalizedString("domain_health", lang)
+        case "education": return LocalizedString("domain_education", lang)
+        case "social": return LocalizedString("domain_social", lang)
+        case "independence": return LocalizedString("domain_independence", lang)
+        case "relationships": return LocalizedString("domain_relationships", lang)
+        case "identity": return LocalizedString("domain_identity", lang)
+        case "substance": return LocalizedString("domain_substance", lang)
+        case "attachment": return LocalizedString("domain_attachment", lang)
+        case "mentalHealth": return LocalizedString("domain_mental_health", lang)
+        case "severeMentalHealth": return LocalizedString("domain_severe_mental_health", lang)
+        case "trauma": return LocalizedString("domain_trauma", lang)
         default: return domainKey
         }
     }

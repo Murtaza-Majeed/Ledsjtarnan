@@ -22,11 +22,13 @@ struct FollowUpComparisonView: View {
     @State private var errorMessage: String?
 
     private let assessmentService = AssessmentService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         Group {
             if isLoading {
-                ProgressView("Loading…")
+                ProgressView(LocalizedString("general_loading", lang))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let errorMessage {
                 Text(errorMessage)
@@ -35,10 +37,10 @@ struct FollowUpComparisonView: View {
                     .padding()
             } else if baseline == nil || followups.isEmpty {
                 VStack(spacing: 12) {
-                    Text("No completed baseline and follow-up pair found.")
+                    Text(LocalizedString("followup_comparison_no_pair", lang))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
-                    Text("Complete at least one baseline and one follow-up to see comparisons.")
+                    Text(LocalizedString("followup_comparison_complete_message", lang))
                         .font(.footnote)
                         .foregroundColor(AppColors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -48,14 +50,14 @@ struct FollowUpComparisonView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         if let baselineDate = baseline?.completedAt {
-                            Text("Baseline completed: \(format(date: baselineDate))")
+                            Text(String(format: LocalizedString("followup_comparison_baseline_completed", lang), format(date: baselineDate)))
                                 .font(.footnote)
                                 .foregroundColor(AppColors.textSecondary)
                                 .padding(.horizontal)
                         }
 
                         if !followups.isEmpty {
-                            Picker("Follow-up", selection: $selectedFollowupId) {
+                            Picker(LocalizedString("followup_comparison_followup_label", lang), selection: $selectedFollowupId) {
                                 ForEach(followups) { a in
                                     Text(followupLabel(for: a))
                                         .tag(Optional(a.id))
@@ -66,10 +68,10 @@ struct FollowUpComparisonView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Domain comparison")
+                            Text(LocalizedString("followup_comparison_domain_comparison", lang))
                                 .font(.headline)
                                 .padding(.horizontal)
-                            Text("Scale: 1 = lågt behov, 5 = högt behov. Green = improvement, red = deterioration.")
+                            Text(LocalizedString("followup_comparison_scale_description", lang))
                                 .font(.caption)
                                 .foregroundColor(AppColors.textSecondary)
                                 .padding(.horizontal)
@@ -81,7 +83,8 @@ struct FollowUpComparisonView: View {
                                 DomainComparisonRow(
                                     title: domain.title,
                                     baseline: base.average,
-                                    followup: foll.average
+                                    followup: foll.average,
+                                    lang: lang
                                 )
                                 .padding(.horizontal)
                             }
@@ -94,7 +97,7 @@ struct FollowUpComparisonView: View {
             }
         }
         .background(AppColors.background)
-        .navigationTitle("Baseline vs follow-up")
+        .navigationTitle(LocalizedString("followup_comparison_title", lang))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadData()
@@ -173,6 +176,7 @@ private struct DomainComparisonRow: View {
     let title: String
     let baseline: Double?
     let followup: Double?
+    let lang: String
 
     private var delta: Double? {
         guard let b = baseline, let f = followup else { return nil }
@@ -195,7 +199,7 @@ private struct DomainComparisonRow: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Baseline")
+                    Text(LocalizedString("followup_comparison_baseline_label", lang))
                         .font(.caption)
                         .foregroundColor(AppColors.textSecondary)
                     Text(formatted(baseline))
@@ -204,7 +208,7 @@ private struct DomainComparisonRow: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("Follow-up")
+                    Text(LocalizedString("followup_comparison_followup_label", lang))
                         .font(.caption)
                         .foregroundColor(AppColors.textSecondary)
                     Text(formatted(followup))

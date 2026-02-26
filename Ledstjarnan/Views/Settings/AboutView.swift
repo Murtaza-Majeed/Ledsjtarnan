@@ -20,31 +20,31 @@ struct AboutView: View {
                     .padding(.top, 40)
                 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Ledstjarnan")
+                    Text(LocalizedString("app_name", languageCode))
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(AppColors.textPrimary)
                     
-                    Text("Version 0.1 (MVP)")
+                    Text(LocalizedString("about_version_format", languageCode).replacingOccurrences(of: "%@", with: "0.1 (MVP)"))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                     
-                    Text("Build date: 2026.01.29")
+                    Text(LocalizedString("about_build_date_format", languageCode).replacingOccurrences(of: "%@", with: "2026.01.29"))
                         .font(.caption)
                         .foregroundColor(AppColors.textSecondary)
                     
                     Divider()
                         .background(AppColors.border)
                     
-                    Text("For staff at Västerbo Social Omsorg")
+                    Text(LocalizedString("about_for_staff", languageCode))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textPrimary)
                     
-                    Text("Client app: Livbojen")
+                    Text(LocalizedString("about_client_app", languageCode))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textPrimary)
                     
-                    Text("Data is protected and scoped by unit.")
+                    Text(LocalizedString("about_data_protection", languageCode))
                         .font(.caption)
                         .foregroundColor(AppColors.textSecondary)
                         .padding(.top, 4)
@@ -55,8 +55,8 @@ struct AboutView: View {
                 .padding(.horizontal)
                 
                 VStack(spacing: 0) {
-                    NavigationLink(destination: Text("Privacy Policy")) {
-                        SettingsRow(icon: "lock.shield.fill", title: "Privacy policy", color: AppColors.primary)
+                    NavigationLink(destination: Text(LocalizedString("about_privacy_policy", languageCode))) {
+                        SettingsRow(icon: "lock.shield.fill", title: LocalizedString("about_privacy_policy", languageCode), color: AppColors.primary)
                             .padding()
                             .background(AppColors.mainSurface)
                     }
@@ -64,8 +64,8 @@ struct AboutView: View {
                     Divider()
                         .background(AppColors.border)
                     
-                    NavigationLink(destination: Text("Terms of Use")) {
-                        SettingsRow(icon: "doc.text.fill", title: "Terms of use", color: AppColors.primary)
+                    NavigationLink(destination: Text(LocalizedString("about_terms_of_service", languageCode))) {
+                        SettingsRow(icon: "doc.text.fill", title: LocalizedString("about_terms_of_service", languageCode), color: AppColors.primary)
                             .padding()
                             .background(AppColors.mainSurface)
                     }
@@ -73,8 +73,8 @@ struct AboutView: View {
                     Divider()
                         .background(AppColors.border)
                     
-                    NavigationLink(destination: Text("Open Source Licenses")) {
-                        SettingsRow(icon: "book.fill", title: "Open source licenses", color: AppColors.primary)
+                    NavigationLink(destination: Text(LocalizedString("about_open_source_licenses", languageCode))) {
+                        SettingsRow(icon: "book.fill", title: LocalizedString("about_open_source_licenses", languageCode), color: AppColors.primary)
                             .padding()
                             .background(AppColors.mainSurface)
                     }

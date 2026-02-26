@@ -44,7 +44,7 @@ struct ResetPasswordView: View {
                                     .font(.system(size: 60))
                                     .foregroundColor(AppColors.success)
                                 
-                                Text("Email sent")
+                                Text(LocalizedString("auth_reset_email_sent", lang))
                                     .font(.title2)
                                     .fontWeight(.semibold)
                                     .foregroundColor(AppColors.textPrimary)
@@ -77,8 +77,8 @@ struct ResetPasswordView: View {
                                 
                                 // Note box
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("• Check spam/junk folder")
-                                    Text("• Link expires after 1 hour")
+                                    Text(LocalizedString("auth_reset_check_spam", lang))
+                                    Text(LocalizedString("auth_reset_link_expires", lang))
                                 }
                                 .font(.caption)
                                 .foregroundColor(AppColors.textSecondary)

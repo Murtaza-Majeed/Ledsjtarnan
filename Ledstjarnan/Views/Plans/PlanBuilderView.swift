@@ -43,11 +43,11 @@ struct PlanBuilderView: View {
     }
     
     private var focusSelectionDescription: String {
-        selectedFocusDomains.isEmpty ? "No focus areas selected" : selectedFocusDomains.count == 1 ? "1 focus area selected" : "\(selectedFocusDomains.count) focus areas selected"
+        selectedFocusDomains.isEmpty ? LocalizedString("plan_builder_focus_areas", lang) : selectedFocusDomains.count == 1 ? "1 \(LocalizedString("plan_builder_focus_areas", lang))" : "\(selectedFocusDomains.count) \(LocalizedString("plan_builder_focus_areas", lang))"
     }
     
     private var clientDisplayName: String {
-        client?.displayName ?? clientName ?? "Client"
+        client?.displayName ?? clientName ?? LocalizedString("general_unknown", lang)
     }
     
     init(
@@ -119,17 +119,17 @@ struct PlanBuilderView: View {
     
     private var focusStep: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Step 1 of 4")
+            Text(LocalizedString("plan_builder_step_1", lang))
                 .font(.caption)
                 .foregroundColor(AppColors.textSecondary)
-            Text("Name the plan and choose what to focus on.")
+            Text(LocalizedString("plan_builder_step_1_description", lang))
                 .font(.title3.weight(.semibold))
             TextField(LocalizedString("plan_builder_plan_name", lang), text: $titleInput)
                 .textFieldStyle(.plain)
                 .padding()
                 .background(AppColors.mainSurface)
                 .cornerRadius(14)
-            Text("Focus areas")
+            Text(LocalizedString("plan_builder_focus_areas", lang))
                 .font(.headline)
             Text(focusSelectionDescription)
                 .font(.subheadline)
@@ -150,10 +150,10 @@ struct PlanBuilderView: View {
     
     private var goalsStep: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Step 2 of 4")
+            Text(LocalizedString("plan_builder_step_2", lang))
                 .font(.caption)
                 .foregroundColor(AppColors.textSecondary)
-            Text("Define goals to reach the desired outcome.")
+            Text(LocalizedString("plan_builder_step_2_description", lang))
                 .font(.title3.weight(.semibold))
             if goals.isEmpty {
                 Text(LocalizedString("plan_detail_no_goals", lang))
@@ -164,7 +164,7 @@ struct PlanBuilderView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(goal.goalText)
                             .font(.headline)
-                        Text("Created \(GoalFormatter.shared.string(goal.createdAt))")
+                        Text(LocalizedString("plan_builder_goal_created", lang).replacingOccurrences(of: "%@", with: GoalFormatter.shared.string(goal.createdAt)))
                             .font(.caption)
                             .foregroundColor(AppColors.textSecondary)
                     }
@@ -174,7 +174,7 @@ struct PlanBuilderView: View {
                 }
             }
             HStack {
-                TextField("New goal", text: $newGoalText)
+                TextField(LocalizedString("plan_detail_add_goal", lang), text: $newGoalText)
                     .textFieldStyle(.plain)
                     .padding()
                     .background(AppColors.mainSurface)
@@ -189,10 +189,10 @@ struct PlanBuilderView: View {
     
     private var actionsStep: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Step 3 of 4")
+            Text(LocalizedString("plan_builder_step_3", lang))
                 .font(.caption)
                 .foregroundColor(AppColors.textSecondary)
-            Text("Break goals into actionable steps.")
+            Text(LocalizedString("plan_builder_step_3_description", lang))
                 .font(.title3.weight(.semibold))
             if actions.isEmpty {
                 Text(LocalizedString("plan_detail_no_interventions", lang))
@@ -204,15 +204,15 @@ struct PlanBuilderView: View {
                 }
             }
             VStack(spacing: 12) {
-                TextField("Action title", text: $newActionTitle)
+                TextField(LocalizedString("plan_detail_add_intervention", lang), text: $newActionTitle)
                     .textFieldStyle(.plain)
                     .padding()
                     .background(AppColors.mainSurface)
                     .cornerRadius(14)
-                Picker("Who owns this action?", selection: $newActionWho) {
-                    Text("Staff").tag("staff")
-                    Text("Client").tag("client")
-                    Text("Shared").tag("shared")
+                Picker(LocalizedString("plan_builder_responsibility_staff", lang), selection: $newActionWho) {
+                    Text(LocalizedString("plan_builder_responsibility_staff", lang)).tag("staff")
+                    Text(LocalizedString("plan_builder_responsibility_client", lang)).tag("client")
+                    Text(LocalizedString("plan_builder_responsibility_shared", lang)).tag("shared")
                 }
                 .pickerStyle(.segmented)
                 Button(LocalizedString("plan_detail_add_intervention", lang)) {
@@ -245,11 +245,11 @@ struct PlanBuilderView: View {
                     }
                     HStack {
                         if assigned {
-                            Text("Assigned")
+                            Text(LocalizedString("plan_builder_assigned_label", lang))
                                 .font(.caption)
                                 .foregroundColor(AppColors.success)
                         } else if let cid = clientId, let sid = appState.currentStaffProfile?.id {
-                            Button("Assign") {
+                            Button(LocalizedString("plan_builder_assign_button", lang)) {
                                 Task { await assignChapter(chapterId: chapter.id, clientId: cid, staffId: sid) }
                             }
                             .font(.subheadline)
@@ -503,19 +503,19 @@ struct PlanBuilderView: View {
         
         var title: String {
             switch self {
-            case .focus: return "Focus"
-            case .goals: return "Goals"
-            case .actions: return "Actions"
-            case .chapters: return "Chapters"
+            case .focus: return LocalizedString("plan_builder_focus_areas", "en")
+            case .goals: return LocalizedString("plan_detail_goals", "en")
+            case .actions: return LocalizedString("plan_detail_interventions", "en")
+            case .chapters: return LocalizedString("plan_builder_step_4_description", "en")
             }
         }
         
         var subtitle: String {
             switch self {
-            case .focus: return "Set title & focus"
-            case .goals: return "Define goals"
-            case .actions: return "Plan actions"
-            case .chapters: return "Assign Livbojen"
+            case .focus: return LocalizedString("plan_builder_step_1_description", "en")
+            case .goals: return LocalizedString("plan_builder_step_2_description", "en")
+            case .actions: return LocalizedString("plan_builder_step_3_description", "en")
+            case .chapters: return LocalizedString("plan_builder_step_4_description", "en")
             }
         }
         
@@ -540,7 +540,7 @@ private struct PlanBuilderProgress: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Plan builder")
+            Text(LocalizedString("plan_builder_title", "en"))
                 .font(.caption)
                 .foregroundColor(AppColors.textSecondary)
             HStack(spacing: 12) {

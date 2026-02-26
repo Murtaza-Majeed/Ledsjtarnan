@@ -96,7 +96,7 @@ struct ClientProfileView: View {
             Text(client.displayName)
                 .font(.title2.weight(.semibold))
                 .foregroundColor(AppColors.textPrimary)
-            Text("Unit: \(unitDisplayName)")
+            Text(LocalizedString("client_profile_unit", lang).replacingOccurrences(of: "%@", with: unitDisplayName))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             Text("Link: \(client.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang))")
@@ -127,13 +127,13 @@ struct ClientProfileView: View {
     
     private var quickActions: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Quick actions")
+            Text(LocalizedString("client_profile_quick_actions", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
             
             QuickActionRow(
-                title: "Link to Livbojen",
-                subtitle: "Generate code for the client",
+                title: LocalizedString("client_profile_link_title", lang),
+                subtitle: LocalizedString("client_profile_link_code_description", lang),
                 badge: QuickActionRow.Badge(
                     text: client.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang),
                     style: client.isLinked ? .active : .alert
@@ -143,9 +143,9 @@ struct ClientProfileView: View {
             
             QuickActionRow(
                 title: LocalizedString("client_profile_assessments", lang),
-                subtitle: "Baseline + follow-up history",
+                subtitle: LocalizedString("client_profile_assessments_title", lang),
                 badge: QuickActionRow.Badge(
-                    text: (detail?.hasBaseline == true) ? LocalizedString("clients_status_baseline", lang) : "No baseline",
+                    text: (detail?.hasBaseline == true) ? LocalizedString("clients_status_baseline", lang) : LocalizedString("client_profile_no_assessments", lang),
                     style: (detail?.hasBaseline == true) ? .active : .inactive
                 ),
                 destination: ClientAssessmentsView(appState: appState, client: client)
@@ -153,9 +153,9 @@ struct ClientProfileView: View {
             
             QuickActionRow(
                 title: LocalizedString("client_profile_plans", lang),
-                subtitle: "View or create plan",
+                subtitle: LocalizedString("plans_empty_message", lang),
                 badge: QuickActionRow.Badge(
-                    text: detail?.activePlan != nil ? LocalizedString("clients_status_plan", lang) : "No plan",
+                    text: detail?.activePlan != nil ? LocalizedString("clients_status_plan", lang) : LocalizedString("plans_empty_title", lang),
                     style: detail?.activePlan != nil ? .active : .inactive
                 ),
                 destination: ClientPlansView(appState: appState, client: client)
@@ -163,23 +163,23 @@ struct ClientProfileView: View {
             
             QuickActionRow(
                 title: LocalizedString("schedule_title", lang),
-                subtitle: "Shared planner and tasks",
+                subtitle: LocalizedString("schedule_no_items_hint", lang),
                 badge: nil,
                 destination: ClientScheduleView(appState: appState, client: client)
             )
             
             QuickActionRow(
-                title: "Notes & Flags",
-                subtitle: "Staff-only notes",
+                title: LocalizedString("client_profile_notes_flags_title", lang),
+                subtitle: LocalizedString("client_profile_staff_only", lang),
                 badge: detail?.flags.isEmpty == false
-                ? QuickActionRow.Badge(text: "Flags", style: .alert)
+                ? QuickActionRow.Badge(text: LocalizedString("client_profile_flags", lang), style: .alert)
                 : nil,
                 destination: ClientNotesFlagsView(appState: appState, client: client)
             )
             
             QuickActionRow(
                 title: LocalizedString("client_profile_timeline", lang),
-                subtitle: "Event log",
+                subtitle: LocalizedString("client_profile_quick_actions_description", lang),
                 badge: nil,
                 destination: ClientTimelineView(client: client)
             )
@@ -188,10 +188,10 @@ struct ClientProfileView: View {
     
     private var dangerZoneCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Danger zone")
+            Text(LocalizedString("client_profile_danger_zone", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.danger)
-            Text("Permanently deletes this client and all related data. Use this when you need to remove test records.")
+            Text(LocalizedString("client_profile_danger_description", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             Button(action: { showDeleteConfirm = true }) {
@@ -200,7 +200,7 @@ struct ClientProfileView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onDanger))
                     }
-                    Text(isDeletingClient ? "Deleting…" : LocalizedString("client_profile_delete", lang))
+                    Text(isDeletingClient ? LocalizedString("general_loading", lang) : LocalizedString("client_profile_delete", lang))
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
@@ -274,7 +274,7 @@ private struct LoadingStateCard: View {
             ProgressView()
                 .progressViewStyle(.circular)
                 .tint(AppColors.primary)
-            Text("Loading client…")
+            Text(LocalizedString("client_profile_loading", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -292,7 +292,7 @@ private struct ErrorStateCard: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            Text("Couldn't load client")
+            Text(LocalizedString("error_generic", lang))
                 .font(.headline)
             Text(message)
                 .font(.subheadline)
@@ -420,6 +420,7 @@ private struct ClientLinkingView: View {
     private let statusTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     
     private let clientService = ClientService()
+    private var lang: String { appState.languageCode }
     
     init(appState: AppState, client: Client) {
         self.appState = appState
@@ -432,7 +433,7 @@ private struct ClientLinkingView: View {
         ScrollView {
             VStack(spacing: 24) {
                 clientHeader
-                Text("Generate a 6-digit code for the youth to enter in Livbojen. Codes expire after 15 minutes.")
+                Text(LocalizedString("client_profile_link_code_description", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -447,7 +448,7 @@ private struct ClientLinkingView: View {
             .padding(20)
         }
         .background(AppColors.background.ignoresSafeArea())
-        .navigationTitle("Link to Livbojen")
+        .navigationTitle(LocalizedString("client_profile_link_title", lang))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadPage() }
         .navigationDestination(isPresented: $showSuccessScreen) {
@@ -455,6 +456,7 @@ private struct ClientLinkingView: View {
         }
         .navigationDestination(isPresented: $showUnlinkedSuccess) {
             UnlinkSuccessView(
+                lang: appState.languageCode,
                 onBackToProfile: {
                     showUnlinkedSuccess = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
@@ -475,6 +477,7 @@ private struct ClientLinkingView: View {
         }
         .sheet(isPresented: $showUnlinkConfirm) {
             UnlinkConfirmationSheet(
+                lang: appState.languageCode,
                 isProcessing: isUnlinking,
                 errorMessage: unlinkError,
                 onCancel: {
@@ -491,10 +494,10 @@ private struct ClientLinkingView: View {
     
     private var clientHeader: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Client: \(client.displayName)")
+            Text(LocalizedString("client_profile_client_name", appState.languageCode).replacingOccurrences(of: "%@", with: client.displayName))
                 .font(.headline)
             HStack(spacing: 8) {
-                Text("Status:")
+                Text(LocalizedString("client_profile_status", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                 StatusPill(text: isLinked ? LocalizedString("clients_status_linked", appState.languageCode) : LocalizedString("clients_status_not_linked", appState.languageCode), style: isLinked ? .active : .alert)
@@ -508,7 +511,7 @@ private struct ClientLinkingView: View {
     
     private var codeCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Link code (6 digits)")
+            Text(LocalizedString("client_profile_link_code", lang))
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(AppColors.textPrimary)
             if isLoading {
@@ -526,7 +529,7 @@ private struct ClientLinkingView: View {
                             .cornerRadius(12)
                     }
                 }
-                Text("Expires in \(countdownText)")
+                Text(LocalizedString("client_profile_code_expires", lang).replacingOccurrences(of: "%@", with: countdownText))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             } else {
@@ -534,11 +537,11 @@ private struct ClientLinkingView: View {
                     .stroke(AppColors.border, style: StrokeStyle(lineWidth: 1, dash: [6]))
                     .frame(height: 72)
                     .overlay(
-                        Text("No active code")
+                        Text(LocalizedString("client_profile_no_code", lang))
                             .font(.headline)
                             .foregroundColor(AppColors.textSecondary)
                     )
-                Text("Code expired. Generate a new one.")
+                Text(LocalizedString("client_profile_code_expired", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.danger)
             }
@@ -553,7 +556,7 @@ private struct ClientLinkingView: View {
     
     private var copyButton: some View {
         Button(action: copyCode) {
-            Text("Copy code")
+            Text(LocalizedString("client_profile_copy_code", lang))
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -571,7 +574,7 @@ private struct ClientLinkingView: View {
                         .progressViewStyle(.circular)
                         .tint(AppColors.onPrimary)
                 }
-                Text("Generate new code")
+                Text(LocalizedString("client_profile_generate_code", lang))
                     .font(.headline)
             }
             .frame(maxWidth: .infinity)
@@ -585,13 +588,13 @@ private struct ClientLinkingView: View {
     
     private var helpCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Client steps")
+            Text(LocalizedString("client_profile_client_steps", lang))
                 .font(.headline)
             VStack(alignment: .leading, spacing: 8) {
-                Text("1) Open Livbojen app")
-                Text("2) Go to Settings → Link")
-                Text("3) Enter the 6-digit code")
-                Text("4) Confirm")
+                Text(LocalizedString("client_profile_step_1", lang))
+                Text(LocalizedString("client_profile_step_2", lang))
+                Text(LocalizedString("client_profile_step_3", lang))
+                Text(LocalizedString("client_profile_step_4", lang))
             }
             .font(.subheadline)
             .foregroundColor(AppColors.textSecondary)
@@ -606,22 +609,22 @@ private struct ClientLinkingView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Unlink client?")
+                    Text(LocalizedString("client_profile_unlink_confirm", lang))
                         .font(.headline)
-                    Text("Stop syncing schedule items and chapter assignments.")
+                    Text(LocalizedString("client_profile_unlink_description", lang))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                 }
                 Spacer()
-                StatusPill(text: "Linked", style: .active)
+                StatusPill(text: LocalizedString("clients_status_linked", appState.languageCode), style: .active)
             }
-            Text("Staff notes and flags remain in Ledstjarnan.")
+            Text(LocalizedString("client_profile_unlink_note", lang))
                 .font(.footnote)
                 .foregroundColor(AppColors.textSecondary)
             Button(role: .destructive) {
                 showUnlinkConfirm = true
             } label: {
-                Text("Unlink client")
+                Text(LocalizedString("client_profile_unlink_button", lang))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -667,7 +670,7 @@ private struct ClientLinkingView: View {
     private func generateLink() async {
         guard let staffId = appState.currentStaffProfile?.id,
               let unitId = appState.currentUnit?.id else {
-            errorMessage = "Missing staff or unit context."
+            errorMessage = LocalizedString("error_generic", appState.languageCode)
             return
         }
         isGenerating = true
@@ -729,7 +732,7 @@ private struct ClientLinkingView: View {
     
     private func unlinkClient() async {
         guard let staffId = appState.currentStaffProfile?.id else {
-            unlinkError = "Missing staff context."
+            unlinkError = LocalizedString("error_generic", appState.languageCode)
             return
         }
         await MainActor.run {
@@ -756,22 +759,23 @@ private struct ClientLinkingView: View {
 
 private struct LinkSuccessCard: View {
     let client: Client
+    let lang: String
     
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 60))
                 .foregroundColor(AppColors.primary)
-            Text("Client is now linked to Livbojen")
+            Text(LocalizedString("client_profile_linked_success", lang))
                 .font(.headline)
             Text(client.displayName)
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             VStack(alignment: .leading, spacing: 8) {
-                Text("You can now:")
+                Text(LocalizedString("client_profile_linked_can_now", lang))
                     .font(.subheadline.weight(.semibold))
-                Text("• Assign Livbojen chapters")
-                Text("• Share schedule items")
+                Text(LocalizedString("client_profile_linked_assign_chapters", lang))
+                Text(LocalizedString("client_profile_linked_share_schedule", lang))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
@@ -793,15 +797,15 @@ private struct LinkSuccessView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                LinkSuccessCard(client: client)
+                LinkSuccessCard(client: client, lang: appState.languageCode)
                 VStack(spacing: 12) {
-                    Button("Open Client Profile") {
+                    Button(LocalizedString("client_profile_open_profile", appState.languageCode)) {
                         dismiss()
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(AppColors.primary)
                     
-                    Button("Assign chapters now") {
+                    Button(LocalizedString("client_profile_assign_chapters", appState.languageCode)) {
                         goToChapters = true
                     }
                     .buttonStyle(.borderedProminent)
@@ -822,12 +826,13 @@ private struct LinkSuccessView: View {
             }
             .padding(24)
         }
-        .navigationTitle("Link success")
+        .navigationTitle(LocalizedString("client_profile_link_success_title", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 private struct UnlinkSuccessView: View {
+    let lang: String
     let onBackToProfile: () -> Void
     let onGenerateNewCode: () -> Void
     
@@ -838,9 +843,9 @@ private struct UnlinkSuccessView: View {
                     Image(systemName: "checkmark.circle")
                         .font(.system(size: 56))
                         .foregroundColor(AppColors.primary)
-                    Text("Client unlinked")
+                    Text(LocalizedString("client_profile_unlinked", lang))
                         .font(.title3.weight(.semibold))
-                    Text("This client is no longer connected to Livbojen. Chapters and schedule will no longer sync.")
+                    Text(LocalizedString("client_profile_unlinked_message", lang))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -851,13 +856,13 @@ private struct UnlinkSuccessView: View {
                 .cornerRadius(24)
                 
                 VStack(spacing: 12) {
-                    Button("Back to profile") {
+                    Button(LocalizedString("client_profile_back_to_profile", lang)) {
                         onBackToProfile()
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(AppColors.primary)
                     
-                    Button("Generate new link code") {
+                    Button(LocalizedString("client_profile_generate_new_code", lang)) {
                         onGenerateNewCode()
                     }
                     .buttonStyle(.bordered)
@@ -866,12 +871,13 @@ private struct UnlinkSuccessView: View {
             }
             .padding(24)
         }
-        .navigationTitle("Client unlinked")
+        .navigationTitle(LocalizedString("client_profile_unlinked_title", lang))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 private struct UnlinkConfirmationSheet: View {
+    let lang: String
     let isProcessing: Bool
     let errorMessage: String?
     let onCancel: () -> Void
@@ -883,9 +889,9 @@ private struct UnlinkConfirmationSheet: View {
                 .fill(AppColors.border)
                 .frame(width: 40, height: 4)
                 .padding(.top, 8)
-            Text("Unlink client?")
+            Text(LocalizedString("client_profile_unlink_confirm", lang))
                 .font(.headline)
-            Text("This will stop syncing schedule items and Livbojen chapters for this client. Notes and flags stay in Ledstjarnan.")
+            Text(LocalizedString("client_profile_unlink_confirm_message", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -897,7 +903,7 @@ private struct UnlinkConfirmationSheet: View {
                     .multilineTextAlignment(.center)
             }
             HStack(spacing: 16) {
-                Button("Cancel") {
+                Button(LocalizedString("general_cancel", lang)) {
                     onCancel()
                 }
                 .frame(maxWidth: .infinity)
@@ -905,7 +911,7 @@ private struct UnlinkConfirmationSheet: View {
                 .background(AppColors.secondarySurface)
                 .cornerRadius(16)
                 
-                Button("Unlink") {
+                Button(LocalizedString("client_profile_unlink", lang)) {
                     onConfirm()
                 }
                 .frame(maxWidth: .infinity)
@@ -946,14 +952,14 @@ private struct ClientAssessmentsView: View {
         List {
             Section {
                 NavigationLink(destination: AssessmentFormView(appState: appState, client: client, assessmentType: "baseline")) {
-                    Label("Start new baseline", systemImage: "doc.text")
+                    Label(LocalizedString("baseline_start", appState.languageCode), systemImage: "doc.text")
                 }
                 NavigationLink(destination: AssessmentFormView(appState: appState, client: client, assessmentType: "followup")) {
-                    Label("Start follow-up", systemImage: "chart.line.uptrend.xyaxis")
+                    Label(LocalizedString("followup_start", appState.languageCode), systemImage: "chart.line.uptrend.xyaxis")
                 }
             }
             
-            Section(header: Text("History")) {
+            Section(header: Text(LocalizedString("client_profile_history", appState.languageCode))) {
                 if isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -961,7 +967,7 @@ private struct ClientAssessmentsView: View {
                     Text(errorMessage)
                         .foregroundColor(AppColors.danger)
                 } else if assessments.isEmpty {
-                    Text("No assessments yet.")
+                    Text(LocalizedString("client_profile_no_assessments", appState.languageCode))
                         .foregroundColor(AppColors.textSecondary)
                 } else {
                     ForEach(assessments) { assessment in
@@ -972,7 +978,7 @@ private struct ClientAssessmentsView: View {
                         } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(assessment.isBaseline ? "Baseline" : "Follow-up")
+                                    Text(assessment.isBaseline ? LocalizedString("comparison_baseline", appState.languageCode) : LocalizedString("comparison_followup", appState.languageCode))
                                         .font(.subheadline.weight(.semibold))
                                     Text(assessment.assessmentDate ?? "—")
                                         .font(.caption)
@@ -983,7 +989,7 @@ private struct ClientAssessmentsView: View {
                                     Image(systemName: "chevron.right")
                                         .foregroundColor(AppColors.mutedNeutral)
                                 } else {
-                                    Text("Draft")
+                                    Text(LocalizedString("client_profile_draft", appState.languageCode))
                                         .font(.caption)
                                         .foregroundColor(.orange)
                                 }
@@ -995,7 +1001,7 @@ private struct ClientAssessmentsView: View {
                 }
             }
         }
-        .navigationTitle("Assessments")
+        .navigationTitle(LocalizedString("client_profile_assessments_title", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadAssessments() }
         .sheet(item: $selectedAssessment) { assessment in
@@ -1056,7 +1062,7 @@ private struct ClientNotesFlagsView: View {
             Button {
                 isPresentingAdd = true
             } label: {
-                Text("+ Add note")
+                Text(LocalizedString("client_profile_add_note", appState.languageCode))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -1068,7 +1074,7 @@ private struct ClientNotesFlagsView: View {
             .background(AppColors.mainSurface)
         }
         .background(AppColors.background.ignoresSafeArea())
-        .navigationTitle("Notes & Flags")
+        .navigationTitle(LocalizedString("client_profile_notes_flags_title", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadDetail()
@@ -1099,17 +1105,17 @@ private struct ClientNotesFlagsView: View {
                 }
             )
         }
-        .alert("Delete note?", isPresented: Binding(
+        .alert(LocalizedString("client_profile_delete_note", appState.languageCode), isPresented: Binding(
             get: { notePendingDelete != nil },
             set: { if !$0 { notePendingDelete = nil } }
         )) {
-            Button("Delete", role: .destructive) {
+            Button(LocalizedString("general_delete", appState.languageCode), role: .destructive) {
                 if let note = notePendingDelete {
                     Task { await deleteNote(note: note) }
                 }
                 notePendingDelete = nil
             }
-            Button("Cancel", role: .cancel) {
+            Button(LocalizedString("general_cancel", appState.languageCode), role: .cancel) {
                 notePendingDelete = nil
             }
         }
@@ -1119,11 +1125,11 @@ private struct ClientNotesFlagsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(client.displayName)
                 .font(.title3.weight(.semibold))
-            Text("Staff-only view")
+            Text(LocalizedString("client_profile_staff_only", appState.languageCode))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             if let updated = detail?.flags.first?.updatedAt ?? notes.first?.updatedAt {
-                Text("Last updated: \(dateFormatter.string(from: updated))")
+                Text(LocalizedString("client_profile_last_updated", appState.languageCode).replacingOccurrences(of: "%@", with: dateFormatter.string(from: updated)))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -1136,7 +1142,7 @@ private struct ClientNotesFlagsView: View {
     
     private var flagsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Flags")
+            Text(LocalizedString("client_profile_flags", appState.languageCode))
                 .font(.headline)
             if isDetailLoading {
                 ProgressView()
@@ -1161,7 +1167,7 @@ private struct ClientNotesFlagsView: View {
     
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Notes")
+            Text(LocalizedString("client_profile_notes", appState.languageCode))
                 .font(.headline)
             if let err = notesError {
                 Text(err)
@@ -1169,7 +1175,7 @@ private struct ClientNotesFlagsView: View {
             } else if isNotesLoading {
                 ProgressView()
             } else if notes.isEmpty {
-                Text("No notes yet.")
+                Text(LocalizedString("client_profile_no_notes", appState.languageCode))
                     .foregroundColor(AppColors.textSecondary)
             } else {
                 ForEach(notes) { note in
@@ -1303,7 +1309,7 @@ private struct ClientNoteEditorView: View {
         VStack(spacing: 20) {
             headerCard
             VStack(alignment: .leading, spacing: 8) {
-                Text("Note")
+                Text(LocalizedString("client_profile_note", appState.languageCode))
                     .font(.headline)
                 TextEditor(text: $text)
                     .padding()
@@ -1322,7 +1328,7 @@ private struct ClientNoteEditorView: View {
                 Button(role: .destructive) {
                     showDeleteConfirm = true
                 } label: {
-                    Text("Delete note")
+                    Text(LocalizedString("client_profile_delete_note", appState.languageCode))
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -1333,23 +1339,23 @@ private struct ClientNoteEditorView: View {
         }
         .padding(20)
         .background(AppColors.background.ignoresSafeArea())
-        .navigationTitle(mode == .create ? "Add note" : "Edit note")
+        .navigationTitle(mode == .create ? LocalizedString("client_profile_add_note", appState.languageCode) : LocalizedString("general_edit", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
+                Button(LocalizedString("general_save", appState.languageCode)) {
                     Task { await saveNote() }
                 }
                 .disabled(!canSave)
             }
         }
-        .alert("Delete note?", isPresented: $showDeleteConfirm) {
-            Button("Delete", role: .destructive) {
+        .alert(LocalizedString("client_profile_delete_note", appState.languageCode), isPresented: $showDeleteConfirm) {
+            Button(LocalizedString("general_delete", appState.languageCode), role: .destructive) {
                 Task { await deleteNote() }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(LocalizedString("general_cancel", appState.languageCode), role: .cancel) {}
         } message: {
-            Text("This note will be permanently deleted.")
+            Text(LocalizedString("client_profile_delete_note_confirm", appState.languageCode))
         }
     }
     
@@ -1362,11 +1368,11 @@ private struct ClientNoteEditorView: View {
             Text("Client: \(client.displayName)")
                 .font(.headline)
             if let note, mode == .edit {
-                Text("\(staffName) • \(note.formattedDate)")
+                Text(LocalizedString("client_profile_note_metadata", appState.languageCode).replacingOccurrences(of: "%1$@", with: staffName).replacingOccurrences(of: "%2$@", with: note.formattedDate))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
             } else {
-                Text("Notes are staff-only")
+                Text(LocalizedString("client_profile_notes_staff_only", appState.languageCode))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -1379,9 +1385,9 @@ private struct ClientNoteEditorView: View {
     
     private var visibilityInfo: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Visibility")
+            Text(LocalizedString("client_profile_visibility", appState.languageCode))
                 .font(.headline)
-            Text("Staff-only (not shared to Livbojen)")
+            Text(LocalizedString("client_profile_visibility_staff_only", appState.languageCode))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -1452,7 +1458,7 @@ private struct ClientTimelineView: View {
             .padding(20)
         }
         .background(AppColors.background.ignoresSafeArea())
-        .navigationTitle("Timeline / History")
+        .navigationTitle(LocalizedString("client_profile_timeline_title", client.displayName))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadTimeline() }
         .refreshable { await loadTimeline() }
@@ -1465,17 +1471,17 @@ private struct ClientTimelineView: View {
         } else if let errorMessage {
             TimelineMessageCard(
                 iconName: "exclamationmark.triangle.fill",
-                title: "Couldn't load history",
+                title: LocalizedString("error_generic", client.displayName),
                 subtitle: errorMessage,
-                buttonTitle: "Retry",
+                buttonTitle: LocalizedString("general_retry", client.displayName),
                 action: { Task { await loadTimeline() } }
             )
         } else if events.isEmpty {
             TimelineMessageCard(
                 iconName: "clock.arrow.circlepath",
-                title: "No history yet",
-                subtitle: "When assessments, plans, or schedules are created they will appear here.",
-                buttonTitle: "Refresh",
+                title: LocalizedString("client_profile_history", client.displayName),
+                subtitle: LocalizedString("client_profile_quick_actions_description", client.displayName),
+                buttonTitle: LocalizedString("button_refresh", client.displayName),
                 action: { Task { await loadTimeline() } }
             )
         } else {
@@ -1488,7 +1494,7 @@ private struct ClientTimelineView: View {
             Text(client.displayName)
                 .font(.title3.weight(.semibold))
                 .foregroundColor(AppColors.textPrimary)
-            Text("All key actions in one place")
+            Text(LocalizedString("client_profile_quick_actions_description", client.displayName))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -1500,7 +1506,7 @@ private struct ClientTimelineView: View {
     
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("History")
+            Text(LocalizedString("client_profile_history", client.displayName))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
             LazyVStack(spacing: 12) {
@@ -1571,8 +1577,8 @@ private struct TimelineLoadingCard: View {
     var body: some View {
         TimelineMessageCard(
             iconName: "hourglass",
-            title: "Loading history",
-            subtitle: "Fetching the latest actions for this client…",
+            title: LocalizedString("general_loading", "en"),
+            subtitle: LocalizedString("client_profile_loading", "en"),
             showSpinner: true
         )
     }
@@ -1655,9 +1661,9 @@ struct NoteCard: View {
                     .foregroundColor(AppColors.textSecondary)
                 Spacer()
                 if canManage {
-                    Button("Edit", action: onEdit)
+                    Button(LocalizedString("general_edit", "en"), action: onEdit)
                         .font(.caption.weight(.semibold))
-                    Button("Delete", action: onDelete)
+                    Button(LocalizedString("general_delete", "en"), action: onDelete)
                         .font(.caption.weight(.semibold))
                         .foregroundColor(AppColors.danger)
                 }
@@ -1680,37 +1686,37 @@ struct AssessmentDetailSheet: View {
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("Overview")) {
+                Section(header: Text(LocalizedString("client_profile_assessment_overview", "en"))) {
                     HStack {
-                        Text("Type")
+                        Text(LocalizedString("client_profile_assessment_type", "en"))
                         Spacer()
                         Text(assessment.isBaseline ? "Baseline" : "Follow-up")
                     }
                     HStack {
-                        Text("Date")
+                        Text(LocalizedString("client_profile_assessment_date", "en"))
                         Spacer()
                         Text(assessment.assessmentDate ?? "—")
                     }
                     HStack {
-                        Text("Stress total")
+                        Text(LocalizedString("client_profile_assessment_stress_total", "en"))
                         Spacer()
                         Text("\(assessment.ptsdTotalScore ?? 0)")
                             .bold()
                     }
                     if let probable = assessment.ptsdProbable {
                         Label(
-                            probable ? "Probable PTSD" : "Not probable",
+                            probable ? LocalizedString("comparison_probable_ptsd", "en") : LocalizedString("insatskarta_no_action", "en"),
                             systemImage: probable ? "exclamationmark.triangle" : "checkmark.seal"
                         )
                         .foregroundColor(probable ? .red : .green)
                     }
                 }
             }
-            .navigationTitle("Assessment")
+            .navigationTitle(LocalizedString("client_profile_assessment_title", "en"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button(LocalizedString("general_done", "en")) { dismiss() }
                 }
             }
         }

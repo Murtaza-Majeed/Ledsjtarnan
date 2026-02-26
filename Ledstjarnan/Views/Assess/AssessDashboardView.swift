@@ -106,10 +106,10 @@ struct AssessDashboardView: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(AppColors.textSecondary)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(selectedSummary?.client.displayName ?? "Pick a client")
+                        Text(selectedSummary?.client.displayName ?? LocalizedString("assessment_pick_client", lang))
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(AppColors.textPrimary)
-                        Text("Search name / code")
+                        Text(LocalizedString("assessment_search_name_code", lang))
                             .font(.caption)
                             .foregroundColor(AppColors.textSecondary)
                     }
@@ -136,14 +136,14 @@ struct AssessDashboardView: View {
 
     private var quickStatsSection: some View {
         HStack(spacing: 16) {
-            QuickStatCard(title: "Baseline needed", value: baselineNeededCount)
-            QuickStatCard(title: "Follow-ups due", value: followUpsDueCount)
+            QuickStatCard(title: LocalizedString("assessment_baseline_needed", lang), value: baselineNeededCount)
+            QuickStatCard(title: LocalizedString("assessment_followups_due", lang), value: followUpsDueCount)
         }
     }
 
     private var selectedClientCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Selected client")
+            Text(LocalizedString("assessment_selected_client", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
 
@@ -154,11 +154,11 @@ struct AssessDashboardView: View {
                             Text(summary.client.displayName)
                                 .font(.title3.weight(.semibold))
                             if let date = summary.nextFollowUpDate {
-                                Text("Next follow-up: \(date.formatted(date: .abbreviated, time: .omitted))")
+                                Text(String(format: LocalizedString("assessment_next_followup", lang), date.formatted(date: .abbreviated, time: .omitted)))
                                     .font(.caption)
                                     .foregroundColor(AppColors.textSecondary)
                             } else {
-                                Text("No follow-up scheduled")
+                                Text(LocalizedString("assessment_no_followup_scheduled", lang))
                                     .font(.caption)
                                     .foregroundColor(AppColors.textSecondary)
                             }
@@ -178,7 +178,7 @@ struct AssessDashboardView: View {
                             color: summary.isLinked ? AppColors.primary : AppColors.textSecondary
                         )
                         if summary.hasFlags {
-                            StatusBadge(label: "Flags", icon: "flag.fill", color: Color.orange)
+                            StatusBadge(label: LocalizedString("assessment_flags", lang), icon: "flag.fill", color: Color.orange)
                         }
                     }
                 }
@@ -187,7 +187,7 @@ struct AssessDashboardView: View {
                 .background(AppColors.mainSurface)
                 .cornerRadius(24)
             } else {
-                Text(isLoading ? "Loading clients…" : "No clients in this unit.")
+                Text(isLoading ? LocalizedString("assessment_loading_clients", lang) : LocalizedString("assessment_no_clients_in_unit", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                     .padding()
@@ -200,7 +200,7 @@ struct AssessDashboardView: View {
 
     private var primaryActions: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Actions")
+            Text(LocalizedString("assessment_actions", lang))
                 .font(.headline)
             VStack(spacing: 12) {
                 Button {
@@ -208,7 +208,7 @@ struct AssessDashboardView: View {
                         baselineNavigationClient = client
                     }
                 } label: {
-                    Text(selectedSummary?.hasBaseline == true ? "View baseline" : "Start baseline")
+                    Text(selectedSummary?.hasBaseline == true ? LocalizedString("assessment_view_baseline", lang) : LocalizedString("assessment_start_baseline_button", lang))
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -223,7 +223,7 @@ struct AssessDashboardView: View {
                         followUpNavigation = AssessmentNavigationContext(client: client, type: "followup")
                     }
                 } label: {
-                    Text("Start follow-up")
+                    Text(LocalizedString("assessment_start_followup", lang))
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -238,12 +238,12 @@ struct AssessDashboardView: View {
 
     private var recentAssessmentsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent assessments")
+            Text(LocalizedString("assessment_recent_assessments", lang))
                 .font(.headline)
             if isLoading {
                 ProgressView()
             } else if recentAssessments.isEmpty {
-                Text("No assessments yet.")
+                Text(LocalizedString("assessment_no_assessments_yet", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -262,7 +262,7 @@ struct AssessDashboardView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(assessment.assessmentType.capitalized)
                                         .font(.subheadline.weight(.semibold))
-                                    Text(clientsLookup[assessment.clientId]?.displayName ?? "Unknown client")
+                                    Text(clientsLookup[assessment.clientId]?.displayName ?? LocalizedString("assessment_unknown_client", lang))
                                         .font(.subheadline)
                                         .foregroundColor(AppColors.textPrimary)
                                     Text(assessment.createdAt?.formatted(date: .abbreviated, time: .omitted) ?? "—")
@@ -294,7 +294,7 @@ struct AssessDashboardView: View {
     private func loadData() async {
         guard let unitId = appState.currentUnit?.id else {
             await MainActor.run {
-                loadError = "Select a unit in Settings to see assessments."
+                loadError = LocalizedString("assessment_select_unit_prompt", lang)
                 clientSummaries = []
                 recentAssessments = []
                 selectedClientId = nil
@@ -357,10 +357,10 @@ struct AssessDashboardView: View {
                 }
             }
             .searchable(text: $pickerSearchText)
-            .navigationTitle("Select client")
+            .navigationTitle(LocalizedString("assessment_select_client_sheet_title", lang))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { showClientPicker = false }
+                    Button(LocalizedString("assessment_close", lang)) { showClientPicker = false }
                 }
             }
         }

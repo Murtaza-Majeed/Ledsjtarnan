@@ -33,7 +33,7 @@ struct ScheduleDashboardView: View {
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if items.isEmpty {
-                    EmptyScheduleState {
+                    EmptyScheduleState(lang: lang) {
                         showAddItem = true
                     }
                 } else {
@@ -84,15 +84,15 @@ struct ScheduleDashboardView: View {
     
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Upcoming")
+            Text(LocalizedString("schedule_upcoming", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textSecondary)
             HStack {
-                Text("\(items.count) planned items")
+                Text(String(format: LocalizedString("schedule_planned_items_count", lang), items.count))
                     .font(.title2.weight(.semibold))
                 Spacer()
                 Button(action: { showAddItem = true }) {
-                    Label("New", systemImage: "plus.circle.fill")
+                    Label(LocalizedString("general_new", lang), systemImage: "plus.circle.fill")
                         .labelStyle(.titleAndIcon)
                         .foregroundColor(AppColors.primary)
                 }
@@ -125,7 +125,7 @@ struct ScheduleDashboardView: View {
     private func loadItems() async {
         guard let unitId = appState.currentUnit?.id else {
             await MainActor.run {
-                loadError = "No unit."
+                loadError = LocalizedString("plans_error_no_unit", lang)
                 loading = false
             }
             return
@@ -163,6 +163,7 @@ struct ScheduleDashboardView: View {
 // MARK: - Subviews
 
 private struct EmptyScheduleState: View {
+    let lang: String
     let onAdd: () -> Void
     
     var body: some View {
@@ -170,15 +171,15 @@ private struct EmptyScheduleState: View {
             Image(systemName: "calendar.badge.plus")
                 .font(.system(size: 48))
                 .foregroundColor(AppColors.primary)
-            Text("No schedule items yet.")
+            Text(LocalizedString("schedule_no_items", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
-            Text("Plan sessions, tasks and routines to help the unit stay aligned.")
+            Text(LocalizedString("schedule_no_items_hint", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            Button("Add first item", action: onAdd)
+            Button(LocalizedString("schedule_add_first_item", lang), action: onAdd)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
                 .background(AppColors.primary)
@@ -215,25 +216,25 @@ struct PlannerItemComposer: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Client") {
-                    Picker("Client", selection: $clientId) {
-                        Text("None (unit-wide)").tag("")
+                Section(LocalizedString("general_unknown", appState.languageCode)) {
+                    Picker(LocalizedString("general_unknown", appState.languageCode), selection: $clientId) {
+                        Text(LocalizedString("schedule_item_unit_wide", appState.languageCode)).tag("")
                         ForEach(clients) { client in
                             Text(client.displayName).tag(client.id)
                         }
                     }
                 }
-                Section("Details") {
-                    Picker("Type", selection: $type) {
+                Section(LocalizedString("client_profile_basic_info", appState.languageCode)) {
+                    Picker(LocalizedString("client_profile_assessment_type", appState.languageCode), selection: $type) {
                         ForEach(PlannerItemType.allCases, id: \.rawValue) { option in
                             Text(option.displayName).tag(option)
                         }
                     }
-                    TextField("Title", text: $title)
-                    DatePicker("Start", selection: $startAt, displayedComponents: [.date, .hourAndMinute])
+                    TextField(LocalizedString("schedule_item_title", appState.languageCode), text: $title)
+                    DatePicker(LocalizedString("schedule_event_date", appState.languageCode), selection: $startAt, displayedComponents: [.date, .hourAndMinute])
                     DurationPicker(duration: $duration, showEndTime: type == .session)
-                    Toggle("Locked session", isOn: $locked)
-                    TextField("Notes", text: $notes, axis: .vertical)
+                    Toggle(LocalizedString("plan_builder_responsibility_shared", appState.languageCode), isOn: $locked)
+                    TextField(LocalizedString("schedule_item_notes", appState.languageCode), text: $notes, axis: .vertical)
                 }
                 if let error = errorMessage {
                     Section {
@@ -242,14 +243,14 @@ struct PlannerItemComposer: View {
                     }
                 }
             }
-            .navigationTitle("New schedule item")
+            .navigationTitle(LocalizedString("schedule_new_item_title", appState.languageCode))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(LocalizedString("general_cancel", appState.languageCode)) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { Task { await saveItem() } }
+                    Button(LocalizedString("general_save", appState.languageCode)) { Task { await saveItem() } }
                         .disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
@@ -336,51 +337,51 @@ struct PlannerItemDetailSheet: View {
                     }
                     Spacer()
                     if item.isLocked {
-                        Label("Locked", systemImage: "lock.fill")
+                        Label(LocalizedString("plan_builder_responsibility_shared", appState.languageCode), systemImage: "lock.fill")
                             .font(.caption)
                             .padding(6)
                             .background(AppColors.primary.opacity(0.1))
                             .cornerRadius(8)
                     }
                 }
-                DetailRow(label: "Type", value: item.type.capitalized)
-                DetailRow(label: "Start", value: plannerDateFormatter.string(from: item.startAt))
+                DetailRow(label: LocalizedString("client_profile_assessment_type", appState.languageCode), value: item.type.capitalized)
+                DetailRow(label: LocalizedString("schedule_event_date", appState.languageCode), value: plannerDateFormatter.string(from: item.startAt))
                 if let endAt = item.endAt {
-                    DetailRow(label: "End", value: plannerDateFormatter.string(from: endAt))
+                    DetailRow(label: LocalizedString("schedule_event_time", appState.languageCode), value: plannerDateFormatter.string(from: endAt))
                     if endAt < item.startAt {
-                        ConflictWarningView(reason: "End time is earlier than start time")
+                        ConflictWarningView(reason: LocalizedString("error_generic", appState.languageCode))
                     }
                 } else {
-                    DetailRow(label: "End", value: "Not set")
+                    DetailRow(label: LocalizedString("schedule_event_time", appState.languageCode), value: LocalizedString("general_none", appState.languageCode))
                 }
-                DetailRow(label: "Status", value: status.displayName)
+                DetailRow(label: LocalizedString("client_profile_status", appState.languageCode), value: status.displayName)
                 if let notes = item.notes, !notes.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Notes")
+                        Text(LocalizedString("schedule_item_notes", appState.languageCode))
                             .font(.headline)
                         Text(notes)
                             .foregroundColor(AppColors.textSecondary)
                     }
                 }
                 Spacer()
-                Picker("Status", selection: $status) {
+                Picker(LocalizedString("client_profile_status", appState.languageCode), selection: $status) {
                     ForEach(PlannerItemStatus.allCases, id: \.rawValue) { option in
                         Text(option.displayName).tag(option)
                     }
                 }
                 .pickerStyle(.segmented)
-                Button("Update status") {
+                Button(LocalizedString("schedule_update_status", appState.languageCode)) {
                     Task { await updateStatus() }
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(isUpdatingStatus)
             }
             .padding()
-            .navigationTitle("Schedule item")
+            .navigationTitle(LocalizedString("schedule_item_title", appState.languageCode))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+                    Button(LocalizedString("general_close", appState.languageCode)) { dismiss() }
                 }
             }
         }
@@ -510,13 +511,13 @@ private struct DurationPicker: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Duration")
+            Text(LocalizedString("schedule_duration", "en"))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             HStack {
                 ForEach([30, 60, 90, 120], id: \.self) { minutes in
                     Button(action: { duration = Double(minutes * 60) }) {
-                        Text("\(minutes)m")
+                        Text(LocalizedString("schedule_duration_minutes", "en").replacingOccurrences(of: "%d", with: "\(minutes)"))
                             .font(.caption)
                             .padding(6)
                             .frame(maxWidth: .infinity)
@@ -527,7 +528,7 @@ private struct DurationPicker: View {
                 }
             }
             if showEndTime {
-                Text("End time: \(endTimeString)")
+                Text(LocalizedString("schedule_end_time", "en").replacingOccurrences(of: "%@", with: endTimeString))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }

@@ -46,9 +46,9 @@ struct CreateClientView: View {
                                 .padding(.vertical, 8)
                         }
                         
-                        FormFieldContainer(title: "Unit") {
+                        FormFieldContainer(title: LocalizedString("settings_unit_code_label", lang)) {
                             if availableUnits.isEmpty {
-                                Text("No unit available")
+                                Text(LocalizedString("create_client_no_unit", lang))
                                     .foregroundColor(AppColors.textSecondary)
                             } else {
                                 Picker("", selection: $selectedUnitId) {
@@ -61,13 +61,13 @@ struct CreateClientView: View {
                             }
                         }
                         
-                        FormFieldContainer(title: "Responsible staff") {
+                        FormFieldContainer(title: LocalizedString("client_profile_staff_link", lang)) {
                             if isLoadingStaff {
                                 ProgressView()
                                     .progressViewStyle(.circular)
                                     .tint(AppColors.primary)
                             } else if staffOptions.isEmpty {
-                                Text("No staff in unit")
+                                Text(LocalizedString("create_client_no_staff", lang))
                                     .foregroundColor(AppColors.textSecondary)
                             } else {
                                 Picker("", selection: $responsibleStaffId) {
@@ -189,7 +189,7 @@ struct CreateClientView: View {
             }
         } catch {
             await MainActor.run {
-                staffLoadError = "Couldn't load staff list: \(error.localizedDescription)"
+                staffLoadError = "\(LocalizedString("error_generic", lang)): \(error.localizedDescription)"
                 isLoadingStaff = false
             }
         }
@@ -201,15 +201,15 @@ struct CreateClientView: View {
             return
         }
         guard let unitId = selectedUnitId else {
-            creationError = "Select a unit."
+            creationError = LocalizedString("create_client_no_unit", lang)
             return
         }
         guard let staffId = responsibleStaffId else {
-            creationError = "Select responsible staff."
+            creationError = LocalizedString("create_client_no_staff", lang)
             return
         }
         guard let creatorId = appState.currentStaffProfile?.id else {
-            creationError = "Staff profile not loaded."
+            creationError = LocalizedString("error_generic", lang)
             return
         }
         

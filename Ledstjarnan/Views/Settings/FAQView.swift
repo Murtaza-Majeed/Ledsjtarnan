@@ -25,7 +25,7 @@ struct FAQView: View {
         }
         .listStyle(.insetGrouped)
         .background(AppColors.background)
-        .navigationTitle("FAQs")
+        .navigationTitle(LocalizedString("faq_title", "en"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -58,14 +58,14 @@ struct FAQArticleDetailView: View {
                 Text(article.answer)
                     .font(.body)
                     .foregroundColor(AppColors.textPrimary)
-                Text("Last updated \(article.lastUpdated.formatted(date: .abbreviated, time: .omitted))")
+                Text(LocalizedString("faq_last_updated", "en").replacingOccurrences(of: "%@", with: article.lastUpdated.formatted(date: .abbreviated, time: .omitted)))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
             .padding()
         }
         .background(AppColors.background)
-        .navigationTitle("Answer")
+        .navigationTitle(LocalizedString("faq_answer_title", "en"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

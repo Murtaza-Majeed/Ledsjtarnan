@@ -140,6 +140,8 @@
 "baseline_error_no_unit" = "Ingen enhet kopplad.";
 "baseline_section_salutogenic" = "Salutogena kapital";
 "baseline_section_pathogenic" = "Patogena kapital";
+"baseline_category_salutogenic" = "Salutogena kapital";
+"baseline_category_pathogenic" = "Patogena kapital";
 "baseline_start" = "Starta baslinje";
 "baseline_continue" = "Fortsätt baslinje";
 "baseline_view" = "Visa baslinje";
@@ -195,6 +197,155 @@
 "assessment_select_client" = "Välj en klient";
 "assessment_no_assessments" = "Inga kartläggningar ännu";
 "assessment_start_baseline" = "Starta baslinjekartläggning";
+"assessment_pick_client" = "Välj en klient";
+"assessment_search_name_code" = "Sök namn / kod";
+"assessment_baseline_needed" = "Baslinje behövs";
+"assessment_followups_due" = "Uppföljningar att göra";
+"assessment_selected_client" = "Vald klient";
+"assessment_next_followup" = "Nästa uppföljning: %@";
+"assessment_no_followup_scheduled" = "Ingen uppföljning schemalagd";
+"assessment_flags" = "Flaggor";
+"assessment_loading_clients" = "Laddar klienter…";
+"assessment_no_clients_in_unit" = "Inga klienter i denna enhet.";
+"assessment_actions" = "Åtgärder";
+"assessment_view_baseline" = "Visa baslinje";
+"assessment_start_baseline_button" = "Starta baslinje";
+"assessment_start_followup" = "Starta uppföljning";
+"assessment_recent_assessments" = "Senaste kartläggningar";
+"assessment_no_assessments_yet" = "Inga kartläggningar ännu.";
+"assessment_unknown_client" = "Okänd klient";
+"assessment_select_unit_prompt" = "Välj en enhet i Inställningar för att se kartläggningar.";
+"assessment_select_client_sheet_title" = "Välj klient";
+"assessment_close" = "Stäng";
+
+// MARK: - Assessment Comparison
+"comparison_progress_title" = "Framsteg: %@";
+"comparison_baseline" = "Baslinje";
+"comparison_followup" = "Uppföljning";
+"comparison_days_between" = "%d dagar mellan bedömningar";
+"comparison_ptsd_title" = "PTSD Symtompoäng (STRESS)";
+"comparison_change" = "förändring";
+"comparison_safety_warnings" = "Aktiva säkerhetsvarningar";
+"comparison_domains_change" = "Livsområden – Förändring";
+"comparison_domain_header" = "Område";
+"comparison_baseline_short" = "Bas";
+"comparison_current_short" = "Nu";
+"comparison_delta" = "Δ";
+"comparison_recommendations" = "Rekommenderade insatser";
+"comparison_probable_ptsd" = "Sannolik PTSD";
+"comparison_needs_attention" = "Behöver extra uppmärksamhet";
+"comparison_worsened_warning" = "Försämring två eller fler poäng";
+
+// MARK: - Domain Names
+"domain_health" = "Kropp & Hälsa";
+"domain_education" = "Utbildning & Arbete";
+"domain_social" = "Social Kompetens";
+"domain_independence" = "Självständighet";
+"domain_relationships" = "Relationer & Nätverk";
+"domain_identity" = "Identitet & Utveckling";
+"domain_substance" = "Alkohol & Droganvändning";
+"domain_attachment" = "Anknytning & Relationer";
+"domain_mental_health" = "Psykisk Ohälsa";
+"domain_severe_mental_health" = "Allvarlig Psykisk Ohälsa";
+"domain_trauma" = "Trauma (STRESS)";
+
+// MARK: - Domain Titles & Subtitles (Baseline)
+"domain_health_title" = "Kropp & hälsa";
+"domain_health_subtitle" = "Fysisk hälsa, medicin, livsstil, stress & återhämtning";
+"domain_education_title" = "Utbildning & arbete";
+"domain_education_subtitle" = "Skola, praktik, motivation & daglig struktur";
+"domain_social_title" = "Social kompetens & arenor";
+"domain_social_subtitle" = "Kommunikation, känsloreglering, DBT-färdigheter";
+"domain_independence_title" = "Självständighet & vardag";
+"domain_independence_subtitle" = "Ekonomi, boende, ADL-färdigheter & vardagsstruktur";
+"domain_relationships_title" = "Relationer & nätverk";
+"domain_relationships_subtitle" = "Nätverk, stödpersoner & hantering av ensamhet";
+"domain_identity_title" = "Identitet & utveckling";
+"domain_identity_subtitle" = "KASAM, värderingar, kultur/andlighet & framtidstro";
+"domain_substance_title" = "Alkohol & droger";
+"domain_substance_subtitle" = "ASI Kriterium E – konsumtion, historik, risk";
+"domain_attachment_title" = "Familj & anknytning";
+"domain_attachment_subtitle" = "Relationer, konflikter, våldsutsatthet";
+"domain_mental_health_title" = "Psykisk hälsa";
+"domain_mental_health_subtitle" = "Diagnoser, symtom, funktionsnivå";
+"domain_severe_mental_health_title" = "Allvarlig psykisk ohälsa";
+"domain_severe_mental_health_subtitle" = "Suicid, självskada, akuta risker";
+"domain_trauma_title" = "Trauma & säkerhet";
+"domain_trauma_subtitle" = "STRESS, PTSD, dissociation & skydd";
+
+// MARK: - Domain Needs Options
+"needs_medical_followup" = "Behöver medicinsk uppföljning";
+"needs_sleep_recovery" = "Sova/återhämtning";
+"needs_lifestyle_coach" = "Livsstilscoach";
+"needs_acute_risk" = "Akut risk";
+"needs_study_coach" = "Studiecoach";
+"needs_daily_structure" = "Behöver daglig struktur";
+"needs_internship_work" = "Praktik/arbete saknas";
+"needs_low_motivation" = "Motivation låg";
+"needs_mentor" = "Behöver mentor";
+"needs_conflicts_relationship_risk" = "Konflikter/relationsrisk";
+"needs_dbt_support" = "Behöver DBT-stöd";
+"needs_interpreter" = "Behöver tolk";
+"needs_housing_support" = "Boendestöd";
+"needs_structure_daily" = "Struktur i vardagen";
+"needs_budgeting" = "Budgetering";
+"needs_practical_adl" = "Praktisk ADL-träning";
+"needs_network_map" = "Behöver nätverkskarta";
+"needs_risk_in_relationships" = "Risk i relationer";
+"needs_family_sessions" = "Behöver familjesamtal";
+"needs_support_contact" = "Stödkontakt saknas";
+"needs_soc_support" = "Behöver KASAM-stöd";
+"needs_low_self_image" = "Självbild låg";
+"needs_cultural_spiritual" = "Behöver kultur/andlig kontakt";
+"needs_future_plan" = "Framtidsplan saknas";
+"needs_ongoing_use" = "Pågående bruk";
+"needs_acra_met" = "Behöver A-CRA/MET";
+"needs_relapse_risk" = "Risk för återfall";
+"needs_detox" = "Behöver avgiftning";
+"needs_violence_risk" = "Våld/risk i nätverk";
+"needs_low_security" = "Låg trygghet";
+"needs_signs_safety" = "Behöver Signs of Safety";
+"needs_psychologist" = "Behöver psykolog";
+"needs_function_affected" = "Funktion påverkas";
+"needs_medical_followup_psych" = "Medicinsk uppföljning";
+"needs_ongoing_outpatient" = "Pågående öppenvård";
+"needs_suicide_risk" = "Suicidrisk";
+"needs_self_harm" = "Självskada";
+"needs_psychiatry" = "Behöver psykiatri";
+"needs_dbt_livlinan" = "DBT/Livlinan";
+"needs_ptsd_symptoms" = "PTSD-symtom";
+"needs_trauma_therapy" = "Behöver traumaterapi";
+"needs_acute_protection" = "Akut skyddsbehov";
+"needs_psych_assessment" = "Psykologutredning";
+
+// MARK: - Insatskarta
+"insatskarta_title" = "Insatskarta — %@";
+"insatskarta_close" = "Stäng";
+"insatskarta_recommendations" = "Rekommenderade insatser";
+"insatskarta_safety_required" = "Säkerhetsåtgärder krävs";
+"insatskarta_stress_trauma" = "STRESS — Traumabedömning";
+"insatskarta_criterion_b" = "Påträngande";
+"insatskarta_criterion_c" = "Undvikande";
+"insatskarta_criterion_d" = "Kognition";
+"insatskarta_criterion_e" = "Reaktivitet";
+"insatskarta_psychologist_needed" = "Psykolog";
+"insatskarta_criteria_met" = "Kriterier uppfyllda";
+"insatskarta_no_action" = "Ingen åtgärd behövs";
+
+// MARK: - Assessment Summary
+"summary_title" = "Sammanfattning";
+"summary_close" = "Stäng";
+"summary_complete_all_domains" = "Slutför alla domäner";
+"summary_completed_label" = "Slutförda: %@";
+"summary_domain_completed" = "Slutförd";
+"summary_domain_not_started" = "Ej påbörjad";
+"summary_no_notes" = "Inga anteckningar ännu.";
+"summary_view_recommendation" = "Visa rekommendation";
+"summary_complete_all_domains_title" = "Slutför alla domäner";
+"summary_complete_all_domains_message" = "Slutför återstående domäner innan du slutför bedömningen.";
+"summary_domain_results" = "Domänresultat";
+"summary_problem_areas" = "Problemområden";
+"summary_assessment_label" = "Bedömning: %@";
 
 // MARK: - Problem Areas
 "problem_priority_title" = "Prioritering";
@@ -450,3 +601,244 @@
 "accessibility_menu" = "Meny";
 "accessibility_search" = "Sök";
 "accessibility_filter" = "Filtrera";
+
+// MARK: - Follow-up Domains
+"followup_domains_assessment_title" = "Uppföljningskartläggning";
+"followup_domains_baseline_date" = "Baslinje: %@";
+"followup_domains_followup_date" = "Uppföljning: %@";
+"followup_domains_update_instruction" = "Uppdatera domänerna (samma som baslinje).";
+"followup_domains_previous_score_hint" = "Du kan se tidigare poäng för jämförelse.";
+"followup_domains_section_title" = "Domäner";
+"followup_domains_score_comparison" = "Förra: %1$@   Nu: %2$@";
+"followup_domains_review_summary" = "Granska sammanfattning";
+"followup_domains_missing_count" = "%d domäner saknas";
+"followup_domains_loading" = "Laddar uppföljning…";
+"followup_domains_error" = "Välj en enhet först.";
+
+// MARK: - Follow-up Summary
+"followup_summary_baseline_vs_followup" = "Baslinje vs Uppföljning";
+"followup_summary_date" = "Uppföljningsdatum: %@";
+"followup_summary_changes_by_domain" = "Förändringar per domän";
+"followup_summary_score_comparison" = "Förra %1$@ → Nu %2$@";
+"followup_summary_staff_note" = "Personalanteckning (valfritt)";
+"followup_summary_staff_note_placeholder" = "Skriv en kort uppföljningsnotering…";
+"followup_summary_finish" = "Slutför uppföljning";
+"followup_summary_prev_label" = "Förra";
+"followup_summary_now_label" = "Nu";
+
+// MARK: - Follow-up Comparison
+"followup_comparison_no_pair" = "Inget slutfört baslinje- och uppföljningspar hittades.";
+"followup_comparison_complete_message" = "Slutför minst en baslinje och en uppföljning för att se jämförelser.";
+"followup_comparison_baseline_completed" = "Baslinje slutförd: %@";
+"followup_comparison_domain_comparison" = "Domänjämförelse";
+"followup_comparison_scale_description" = "Skala: 1 = lågt behov, 5 = högt behov. Grönt = förbättring, rött = försämring.";
+"followup_comparison_baseline_label" = "Baslinje";
+"followup_comparison_followup_label" = "Uppföljning";
+"followup_comparison_title" = "Baslinje vs uppföljning";
+
+// MARK: - Assessment Recommendation
+"assessment_recommendation_open_insatskarta" = "Öppna Insatskarta (detaljerat)";
+"assessment_recommendation_focus_areas" = "Rekommenderade fokusområden";
+"assessment_recommendation_complete_message" = "Slutför kartläggningen för att generera rekommendationer.";
+"assessment_recommendation_suggested_chapters" = "Föreslagna Livbojen-kapitel";
+"assessment_recommendation_assign_after_selection" = "Tilldela Livbojen-kapitel efter att du valt fokusområden.";
+"assessment_recommendation_tap_assign_hint" = "Tryck på Tilldela för att skicka kapitel till Livbojen.";
+"assessment_recommendation_go_to_plan_builder" = "Gå till planbyggare";
+"assessment_recommendation_assign_chapters_picker" = "Tilldela kapitel (väljare)";
+"assessment_recommendation_link_client_message" = "Länka klienten till Livbojen för att tilldela kapitel.";
+"assessment_recommendation_title" = "Rekommendation";
+"assessment_recommendation_subtitle_baseline" = "Baserat på baslinjeresultat";
+"assessment_recommendation_subtitle_followup" = "Baserat på uppföljningsresultat";
+"assessment_recommendation_priority_high" = "Hög prioritet";
+"assessment_recommendation_priority_medium" = "Medel prioritet";
+"assessment_recommendation_priority_medium_low" = "Medel-låg";
+"assessment_recommendation_priority_low" = "Låg prioritet";
+"assessment_recommendation_button_added" = "Tillagd";
+"assessment_recommendation_button_add" = "Lägg till i plan";
+
+// MARK: - Assessment Summary
+"assessment_summary_key_notes" = "Viktiga anteckningar";
+"assessment_summary_finish" = "Slutför kartläggning";
+
+// MARK: - Assessment Form
+"assessment_form_domains" = "Domäner";
+"assessment_form_questions_answered" = "%1$d av %2$d frågor";
+"assessment_form_complete_required" = "Slutför obligatoriska fält";
+"assessment_form_questions_need_attention" = "%1$d av %2$d frågor behöver fortfarande uppmärksamhet.";
+"assessment_form_view_insatskarta" = "Visa Insatskarta";
+
+// MARK: - Client Picker
+"assess_client_picker_no_clients" = "Inga klienter i denna enhet.";
+"assess_client_picker_title" = "Välj klient";
+"assess_client_picker_loading" = "Laddar klienter…";
+
+// MARK: - Trauma Screening
+"trauma_screening_question_number" = "F%d";
+
+// MARK: - Insatskarta
+"insatskarta_total_symptom_score" = "Total symtompoäng:";
+"insatskarta_ptsd_probable" = "Sannolik PTSD — alla kriterier uppfyllda";
+"insatskarta_ptsd_partial" = "Partiell PTSD — %d av 4 kriterier uppfyllda";
+
+// MARK: - Auth
+"auth_reset_email_sent" = "E-post skickad";
+"auth_reset_check_spam" = "• Kontrollera skräppost/spam";
+"auth_reset_link_expires" = "• Länken upphör efter 1 timme";
+
+// MARK: - Create Client
+"create_client_no_unit" = "Ingen enhet tillgänglig";
+"create_client_no_staff" = "Ingen personal i enheten";
+
+// MARK: - Clients List
+"clients_list_next_followup_none" = "Nästa: Uppföljning —";
+"clients_list_next_followup_date" = "Nästa: Uppföljning %@";
+
+// MARK: - Onboarding
+"onboarding_greeting" = "Hej!";
+"onboarding_notifications_title" = "Håll koll på sessioner";
+"onboarding_notifications_message" = "Tillåt notiser för att få mjuka påminnelser om uppföljningar.";
+
+// MARK: - Schedule
+"schedule_title" = "Schema";
+"schedule_loading" = "Laddar schema…";
+"schedule_client_title" = "Schema – %@";
+"schedule_client_no_items" = "Inga schemaobjekt för denna klient.";
+"schedule_client_create_hint" = "Skapa en session, uppgift eller aktivitet för att komma igång.";
+"schedule_client_ends_at" = "Slutar %@";
+"schedule_upcoming" = "Kommande";
+"schedule_planned_items_count" = "%d planerade objekt";
+"schedule_no_items" = "Inga schemaobjekt ännu.";
+"schedule_no_items_hint" = "Planera sessioner, uppgifter och rutiner för att hålla enheten samordnad.";
+"schedule_add_first_item" = "Lägg till första objektet";
+"schedule_item_unit_wide" = "Ingen (enhetsövergripande)";
+"schedule_item_notes" = "Anteckningar";
+"schedule_update_status" = "Uppdatera status";
+"schedule_duration" = "Varaktighet";
+"schedule_duration_minutes" = "%dm";
+"schedule_end_time" = "Sluttid: %@";
+"schedule_new_item_title" = "Nytt schemaobjekt";
+"schedule_item_title" = "Schemaobjekt";
+
+// MARK: - About
+"app_name" = "Ledstjärnan";
+"about_version_format" = "Version %@";
+"about_build_date_format" = "Byggdatum: %@";
+"about_for_staff" = "För personal på Västerbo Social Omsorg";
+"about_client_app" = "Klientapp: Livbojen";
+"about_data_protection" = "Data skyddas och avgränsas per enhet.";
+"about_open_source_licenses" = "Open Source-licenser";
+
+// MARK: - Contact Support
+"general_send" = "Skicka";
+"contact_support_ticket_submitted" = "Ärende inskickat";
+"contact_support_ticket_message" = "Vårt team kommer att svara till din e-post så snart vi granskat ärendet.";
+"contact_support_message_hint" = "Beskriv vad som hände så följer vi upp via e-post.";
+
+// MARK: - Settings
+"settings_debug_localization" = "Felsök lokalisering";
+
+// MARK: - FAQ
+"faq_last_updated" = "Senast uppdaterad %@";
+"faq_answer_title" = "Svar";
+
+// MARK: - Privacy
+"privacy_data_sharing" = "Datadelning";
+"privacy_role_permissions" = "Roll & behörigheter";
+"privacy_device_security" = "Enhetssäkerhet";
+"privacy_access_title" = "Integritet & åtkomst";
+
+// MARK: - Status
+"status_updates_title" = "Status & uppdateringar";
+
+// MARK: - Plans
+"plan_builder_step_1" = "Steg 1 av 4";
+"plan_builder_step_1_description" = "Namnge planen och välj vad som ska fokuseras på.";
+"plan_builder_focus_areas" = "Fokusområden";
+"plan_builder_step_2" = "Steg 2 av 4";
+"plan_builder_step_2_description" = "Definiera mål för att nå önskat resultat.";
+"plan_builder_goal_created" = "Skapad %@";
+"plan_builder_step_3" = "Steg 3 av 4";
+"plan_builder_step_3_description" = "Dela upp mål i konkreta steg.";
+"plan_builder_responsibility_staff" = "Personal";
+"plan_builder_responsibility_client" = "Klient";
+"plan_builder_responsibility_shared" = "Delad";
+"plan_builder_step_4" = "Steg 4 av 4";
+"plan_builder_step_4_description" = "Tilldela Livbojen-kapitel.";
+"plan_builder_assigned_count" = "Tilldelade %d kapitel";
+"plan_builder_assigned_label" = "Tilldelad";
+"plan_builder_assign_button" = "Tilldela";
+"plan_builder_title" = "Planbyggare";
+"plans_untitled" = "Namnlös plan";
+"plans_error_no_unit" = "Ingen enhet.";
+"plans_new_plan_title" = "Ny plan";
+"plans_client_title" = "Planer – %@";
+
+// MARK: - Client Profile
+"client_profile_unit" = "Enhet: %@";
+"client_profile_quick_actions" = "Snabbåtgärder";
+"client_profile_quick_actions_description" = "Alla viktiga åtgärder på ett ställe";
+"client_profile_danger_zone" = "Farlig zon";
+"client_profile_danger_description" = "Tar permanent bort denna klient och all relaterad data. Använd detta när du behöver ta bort testposter.";
+"client_profile_loading" = "Laddar klient…";
+"client_profile_link_code_description" = "Generera en 6-siffrig kod som ungdomen ska ange i Livbojen. Koder upphör efter 15 minuter.";
+"client_profile_link_title" = "Länka till Livbojen";
+"client_profile_client_name" = "Klient: %@";
+"client_profile_status" = "Status:";
+"client_profile_link_code" = "Länkkod (6 siffror)";
+"client_profile_code_expires" = "Upphör om %@";
+"client_profile_no_code" = "Ingen aktiv kod";
+"client_profile_code_expired" = "Koden har upphört. Generera en ny.";
+"client_profile_copy_code" = "Kopiera kod";
+"client_profile_generate_code" = "Generera ny kod";
+"client_profile_client_steps" = "Klientsteg";
+"client_profile_step_1" = "1) Öppna Livbojen-appen";
+"client_profile_step_2" = "2) Gå till Inställningar → Länka";
+"client_profile_step_3" = "3) Ange den 6-siffriga koden";
+"client_profile_step_4" = "4) Bekräfta";
+"client_profile_unlink_confirm" = "Avlänka klient?";
+"client_profile_unlink_description" = "Sluta synkronisera schemaobjekt och kapiteltilldelningar.";
+"client_profile_unlink_note" = "Personalanteckningar och flaggor finns kvar i Ledstjärnan.";
+"client_profile_unlink_button" = "Avlänka klient";
+"client_profile_linked_success" = "Klienten är nu länkad till Livbojen";
+"client_profile_linked_can_now" = "Du kan nu:";
+"client_profile_linked_assign_chapters" = "• Tilldela Livbojen-kapitel";
+"client_profile_linked_share_schedule" = "• Dela schemaobjekt";
+"client_profile_open_profile" = "Öppna klientprofil";
+"client_profile_assign_chapters" = "Tilldela kapitel nu";
+"client_profile_link_success_title" = "Länkning lyckades";
+"client_profile_unlinked" = "Klient avlänkad";
+"client_profile_unlinked_message" = "Denna klient är inte längre ansluten till Livbojen. Kapitel och schema synkroniseras inte längre.";
+"client_profile_back_to_profile" = "Tillbaka till profil";
+"client_profile_generate_new_code" = "Generera ny länkkod";
+"client_profile_unlinked_title" = "Klient avlänkad";
+"client_profile_unlink_confirm_message" = "Detta kommer att sluta synkronisera schemaobjekt och Livbojen-kapitel för denna klient. Anteckningar och flaggor finns kvar i Ledstjärnan.";
+"client_profile_unlink" = "Avlänka";
+"client_profile_history" = "Historik";
+"client_profile_no_assessments" = "Inga kartläggningar ännu.";
+"client_profile_draft" = "Utkast";
+"client_profile_assessments_title" = "Kartläggningar";
+"client_profile_add_note" = "+ Lägg till anteckning";
+"client_profile_notes_flags_title" = "Anteckningar & Flaggor";
+"client_profile_staff_only" = "Endast för personal";
+"client_profile_last_updated" = "Senast uppdaterad: %@";
+"client_profile_flags" = "Flaggor";
+"client_profile_notes" = "Anteckningar";
+"client_profile_no_notes" = "Inga anteckningar ännu.";
+"client_profile_note" = "Anteckning";
+"client_profile_delete_note" = "Ta bort anteckning";
+"client_profile_delete_note_confirm" = "Denna anteckning kommer att tas bort permanent.";
+"client_profile_note_metadata" = "%1$@ • %2$@";
+"client_profile_notes_staff_only" = "Anteckningar är endast för personal";
+"client_profile_visibility" = "Synlighet";
+"client_profile_visibility_staff_only" = "Endast för personal (delas inte till Livbojen)";
+"client_profile_timeline_title" = "Tidslinje / Historik";
+"client_profile_assessment_overview" = "Översikt";
+"client_profile_assessment_type" = "Typ";
+"client_profile_assessment_date" = "Datum";
+"client_profile_assessment_stress_total" = "STRESS-total";
+"client_profile_assessment_title" = "Kartläggning";
+
+// MARK: - General Additional
+"general_new" = "Ny";
+"general_done" = "Klar";
+"general_loading" = "Laddar…";

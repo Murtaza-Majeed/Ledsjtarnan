@@ -14,11 +14,13 @@ struct ClientPickerView: View {
     @State private var loading = true
     @State private var loadError: String?
     private let clientService = ClientService()
+    
+    private var lang: String { appState.languageCode }
 
     var body: some View {
         Group {
             if loading {
-                ProgressView("Loading clients…")
+                ProgressView(LocalizedString("assess_client_picker_loading", lang))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = loadError {
                 VStack(spacing: 12) {
@@ -29,7 +31,7 @@ struct ClientPickerView: View {
                 }
                 .padding()
             } else if clients.isEmpty {
-                Text("No clients in this unit.")
+                Text(LocalizedString("assess_client_picker_no_clients", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -56,7 +58,7 @@ struct ClientPickerView: View {
             }
         }
         .background(AppColors.background)
-        .navigationTitle("Select client")
+        .navigationTitle(LocalizedString("assess_client_picker_title", lang))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadClients()

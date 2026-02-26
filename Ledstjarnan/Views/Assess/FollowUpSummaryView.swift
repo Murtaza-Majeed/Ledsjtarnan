@@ -31,6 +31,7 @@ struct FollowUpSummaryDomain: Identifiable {
 
 struct FollowUpSummaryView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.languageCode) private var lang
 
     let client: Client
     let followUpDate: Date?
@@ -64,14 +65,14 @@ struct FollowUpSummaryView: View {
                     .padding(20)
                     .background(AppColors.background.opacity(0.95))
             }
-            .navigationTitle("Follow-up Summary")
+            .navigationTitle(LocalizedString("followup_summary_title", lang))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+                    Button(LocalizedString("general_close", lang)) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(LocalizedString("general_save", lang)) {
                         onSaveDraft()
                     }
                 }
@@ -83,10 +84,10 @@ struct FollowUpSummaryView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(client.displayName)
                 .font(.title3.bold())
-            Text("Baseline vs Follow-up")
+            Text(LocalizedString("followup_summary_baseline_vs_followup", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
-            Text("Follow-up date: \(formattedDate)")
+            Text(String(format: LocalizedString("followup_summary_date", lang), formattedDate))
                 .font(.caption)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -98,7 +99,7 @@ struct FollowUpSummaryView: View {
 
     private var domainChanges: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Changes by domain")
+            Text(LocalizedString("followup_summary_changes_by_domain", lang))
                 .font(.headline)
             VStack(spacing: 12) {
                 ForEach(domains) { domain in
@@ -106,7 +107,7 @@ struct FollowUpSummaryView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(domain.title)
                                 .font(.subheadline.weight(.semibold))
-                            Text("Prev \(formattedScore(domain.previousScore)) → Now \(formattedScore(domain.currentScore))")
+                            Text(String(format: LocalizedString("followup_summary_score_comparison", lang), formattedScore(domain.previousScore), formattedScore(domain.currentScore)))
                                 .font(.caption)
                                 .foregroundColor(AppColors.textSecondary)
                         }
@@ -133,9 +134,9 @@ struct FollowUpSummaryView: View {
 
     private var staffNoteField: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Staff note (optional)")
+            Text(LocalizedString("followup_summary_staff_note", lang))
                 .font(.headline)
-            TextField("Write a short follow-up note…", text: $staffNote, axis: .vertical)
+            TextField(LocalizedString("followup_summary_staff_note_placeholder", lang), text: $staffNote, axis: .vertical)
                 .textFieldStyle(.plain)
                 .padding()
                 .background(AppColors.secondarySurface)
@@ -153,7 +154,7 @@ struct FollowUpSummaryView: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                 } else {
-                    Text("Finish follow-up")
+                    Text(LocalizedString("followup_summary_finish", lang))
                         .font(.headline)
                 }
             }

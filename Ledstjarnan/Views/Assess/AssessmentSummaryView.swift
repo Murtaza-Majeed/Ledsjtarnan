@@ -15,6 +15,7 @@ struct AssessmentSummaryDomain: Identifiable {
 
 struct AssessmentSummaryView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.languageCode) var lang
 
     let client: Client
     let assessmentType: String
@@ -80,9 +81,9 @@ struct AssessmentSummaryView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(AppColors.onDanger)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Complete all domains")
+                                Text(LocalizedString("summary_complete_all_domains_title", lang))
                                     .font(.headline)
-                                Text("Finish the remaining domains before completing the assessment.")
+                                Text(LocalizedString("summary_complete_all_domains_message", lang))
                                     .font(.subheadline)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -94,9 +95,9 @@ struct AssessmentSummaryView: View {
                     }
 
                     clientCard
-                    domainSection(title: "Domain results", domains: domains)
+                    domainSection(title: LocalizedString("summary_domain_results", lang), domains: domains)
                     if !problemDomains.isEmpty {
-                        domainSection(title: "Problem areas", domains: problemDomains)
+                        domainSection(title: LocalizedString("summary_problem_areas", lang), domains: problemDomains)
                     }
                     keyNotesSection
                 }
@@ -109,11 +110,11 @@ struct AssessmentSummaryView: View {
                     .padding(20)
                     .background(AppColors.background.opacity(0.95))
             }
-            .navigationTitle("Summary")
+            .navigationTitle(LocalizedString("summary_title", lang))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+                    Button(LocalizedString("summary_close", lang)) { dismiss() }
                 }
             }
         }
@@ -123,10 +124,10 @@ struct AssessmentSummaryView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(client.displayName)
                 .font(.title3.bold())
-            Text("Assessment: \(assessmentLabel)")
+            Text(String(format: LocalizedString("summary_assessment_label", lang), assessmentLabel))
                 .foregroundColor(AppColors.textSecondary)
                 .font(.subheadline)
-            Text("Completed: \(completionLabel)")
+            Text(String(format: LocalizedString("summary_completed_label", lang), completionLabel))
                 .foregroundColor(AppColors.textSecondary)
                 .font(.subheadline)
         }
@@ -150,7 +151,7 @@ struct AssessmentSummaryView: View {
                                 Text(domain.title)
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(AppColors.textPrimary)
-                                Text(domain.isCompleted ? "Completed" : "Not started")
+                                Text(domain.isCompleted ? LocalizedString("summary_domain_completed", lang) : LocalizedString("summary_domain_not_started", lang))
                                     .font(.caption)
                                     .foregroundColor(domain.isCompleted ? AppColors.textSecondary : AppColors.danger)
                             }
@@ -179,9 +180,9 @@ struct AssessmentSummaryView: View {
 
     private var keyNotesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Key notes")
+            Text(LocalizedString("assessment_summary_key_notes", lang))
                 .font(.headline)
-            Text(keyNotes.isEmpty ? "No notes yet." : keyNotes)
+            Text(keyNotes.isEmpty ? LocalizedString("summary_no_notes", lang) : keyNotes)
                 .font(.body)
                 .foregroundColor(AppColors.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -196,7 +197,7 @@ struct AssessmentSummaryView: View {
             Button {
                 onViewRecommendation()
             } label: {
-                Text("View recommendation")
+                Text(LocalizedString("summary_view_recommendation", lang))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -215,7 +216,7 @@ struct AssessmentSummaryView: View {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
                         } else {
-                            Text("Finish assessment")
+                            Text(LocalizedString("assessment_summary_finish", lang))
                         }
                     }
                     .font(.headline)

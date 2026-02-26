@@ -11,111 +11,123 @@ enum BaselineDomainCategory: String, Codable {
     case salutogenic
     case pathogenic
 
-    var label: String {
+    func label(lang: String) -> String {
         switch self {
         case .salutogenic:
-            return "Salutogena kapital"
+            return LocalizedString("baseline_category_salutogenic", lang)
         case .pathogenic:
-            return "Patogena kapital"
+            return LocalizedString("baseline_category_pathogenic", lang)
         }
     }
 }
 
 struct BaselineDomain: Identifiable, Hashable {
     let key: String
-    let title: String
-    let subtitle: String
+    let titleKey: String
+    let subtitleKey: String
     let icon: String
     let questionCount: Int
-    let needsOptions: [String]
+    let needsOptionsKeys: [String]
     let category: BaselineDomainCategory
 
     var id: String { key }
+    
+    func title(lang: String) -> String {
+        LocalizedString(titleKey, lang)
+    }
+    
+    func subtitle(lang: String) -> String {
+        LocalizedString(subtitleKey, lang)
+    }
+    
+    func needsOptions(lang: String) -> [String] {
+        needsOptionsKeys.map { LocalizedString($0, lang) }
+    }
 }
 
 enum BaselineDomainFlowConfig {
     static let salutogenicDomains: [BaselineDomain] = [
         BaselineDomain(
             key: "health",
-            title: "Kropp & hälsa",
-            subtitle: "Fysisk hälsa, medicin, livsstil, stress & återhämtning",
+            titleKey: "domain_health_title",
+            subtitleKey: "domain_health_subtitle",
             icon: "heart.text.square",
             questionCount: 3,
-            needsOptions: [
-                "Behöver medicinsk uppföljning",
-                "Sova/återhämtning",
-                "Livsstilscoach",
-                "Akut risk"
+            needsOptionsKeys: [
+                "needs_medical_followup",
+                "needs_sleep_recovery",
+                "needs_lifestyle_coach",
+                "needs_acute_risk"
             ],
             category: .salutogenic
         ),
         BaselineDomain(
             key: "education",
-            title: "Utbildning & arbete",
-            subtitle: "Skola, praktik, motivation & daglig struktur",
+            titleKey: "domain_education_title",
+            subtitleKey: "domain_education_subtitle",
             icon: "book.closed.fill",
             questionCount: 3,
-            needsOptions: [
-                "Studiecoach",
-                "Behöver daglig struktur",
-                "Praktik/arbete saknas",
-                "Motivation låg"
+            needsOptionsKeys: [
+                "needs_study_coach",
+                "needs_daily_structure",
+                "needs_internship_work",
+                "needs_low_motivation"
             ],
             category: .salutogenic
         ),
         BaselineDomain(
             key: "social",
-            title: "Social kompetens & arenor",
-            subtitle: "Kommunikation, känsloreglering, DBT-färdigheter",
+            titleKey: "domain_social_title",
+            subtitleKey: "domain_social_subtitle",
             icon: "person.2.fill",
             questionCount: 3,
-            needsOptions: [
-                "Behöver mentor",
-                "Konflikter/relationsrisk",
-                "Behöver DBT-stöd",
-                "Behöver tolk"
+            needsOptionsKeys: [
+                "needs_mentor",
+                "needs_conflicts_relationship_risk",
+                "needs_dbt_support",
+                "needs_interpreter"
             ],
             category: .salutogenic
         ),
         BaselineDomain(
             key: "independence",
-            title: "Självständighet & vardag",
-            subtitle: "Ekonomi, boende, ADL-färdigheter & vardagsstruktur",
+            titleKey: "domain_independence_title",
+            subtitleKey: "domain_independence_subtitle",
             icon: "house.fill",
             questionCount: 3,
-            needsOptions: [
-                "Boendestöd",
-                "Struktur i vardagen",
-                "Budgetering",
-                "Praktisk ADL-träning"
+            needsOptionsKeys: [
+                "needs_housing_support",
+                "needs_structure_daily",
+                "needs_budgeting",
+                "needs_practical_adl"
             ],
             category: .salutogenic
         ),
         BaselineDomain(
             key: "relationships",
-            title: "Relationer & nätverk",
-            subtitle: "Nätverk, stödpersoner & hantering av ensamhet",
+            titleKey: "domain_relationships_title",
+            subtitleKey: "domain_relationships_subtitle",
             icon: "link",
             questionCount: 3,
-            needsOptions: [
-                "Behöver nätverkskarta",
-                "Risk i relationer",
-                "Behöver familjesamtal",
-                "Stödkontakt saknas"
+            needsOptionsKeys: [
+                "needs_network_map",
+                "needs_risk_in_relationships",
+                "needs_family_sessions",
+                "needs_support_contact"
             ],
             category: .salutogenic
         ),
         BaselineDomain(
             key: "identity",
-            title: "Identitet & utveckling",
-            subtitle: "KASAM, värderingar, kultur/andlighet & framtidstro",
+            titleKey: "domain_identity_title",
+            subtitleKey: "domain_identity_subtitle",
             icon: "sparkles",
             questionCount: 3,
-            needsOptions: [
-                "Behöver KASAM-stöd",
-                "Självbild låg",
-                "Behöver kultur/andlig kontakt",
-                "Framtidsplan saknas"
+            needsOptionsKeys: [
+                "needs_soc_support",
+                "needs_low_self_image",
+                "needs_cultural_spiritual",
+                "needs_future_plan"
             ],
             category: .salutogenic
         )
@@ -124,71 +136,71 @@ enum BaselineDomainFlowConfig {
     static let pathogenicDomains: [BaselineDomain] = [
         BaselineDomain(
             key: "substance",
-            title: "Alkohol & droger",
-            subtitle: "ASI Kriterium E – konsumtion, historik, risk",
+            titleKey: "domain_substance_title",
+            subtitleKey: "domain_substance_subtitle",
             icon: "cross.vial",
             questionCount: 3,
-            needsOptions: [
-                "Pågående bruk",
-                "Behöver A-CRA/MET",
-                "Risk för återfall",
-                "Behöver avgiftning"
+            needsOptionsKeys: [
+                "needs_ongoing_use",
+                "needs_acra_met",
+                "needs_relapse_risk",
+                "needs_detox"
             ],
             category: .pathogenic
         ),
         BaselineDomain(
             key: "attachment",
-            title: "Familj & anknytning",
-            subtitle: "Relationer, konflikter, våldsutsatthet",
+            titleKey: "domain_attachment_title",
+            subtitleKey: "domain_attachment_subtitle",
             icon: "figure.2.arms.open",
             questionCount: 3,
-            needsOptions: [
-                "Våld/risk i nätverk",
-                "Behöver familjesamtal",
-                "Låg trygghet",
-                "Behöver Signs of Safety"
+            needsOptionsKeys: [
+                "needs_violence_risk",
+                "needs_family_sessions",
+                "needs_low_security",
+                "needs_signs_safety"
             ],
             category: .pathogenic
         ),
         BaselineDomain(
             key: "mentalHealth",
-            title: "Psykisk hälsa",
-            subtitle: "Diagnoser, symtom, funktionsnivå",
+            titleKey: "domain_mental_health_title",
+            subtitleKey: "domain_mental_health_subtitle",
             icon: "brain.head.profile",
             questionCount: 3,
-            needsOptions: [
-                "Behöver psykolog",
-                "Funktion påverkas",
-                "Medicinsk uppföljning",
-                "Pågående öppenvård"
+            needsOptionsKeys: [
+                "needs_psychologist",
+                "needs_function_affected",
+                "needs_medical_followup_psych",
+                "needs_ongoing_outpatient"
             ],
             category: .pathogenic
         ),
         BaselineDomain(
             key: "severeMentalHealth",
-            title: "Allvarlig psykisk ohälsa",
-            subtitle: "Suicid, självskada, akuta risker",
+            titleKey: "domain_severe_mental_health_title",
+            subtitleKey: "domain_severe_mental_health_subtitle",
             icon: "exclamationmark.triangle.fill",
             questionCount: 3,
-            needsOptions: [
-                "Suicidrisk",
-                "Självskada",
-                "Behöver psykiatri",
-                "DBT/Livlinan"
+            needsOptionsKeys: [
+                "needs_suicide_risk",
+                "needs_self_harm",
+                "needs_psychiatry",
+                "needs_dbt_livlinan"
             ],
             category: .pathogenic
         ),
         BaselineDomain(
             key: "trauma",
-            title: "Trauma & säkerhet",
-            subtitle: "STRESS, PTSD, dissociation & skydd",
+            titleKey: "domain_trauma_title",
+            subtitleKey: "domain_trauma_subtitle",
             icon: "shield.lefthalf.filled",
             questionCount: 3,
-            needsOptions: [
-                "PTSD-symtom",
-                "Behöver traumaterapi",
-                "Akut skyddsbehov",
-                "Psykologutredning"
+            needsOptionsKeys: [
+                "needs_ptsd_symptoms",
+                "needs_trauma_therapy",
+                "needs_acute_protection",
+                "needs_psych_assessment"
             ],
             category: .pathogenic
         )

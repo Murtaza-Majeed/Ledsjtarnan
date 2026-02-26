@@ -32,7 +32,7 @@ struct ContactSupportView: View {
             .padding(.bottom, 20)
         }
         .background(AppColors.background)
-        .navigationTitle("Contact Support")
+        .navigationTitle(LocalizedString("contact_support_title", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if !showSuccess {
@@ -41,7 +41,7 @@ struct ContactSupportView: View {
                         if isSending {
                             ProgressView()
                         } else {
-                            Text("Send")
+                            Text(LocalizedString("general_send", appState.languageCode))
                         }
                     }
                     .disabled(!canSubmit)
@@ -58,11 +58,11 @@ struct ContactSupportView: View {
     
     private var formContent: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Describe what happened and we'll follow up via email.")
+            Text(LocalizedString("contact_support_message_hint", appState.languageCode))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
                 .padding(.horizontal)
-            Picker("Issue type", selection: $issueType) {
+            Picker(LocalizedString("contact_support_subject", appState.languageCode), selection: $issueType) {
                 ForEach(SupportTicket.IssueType.allCases, id: \.rawValue) { type in
                     Text(type.displayName).tag(type)
                 }
@@ -71,10 +71,10 @@ struct ContactSupportView: View {
             .padding(.horizontal)
             
             VStack(spacing: 16) {
-                InputField(title: "Screen / location", placeholder: "e.g. Clients > Anna > Timeline", text: $locationPath)
-                InputField(title: "Subject", placeholder: "Short summary", text: $subject)
+                InputField(title: LocalizedString("schedule_title", appState.languageCode), placeholder: "e.g. Clients > Anna > Timeline", text: $locationPath)
+                InputField(title: LocalizedString("contact_support_subject", appState.languageCode), placeholder: LocalizedString("contact_support_subject", appState.languageCode), text: $subject)
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Message")
+                    Text(LocalizedString("contact_support_message", appState.languageCode))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                     TextEditor(text: $message)
@@ -134,9 +134,9 @@ private struct SuccessCard: View {
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(size: 64))
                 .foregroundColor(AppColors.success)
-            Text("Ticket submitted")
+            Text(LocalizedString("contact_support_ticket_submitted", "en"))
                 .font(.title2.weight(.semibold))
-            Text("Our team will reply to your email as soon as we've reviewed the issue.")
+            Text(LocalizedString("contact_support_ticket_message", "en"))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)

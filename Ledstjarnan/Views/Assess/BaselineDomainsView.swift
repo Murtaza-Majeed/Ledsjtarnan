@@ -307,7 +307,8 @@ struct BaselineDomainsView: View {
             return BaselineDisplayDomain(
                 base: domain,
                 logic: logic,
-                questionCount: questionCount > 0 ? questionCount : domain.questionCount
+                questionCount: questionCount > 0 ? questionCount : domain.questionCount,
+                lang: lang
             )
         }
     }
@@ -316,6 +317,7 @@ struct BaselineDomainsView: View {
 private struct ErrorStateView: View {
     let message: String
     let retry: () -> Void
+    @Environment(\.languageCode) var lang
 
     var body: some View {
         VStack(spacing: 12) {
@@ -323,7 +325,7 @@ private struct ErrorStateView: View {
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(AppColors.textSecondary)
-            Button("Retry", action: retry)
+            Button(LocalizedString("general_retry", lang), action: retry)
                 .buttonStyle(.borderedProminent)
         }
         .padding()
@@ -335,9 +337,10 @@ private struct BaselineDisplayDomain: Identifiable {
     let base: BaselineDomain
     let logic: LogicAssessmentDomain?
     let questionCount: Int
+    let lang: String
 
     var id: String { base.id }
-    var title: String { logic?.label ?? base.title }
-    var subtitle: String { logic?.description ?? base.subtitle }
+    var title: String { base.title(lang: lang) }
+    var subtitle: String { base.subtitle(lang: lang) }
     var icon: String { base.icon }
 }

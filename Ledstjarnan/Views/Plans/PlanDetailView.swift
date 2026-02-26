@@ -27,7 +27,7 @@ struct PlanDetailView: View {
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(AppColors.textPrimary)
-                    Text(plan.title ?? "Untitled plan")
+                    Text(plan.title ?? LocalizedString("plans_untitled", lang))
                         .font(.subheadline)
                         .foregroundColor(AppColors.textSecondary)
                     Text(plan.status)
@@ -89,7 +89,7 @@ struct PlanDetailView: View {
                         .padding(.horizontal)
                     }
                     if !assignments.isEmpty {
-                        sectionTitle("Livbojen chapters")
+                        sectionTitle(LocalizedString("plan_builder_step_4_description", lang))
                         VStack(alignment: .leading, spacing: 6) {
                             ForEach(assignments) { a in
                                 if let ch = chapters.first(where: { $0.id == a.chapterId }) {

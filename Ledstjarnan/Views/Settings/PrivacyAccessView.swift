@@ -8,7 +8,7 @@ import SwiftUI
 struct PrivacyAccessView: View {
     var body: some View {
         List {
-            Section(header: Text("Data sharing")) {
+            Section(header: Text(LocalizedString("privacy_data_sharing", "en"))) {
                 InfoRow(
                     title: "Livbojen link",
                     detail: "Only active plans share goals/actions with the youth. Staff-only notes stay in Ledstjärnan."
@@ -19,7 +19,7 @@ struct PrivacyAccessView: View {
                 )
             }
             
-            Section(header: Text("Role & permissions")) {
+            Section(header: Text(LocalizedString("privacy_role_permissions", "en"))) {
                 InfoRow(
                     title: "Contact persons",
                     detail: "Standard staff can create clients, assessments, plans, and schedule items."
@@ -30,7 +30,7 @@ struct PrivacyAccessView: View {
                 )
             }
             
-            Section(header: Text("Device security")) {
+            Section(header: Text(LocalizedString("privacy_device_security", "en"))) {
                 InfoRow(
                     title: "Biometric lock",
                     detail: "Enable Face ID / Touch ID in iOS Settings → Ledstjärnan to require biometrics when reopening the app."
@@ -43,7 +43,7 @@ struct PrivacyAccessView: View {
         }
         .listStyle(.insetGrouped)
         .background(AppColors.background)
-        .navigationTitle("Privacy & Access")
+        .navigationTitle(LocalizedString("privacy_access_title", "en"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

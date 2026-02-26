@@ -19,7 +19,7 @@ struct ClientScheduleView: View {
     var body: some View {
         VStack {
             if loading {
-                ProgressView("Loading…")
+                ProgressView(LocalizedString("general_loading", appState.languageCode))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = loadError {
                 Text(error)
@@ -27,13 +27,13 @@ struct ClientScheduleView: View {
                     .foregroundColor(AppColors.danger)
                     .padding()
             } else if items.isEmpty {
-                ClientEmptyScheduleState {
+                ClientEmptyScheduleState(lang: appState.languageCode) {
                     showComposer = true
                 }
             } else {
                 List(items) { item in
                     Button(action: { selectedItem = item }) {
-                        ClientPlannerItemRow(item: item, clientName: client.displayName)
+                        ClientPlannerItemRow(item: item, clientName: client.displayName, lang: appState.languageCode)
                     }
                     .listRowBackground(AppColors.mainSurface)
                 }
@@ -41,7 +41,7 @@ struct ClientScheduleView: View {
             }
         }
         .background(AppColors.background)
-        .navigationTitle("Schedule – \(client.displayName)")
+        .navigationTitle(LocalizedString("schedule_client_title", appState.languageCode).replacingOccurrences(of: "%@", with: client.displayName))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -96,6 +96,7 @@ struct ClientScheduleView: View {
 }
 
 private struct ClientEmptyScheduleState: View {
+    let lang: String
     let action: () -> Void
     
     var body: some View {
@@ -103,14 +104,14 @@ private struct ClientEmptyScheduleState: View {
             Image(systemName: "calendar.badge.clock")
                 .font(.system(size: 44))
                 .foregroundColor(AppColors.primary)
-            Text("No schedule items for this client.")
+            Text(LocalizedString("schedule_client_no_items", lang))
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
-            Text("Create a session, task, or activity to get started.")
+            Text(LocalizedString("schedule_client_create_hint", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
                 .multilineTextAlignment(.center)
-            Button("Add item", action: action)
+            Button(LocalizedString("schedule_add_first_item", lang), action: action)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
                 .background(AppColors.primary)
@@ -124,6 +125,7 @@ private struct ClientEmptyScheduleState: View {
 private struct ClientPlannerItemRow: View {
     let item: PlannerItem
     let clientName: String
+    let lang: String
     private static let formatter: DateFormatter = {
         let f = DateFormatter()
         f.dateStyle = .medium
@@ -145,12 +147,12 @@ private struct ClientPlannerItemRow: View {
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             if let endAt = item.endAt {
-                Text("Ends \(ClientPlannerItemRow.formatter.string(from: endAt))")
+                Text(LocalizedString("schedule_client_ends_at", lang).replacingOccurrences(of: "%@", with: ClientPlannerItemRow.formatter.string(from: endAt)))
                     .font(.caption)
                     .foregroundColor(AppColors.mutedNeutral)
             }
             if item.isLocked {
-                Label("Locked", systemImage: "lock.fill")
+                Label(LocalizedString("plan_builder_responsibility_shared", lang), systemImage: "lock.fill")
                     .font(.caption)
                     .foregroundColor(AppColors.primary)
             }

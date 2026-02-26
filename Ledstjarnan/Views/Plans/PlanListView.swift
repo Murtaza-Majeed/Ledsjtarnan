@@ -87,7 +87,7 @@ struct PlanListView: View {
                                         Text(clientNames[plan.clientId] ?? "—")
                                             .font(.headline)
                                             .foregroundColor(AppColors.textPrimary)
-                                        Text(plan.title ?? "Untitled plan")
+                                        Text(plan.title ?? LocalizedString("plans_untitled", lang))
                                             .font(.subheadline)
                                             .foregroundColor(AppColors.textSecondary)
                                     }
@@ -165,7 +165,7 @@ struct PlanClientPickerView: View {
     var body: some View {
         Group {
             if loading {
-                ProgressView("Loading…")
+                ProgressView(LocalizedString("general_loading", appState.languageCode))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = loadError {
                 Text(error)
@@ -186,7 +186,7 @@ struct PlanClientPickerView: View {
             }
         }
         .background(AppColors.background)
-        .navigationTitle("New plan")
+        .navigationTitle(LocalizedString("plans_new_plan_title", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadClients()

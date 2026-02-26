@@ -140,6 +140,8 @@
 "baseline_error_no_unit" = "No unit connected.";
 "baseline_section_salutogenic" = "Salutogenic capital";
 "baseline_section_pathogenic" = "Pathogenic capital";
+"baseline_category_salutogenic" = "Salutogenic capital";
+"baseline_category_pathogenic" = "Pathogenic capital";
 "baseline_start" = "Start baseline";
 "baseline_continue" = "Continue baseline";
 "baseline_view" = "View baseline";
@@ -195,6 +197,155 @@
 "assessment_select_client" = "Select a client";
 "assessment_no_assessments" = "No assessments yet";
 "assessment_start_baseline" = "Start baseline assessment";
+"assessment_pick_client" = "Pick a client";
+"assessment_search_name_code" = "Search name / code";
+"assessment_baseline_needed" = "Baseline needed";
+"assessment_followups_due" = "Follow-ups due";
+"assessment_selected_client" = "Selected client";
+"assessment_next_followup" = "Next follow-up: %@";
+"assessment_no_followup_scheduled" = "No follow-up scheduled";
+"assessment_flags" = "Flags";
+"assessment_loading_clients" = "Loading clients…";
+"assessment_no_clients_in_unit" = "No clients in this unit.";
+"assessment_actions" = "Actions";
+"assessment_view_baseline" = "View baseline";
+"assessment_start_baseline_button" = "Start baseline";
+"assessment_start_followup" = "Start follow-up";
+"assessment_recent_assessments" = "Recent assessments";
+"assessment_no_assessments_yet" = "No assessments yet.";
+"assessment_unknown_client" = "Unknown client";
+"assessment_select_unit_prompt" = "Select a unit in Settings to see assessments.";
+"assessment_select_client_sheet_title" = "Select client";
+"assessment_close" = "Close";
+
+// MARK: - Assessment Comparison
+"comparison_progress_title" = "Progress: %@";
+"comparison_baseline" = "Baseline";
+"comparison_followup" = "Follow-up";
+"comparison_days_between" = "%d days between assessments";
+"comparison_ptsd_title" = "PTSD Symptom Score (STRESS)";
+"comparison_change" = "change";
+"comparison_safety_warnings" = "Active safety warnings";
+"comparison_domains_change" = "Life domains – Change";
+"comparison_domain_header" = "Domain";
+"comparison_baseline_short" = "Base";
+"comparison_current_short" = "Now";
+"comparison_delta" = "Δ";
+"comparison_recommendations" = "Recommended interventions";
+"comparison_probable_ptsd" = "Probable PTSD";
+"comparison_needs_attention" = "Needs extra attention";
+"comparison_worsened_warning" = "Deterioration of two or more points";
+
+// MARK: - Domain Names
+"domain_health" = "Body & Health";
+"domain_education" = "Education & Work";
+"domain_social" = "Social Competence";
+"domain_independence" = "Independence";
+"domain_relationships" = "Relationships & Network";
+"domain_identity" = "Identity & Development";
+"domain_substance" = "Alcohol & Drug Use";
+"domain_attachment" = "Attachment & Relationships";
+"domain_mental_health" = "Mental Health";
+"domain_severe_mental_health" = "Severe Mental Health";
+"domain_trauma" = "Trauma (STRESS)";
+
+// MARK: - Domain Titles & Subtitles (Baseline)
+"domain_health_title" = "Body & health";
+"domain_health_subtitle" = "Physical health, medication, lifestyle, stress & recovery";
+"domain_education_title" = "Education & work";
+"domain_education_subtitle" = "School, internships, motivation & daily structure";
+"domain_social_title" = "Social competence & arenas";
+"domain_social_subtitle" = "Communication, emotion regulation, DBT skills";
+"domain_independence_title" = "Independence & daily life";
+"domain_independence_subtitle" = "Finance, housing, ADL skills & daily structure";
+"domain_relationships_title" = "Relationships & network";
+"domain_relationships_subtitle" = "Network, support persons & managing loneliness";
+"domain_identity_title" = "Identity & development";
+"domain_identity_subtitle" = "SOC, values, culture/spirituality & hope for the future";
+"domain_substance_title" = "Alcohol & drugs";
+"domain_substance_subtitle" = "ASI Criterion E – consumption, history, risk";
+"domain_attachment_title" = "Family & attachment";
+"domain_attachment_subtitle" = "Relationships, conflicts, exposure to violence";
+"domain_mental_health_title" = "Mental health";
+"domain_mental_health_subtitle" = "Diagnoses, symptoms, level of functioning";
+"domain_severe_mental_health_title" = "Severe mental illness";
+"domain_severe_mental_health_subtitle" = "Suicide, self-harm, acute risks";
+"domain_trauma_title" = "Trauma & safety";
+"domain_trauma_subtitle" = "STRESS, PTSD, dissociation & protection";
+
+// MARK: - Domain Needs Options
+"needs_medical_followup" = "Needs medical follow-up";
+"needs_sleep_recovery" = "Sleep/recovery";
+"needs_lifestyle_coach" = "Lifestyle coach";
+"needs_acute_risk" = "Acute risk";
+"needs_study_coach" = "Study coach";
+"needs_daily_structure" = "Needs daily structure";
+"needs_internship_work" = "Internship/work missing";
+"needs_low_motivation" = "Low motivation";
+"needs_mentor" = "Needs mentor";
+"needs_conflicts_relationship_risk" = "Conflicts/relationship risk";
+"needs_dbt_support" = "Needs DBT support";
+"needs_interpreter" = "Needs interpreter";
+"needs_housing_support" = "Housing support";
+"needs_structure_daily" = "Structure in daily life";
+"needs_budgeting" = "Budgeting";
+"needs_practical_adl" = "Practical ADL training";
+"needs_network_map" = "Needs network map";
+"needs_risk_in_relationships" = "Risk in relationships";
+"needs_family_sessions" = "Needs family sessions";
+"needs_support_contact" = "Support contact missing";
+"needs_soc_support" = "Needs SOC support";
+"needs_low_self_image" = "Low self-image";
+"needs_cultural_spiritual" = "Needs cultural/spiritual contact";
+"needs_future_plan" = "Future plan missing";
+"needs_ongoing_use" = "Ongoing use";
+"needs_acra_met" = "Needs A-CRA/MET";
+"needs_relapse_risk" = "Risk of relapse";
+"needs_detox" = "Needs detoxification";
+"needs_violence_risk" = "Violence/risk in network";
+"needs_low_security" = "Low security";
+"needs_signs_safety" = "Needs Signs of Safety";
+"needs_psychologist" = "Needs psychologist";
+"needs_function_affected" = "Function affected";
+"needs_medical_followup_psych" = "Medical follow-up";
+"needs_ongoing_outpatient" = "Ongoing outpatient care";
+"needs_suicide_risk" = "Suicide risk";
+"needs_self_harm" = "Self-harm";
+"needs_psychiatry" = "Needs psychiatry";
+"needs_dbt_livlinan" = "DBT/Livlinan";
+"needs_ptsd_symptoms" = "PTSD symptoms";
+"needs_trauma_therapy" = "Needs trauma therapy";
+"needs_acute_protection" = "Acute protection needs";
+"needs_psych_assessment" = "Psychological assessment";
+
+// MARK: - Insatskarta
+"insatskarta_title" = "Intervention Map — %@";
+"insatskarta_close" = "Close";
+"insatskarta_recommendations" = "Recommended interventions";
+"insatskarta_safety_required" = "Safety measures required";
+"insatskarta_stress_trauma" = "STRESS — Trauma Assessment";
+"insatskarta_criterion_b" = "Intrusive";
+"insatskarta_criterion_c" = "Avoidance";
+"insatskarta_criterion_d" = "Cognition";
+"insatskarta_criterion_e" = "Reactivity";
+"insatskarta_psychologist_needed" = "Psychologist";
+"insatskarta_criteria_met" = "Criteria met";
+"insatskarta_no_action" = "No action needed";
+
+// MARK: - Assessment Summary
+"summary_title" = "Summary";
+"summary_close" = "Close";
+"summary_complete_all_domains" = "Complete all domains";
+"summary_completed_label" = "Completed: %@";
+"summary_domain_completed" = "Completed";
+"summary_domain_not_started" = "Not started";
+"summary_no_notes" = "No notes yet.";
+"summary_view_recommendation" = "View recommendation";
+"summary_complete_all_domains_title" = "Complete all domains";
+"summary_complete_all_domains_message" = "Finish the remaining domains before completing the assessment.";
+"summary_domain_results" = "Domain results";
+"summary_problem_areas" = "Problem areas";
+"summary_assessment_label" = "Assessment: %@";
 
 // MARK: - Problem Areas
 "problem_priority_title" = "Priority";
@@ -450,3 +601,244 @@
 "accessibility_menu" = "Menu";
 "accessibility_search" = "Search";
 "accessibility_filter" = "Filter";
+
+// MARK: - Follow-up Domains
+"followup_domains_assessment_title" = "Follow-up Assessment";
+"followup_domains_baseline_date" = "Baseline: %@";
+"followup_domains_followup_date" = "Follow-up: %@";
+"followup_domains_update_instruction" = "Update the domains (same as baseline).";
+"followup_domains_previous_score_hint" = "You can see the previous score for comparison.";
+"followup_domains_section_title" = "Domains";
+"followup_domains_score_comparison" = "Prev: %1$@   Now: %2$@";
+"followup_domains_review_summary" = "Review summary";
+"followup_domains_missing_count" = "%d domains missing";
+"followup_domains_loading" = "Loading follow-up…";
+"followup_domains_error" = "Select a unit first.";
+
+// MARK: - Follow-up Summary
+"followup_summary_baseline_vs_followup" = "Baseline vs Follow-up";
+"followup_summary_date" = "Follow-up date: %@";
+"followup_summary_changes_by_domain" = "Changes by domain";
+"followup_summary_score_comparison" = "Prev %1$@ → Now %2$@";
+"followup_summary_staff_note" = "Staff note (optional)";
+"followup_summary_staff_note_placeholder" = "Write a short follow-up note…";
+"followup_summary_finish" = "Finish follow-up";
+"followup_summary_prev_label" = "Prev";
+"followup_summary_now_label" = "Now";
+
+// MARK: - Follow-up Comparison
+"followup_comparison_no_pair" = "No completed baseline and follow-up pair found.";
+"followup_comparison_complete_message" = "Complete at least one baseline and one follow-up to see comparisons.";
+"followup_comparison_baseline_completed" = "Baseline completed: %@";
+"followup_comparison_domain_comparison" = "Domain comparison";
+"followup_comparison_scale_description" = "Scale: 1 = low need, 5 = high need. Green = improvement, red = deterioration.";
+"followup_comparison_baseline_label" = "Baseline";
+"followup_comparison_followup_label" = "Follow-up";
+"followup_comparison_title" = "Baseline vs follow-up";
+
+// MARK: - Assessment Recommendation
+"assessment_recommendation_open_insatskarta" = "Open Insatskarta (detailed)";
+"assessment_recommendation_focus_areas" = "Recommended focus areas";
+"assessment_recommendation_complete_message" = "Complete the assessment to generate recommendations.";
+"assessment_recommendation_suggested_chapters" = "Suggested Livbojen chapters";
+"assessment_recommendation_assign_after_selection" = "Assign Livbojen chapters after you select focus areas.";
+"assessment_recommendation_tap_assign_hint" = "Tap Assign to send chapters to Livbojen.";
+"assessment_recommendation_go_to_plan_builder" = "Go to plan builder";
+"assessment_recommendation_assign_chapters_picker" = "Assign chapters (picker)";
+"assessment_recommendation_link_client_message" = "Link the client to Livbojen to assign chapters.";
+"assessment_recommendation_title" = "Recommendation";
+"assessment_recommendation_subtitle_baseline" = "Based on baseline results";
+"assessment_recommendation_subtitle_followup" = "Based on follow-up results";
+"assessment_recommendation_priority_high" = "High priority";
+"assessment_recommendation_priority_medium" = "Medium priority";
+"assessment_recommendation_priority_medium_low" = "Medium-low";
+"assessment_recommendation_priority_low" = "Low priority";
+"assessment_recommendation_button_added" = "Added";
+"assessment_recommendation_button_add" = "Add to plan";
+
+// MARK: - Assessment Summary
+"assessment_summary_key_notes" = "Key notes";
+"assessment_summary_finish" = "Finish assessment";
+
+// MARK: - Assessment Form
+"assessment_form_domains" = "Domains";
+"assessment_form_questions_answered" = "%1$d of %2$d questions";
+"assessment_form_complete_required" = "Complete required fields";
+"assessment_form_questions_need_attention" = "%1$d of %2$d questions still need attention.";
+"assessment_form_view_insatskarta" = "View Insatskarta";
+
+// MARK: - Client Picker
+"assess_client_picker_no_clients" = "No clients in this unit.";
+"assess_client_picker_title" = "Select client";
+"assess_client_picker_loading" = "Loading clients…";
+
+// MARK: - Trauma Screening
+"trauma_screening_question_number" = "Q%d";
+
+// MARK: - Insatskarta
+"insatskarta_total_symptom_score" = "Total symptom score:";
+"insatskarta_ptsd_probable" = "Probable PTSD — all criteria met";
+"insatskarta_ptsd_partial" = "Partial PTSD — %d of 4 criteria met";
+
+// MARK: - Auth
+"auth_reset_email_sent" = "Email sent";
+"auth_reset_check_spam" = "• Check spam/junk folder";
+"auth_reset_link_expires" = "• Link expires after 1 hour";
+
+// MARK: - Create Client
+"create_client_no_unit" = "No unit available";
+"create_client_no_staff" = "No staff in unit";
+
+// MARK: - Clients List
+"clients_list_next_followup_none" = "Next: Follow-up —";
+"clients_list_next_followup_date" = "Next: Follow-up %@";
+
+// MARK: - Onboarding
+"onboarding_greeting" = "Hi!";
+"onboarding_notifications_title" = "Stay on top of sessions";
+"onboarding_notifications_message" = "Allow notifications for gentle follow-up reminders.";
+
+// MARK: - Schedule
+"schedule_title" = "Schedule";
+"schedule_loading" = "Loading schedule…";
+"schedule_client_title" = "Schedule – %@";
+"schedule_client_no_items" = "No schedule items for this client.";
+"schedule_client_create_hint" = "Create a session, task, or activity to get started.";
+"schedule_client_ends_at" = "Ends %@";
+"schedule_upcoming" = "Upcoming";
+"schedule_planned_items_count" = "%d planned items";
+"schedule_no_items" = "No schedule items yet.";
+"schedule_no_items_hint" = "Plan sessions, tasks and routines to help the unit stay aligned.";
+"schedule_add_first_item" = "Add first item";
+"schedule_item_unit_wide" = "None (unit-wide)";
+"schedule_item_notes" = "Notes";
+"schedule_update_status" = "Update status";
+"schedule_duration" = "Duration";
+"schedule_duration_minutes" = "%dm";
+"schedule_end_time" = "End time: %@";
+"schedule_new_item_title" = "New schedule item";
+"schedule_item_title" = "Schedule item";
+
+// MARK: - About
+"app_name" = "Ledstjärnan";
+"about_version_format" = "Version %@";
+"about_build_date_format" = "Build date: %@";
+"about_for_staff" = "For staff at Västerbo Social Omsorg";
+"about_client_app" = "Client app: Livbojen";
+"about_data_protection" = "Data is protected and scoped by unit.";
+"about_open_source_licenses" = "Open Source Licenses";
+
+// MARK: - Contact Support
+"general_send" = "Send";
+"contact_support_ticket_submitted" = "Ticket submitted";
+"contact_support_ticket_message" = "Our team will reply to your email as soon as we've reviewed the issue.";
+"contact_support_message_hint" = "Describe what happened and we'll follow up via email.";
+
+// MARK: - Settings
+"settings_debug_localization" = "Debug Localization";
+
+// MARK: - FAQ
+"faq_last_updated" = "Last updated %@";
+"faq_answer_title" = "Answer";
+
+// MARK: - Privacy
+"privacy_data_sharing" = "Data sharing";
+"privacy_role_permissions" = "Role & permissions";
+"privacy_device_security" = "Device security";
+"privacy_access_title" = "Privacy & Access";
+
+// MARK: - Status
+"status_updates_title" = "Status & Updates";
+
+// MARK: - Plans
+"plan_builder_step_1" = "Step 1 of 4";
+"plan_builder_step_1_description" = "Name the plan and choose what to focus on.";
+"plan_builder_focus_areas" = "Focus areas";
+"plan_builder_step_2" = "Step 2 of 4";
+"plan_builder_step_2_description" = "Define goals to reach the desired outcome.";
+"plan_builder_goal_created" = "Created %@";
+"plan_builder_step_3" = "Step 3 of 4";
+"plan_builder_step_3_description" = "Break goals into actionable steps.";
+"plan_builder_responsibility_staff" = "Staff";
+"plan_builder_responsibility_client" = "Client";
+"plan_builder_responsibility_shared" = "Shared";
+"plan_builder_step_4" = "Step 4 of 4";
+"plan_builder_step_4_description" = "Assign Livbojen chapters.";
+"plan_builder_assigned_count" = "Assigned %d chapters";
+"plan_builder_assigned_label" = "Assigned";
+"plan_builder_assign_button" = "Assign";
+"plan_builder_title" = "Plan builder";
+"plans_untitled" = "Untitled plan";
+"plans_error_no_unit" = "No unit.";
+"plans_new_plan_title" = "New plan";
+"plans_client_title" = "Plans – %@";
+
+// MARK: - Client Profile
+"client_profile_unit" = "Unit: %@";
+"client_profile_quick_actions" = "Quick actions";
+"client_profile_quick_actions_description" = "All key actions in one place";
+"client_profile_danger_zone" = "Danger zone";
+"client_profile_danger_description" = "Permanently deletes this client and all related data. Use this when you need to remove test records.";
+"client_profile_loading" = "Loading client…";
+"client_profile_link_code_description" = "Generate a 6-digit code for the youth to enter in Livbojen. Codes expire after 15 minutes.";
+"client_profile_link_title" = "Link to Livbojen";
+"client_profile_client_name" = "Client: %@";
+"client_profile_status" = "Status:";
+"client_profile_link_code" = "Link code (6 digits)";
+"client_profile_code_expires" = "Expires in %@";
+"client_profile_no_code" = "No active code";
+"client_profile_code_expired" = "Code expired. Generate a new one.";
+"client_profile_copy_code" = "Copy code";
+"client_profile_generate_code" = "Generate new code";
+"client_profile_client_steps" = "Client steps";
+"client_profile_step_1" = "1) Open Livbojen app";
+"client_profile_step_2" = "2) Go to Settings → Link";
+"client_profile_step_3" = "3) Enter the 6-digit code";
+"client_profile_step_4" = "4) Confirm";
+"client_profile_unlink_confirm" = "Unlink client?";
+"client_profile_unlink_description" = "Stop syncing schedule items and chapter assignments.";
+"client_profile_unlink_note" = "Staff notes and flags remain in Ledstjärnan.";
+"client_profile_unlink_button" = "Unlink client";
+"client_profile_linked_success" = "Client is now linked to Livbojen";
+"client_profile_linked_can_now" = "You can now:";
+"client_profile_linked_assign_chapters" = "• Assign Livbojen chapters";
+"client_profile_linked_share_schedule" = "• Share schedule items";
+"client_profile_open_profile" = "Open Client Profile";
+"client_profile_assign_chapters" = "Assign chapters now";
+"client_profile_link_success_title" = "Link success";
+"client_profile_unlinked" = "Client unlinked";
+"client_profile_unlinked_message" = "This client is no longer connected to Livbojen. Chapters and schedule will no longer sync.";
+"client_profile_back_to_profile" = "Back to profile";
+"client_profile_generate_new_code" = "Generate new link code";
+"client_profile_unlinked_title" = "Client unlinked";
+"client_profile_unlink_confirm_message" = "This will stop syncing schedule items and Livbojen chapters for this client. Notes and flags stay in Ledstjärnan.";
+"client_profile_unlink" = "Unlink";
+"client_profile_history" = "History";
+"client_profile_no_assessments" = "No assessments yet.";
+"client_profile_draft" = "Draft";
+"client_profile_assessments_title" = "Assessments";
+"client_profile_add_note" = "+ Add note";
+"client_profile_notes_flags_title" = "Notes & Flags";
+"client_profile_staff_only" = "Staff-only view";
+"client_profile_last_updated" = "Last updated: %@";
+"client_profile_flags" = "Flags";
+"client_profile_notes" = "Notes";
+"client_profile_no_notes" = "No notes yet.";
+"client_profile_note" = "Note";
+"client_profile_delete_note" = "Delete note";
+"client_profile_delete_note_confirm" = "This note will be permanently deleted.";
+"client_profile_note_metadata" = "%1$@ • %2$@";
+"client_profile_notes_staff_only" = "Notes are staff-only";
+"client_profile_visibility" = "Visibility";
+"client_profile_visibility_staff_only" = "Staff-only (not shared to Livbojen)";
+"client_profile_timeline_title" = "Timeline / History";
+"client_profile_assessment_overview" = "Overview";
+"client_profile_assessment_type" = "Type";
+"client_profile_assessment_date" = "Date";
+"client_profile_assessment_stress_total" = "Stress total";
+"client_profile_assessment_title" = "Assessment";
+
+// MARK: - General Additional
+"general_new" = "New";
+"general_done" = "Done";
+"general_loading" = "Loading…";

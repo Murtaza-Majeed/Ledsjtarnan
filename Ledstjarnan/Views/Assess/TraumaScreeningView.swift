@@ -166,7 +166,7 @@ struct TraumaScreeningView: View {
                 Button(action: {
                     binding.wrappedValue = (selection == true) ? nil : true
                 }) {
-                    Text("Ja")
+                    Text(LocalizedString("general_yes", lang))
                         .font(.caption)
                         .fontWeight(selection == true ? .semibold : .regular)
                         .foregroundColor(selection == true ? AppColors.onPrimary : AppColors.textPrimary)
@@ -178,7 +178,7 @@ struct TraumaScreeningView: View {
                 Button(action: {
                     binding.wrappedValue = (selection == false) ? nil : false
                 }) {
-                    Text("Nej")
+                    Text(LocalizedString("general_no", lang))
                         .font(.caption)
                         .fontWeight(selection == false ? .semibold : .regular)
                         .foregroundColor(selection == false ? AppColors.onPrimary : AppColors.textPrimary)
@@ -189,7 +189,7 @@ struct TraumaScreeningView: View {
                 }
             }
             if missingKeys.contains(key) {
-                Text("Required").font(.caption2).foregroundColor(AppColors.danger)
+                Text(LocalizedString("general_required", lang)).font(.caption2).foregroundColor(AppColors.danger)
             }
         }
         .padding(.vertical, 4)
@@ -232,7 +232,7 @@ struct TraumaScreeningView: View {
                 }
             }
             if missingKeys.contains(key) {
-                Text("Required")
+                Text(LocalizedString("general_required", lang))
                     .font(.caption2)
                     .foregroundColor(AppColors.danger)
             }
@@ -291,7 +291,7 @@ struct TraumaScreeningView: View {
                 }
             }
             if missingKeys.contains(key) {
-                Text("Required")
+                Text(LocalizedString("general_required", lang))
                     .font(.caption2)
                     .foregroundColor(AppColors.danger)
             }
@@ -322,7 +322,7 @@ struct TraumaScreeningView: View {
             TextField("", text: binding)
                 .textFieldStyle(.roundedBorder)
             if missingKeys.contains(key) {
-                Text("Required")
+                Text(LocalizedString("general_required", lang))
                     .font(.caption2)
                     .foregroundColor(AppColors.danger)
             }

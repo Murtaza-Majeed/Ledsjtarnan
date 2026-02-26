@@ -460,7 +460,7 @@ struct ProblemAreaFormView: View {
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(2...4)
             if isMissing(key) {
-                Text("Required")
+                Text(LocalizedString("general_required", lang))
                     .font(.caption2)
                     .foregroundColor(AppColors.danger)
             }
@@ -496,7 +496,7 @@ struct ProblemAreaFormView: View {
             }
             .pickerStyle(.segmented)
             if isMissing(key) {
-                Text("Required")
+                Text(LocalizedString("general_required", lang))
                     .font(.caption2)
                     .foregroundColor(AppColors.danger)
             }

@@ -140,7 +140,7 @@ struct AssessmentFormView: View {
             }
         }
         if allNotes.isEmpty {
-            return "No notes yet."
+            return LocalizedString("summary_no_notes", lang)
         }
         return allNotes.map { "• \($0)" }.joined(separator: "\n")
     }
@@ -180,7 +180,7 @@ struct AssessmentFormView: View {
                 Button {
                     showInsatskartra = true
                 } label: {
-                    Label("View Insatskarta", systemImage: "map")
+                    Label(LocalizedString("assessment_form_view_insatskarta", lang), systemImage: "map")
                         .font(.subheadline.bold())
                         .foregroundColor(AppColors.onPrimary)
                         .frame(maxWidth: .infinity)
@@ -209,7 +209,7 @@ struct AssessmentFormView: View {
         VStack(alignment: .leading, spacing: 12) {
             scoresCarousel
             HStack {
-                Text("Domains")
+                Text(LocalizedString("assessment_form_domains", lang))
                     .font(.title3.weight(.semibold))
                 Spacer()
                 Button {
@@ -577,7 +577,7 @@ struct AssessmentFormView: View {
                     }
                 }
                 if isKeyMissing(key) {
-                    Text("Required")
+                    Text(LocalizedString("general_required", lang))
                         .font(.caption2)
                         .foregroundColor(AppColors.danger)
                 }

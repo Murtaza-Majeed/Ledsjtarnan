@@ -13,12 +13,12 @@ struct AssessmentRecommendationFocus: Identifiable {
     let title: String
     let needLevel: NeedLevel
 
-    var priorityLabel: String {
+    func priorityLabel(lang: String) -> String {
         switch needLevel {
-        case .high: return "High priority"
-        case .mediumHigh: return "Medium priority"
-        case .mediumLow: return "Medium-low"
-        case .low: return "Low priority"
+        case .high: return LocalizedString("assessment_recommendation_priority_high", lang)
+        case .mediumHigh: return LocalizedString("assessment_recommendation_priority_medium", lang)
+        case .mediumLow: return LocalizedString("assessment_recommendation_priority_medium_low", lang)
+        case .low: return LocalizedString("assessment_recommendation_priority_low", lang)
         }
     }
 
@@ -44,9 +44,10 @@ struct AssessmentRecommendationView: View {
     let onOpenInsatskarta: (() -> Void)?
 
     @State private var selectedDomains: Set<String> = []
+    @Environment(\.languageCode) var lang
 
     private var headerSubtitle: String {
-        assessmentType == "baseline" ? "Based on baseline results" : "Based on follow-up results"
+        assessmentType == "baseline" ? LocalizedString("assessment_recommendation_subtitle_baseline", lang) : LocalizedString("assessment_recommendation_subtitle_followup", lang)
     }
 
     private var defaultSelection: Set<String> {
@@ -69,7 +70,7 @@ struct AssessmentRecommendationView: View {
                     focusList
                     chapterSuggestions
                     if let onOpenInsatskarta {
-                        Button("Open Insatskarta (detailed)") {
+                        Button(LocalizedString("assessment_recommendation_open_insatskarta", lang)) {
                             onOpenInsatskarta()
                         }
                         .font(.subheadline)
@@ -86,11 +87,11 @@ struct AssessmentRecommendationView: View {
                     .padding(20)
                     .background(AppColors.background.opacity(0.95))
             }
-            .navigationTitle("Recommendation")
+            .navigationTitle(LocalizedString("assessment_recommendation_title", lang))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { onClose() }
+                    Button(LocalizedString("general_close", lang)) { onClose() }
                 }
             }
         }
@@ -112,10 +113,10 @@ struct AssessmentRecommendationView: View {
 
     private var focusList: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recommended focus areas")
+            Text(LocalizedString("assessment_recommendation_focus_areas", lang))
                 .font(.headline)
             if focusSuggestions.isEmpty {
-                Text("Complete the assessment to generate recommendations.")
+                Text(LocalizedString("assessment_recommendation_complete_message", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -136,12 +137,12 @@ struct AssessmentRecommendationView: View {
                 Text(suggestion.title)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(AppColors.textPrimary)
-                Text(suggestion.priorityLabel)
+                Text(suggestion.priorityLabel(lang: lang))
                     .font(.caption)
                     .foregroundColor(suggestion.priorityColor)
             }
             Spacer()
-            Button(isSelected ? "Added" : "Add to plan") {
+            Button(isSelected ? LocalizedString("assessment_recommendation_button_added", lang) : LocalizedString("assessment_recommendation_button_add", lang)) {
                 toggleSelection(for: suggestion.domainKey)
             }
             .font(.caption.bold())
@@ -166,10 +167,10 @@ struct AssessmentRecommendationView: View {
 
     private var chapterSuggestions: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Suggested Livbojen chapters")
+            Text(LocalizedString("assessment_recommendation_suggested_chapters", lang))
                 .font(.headline)
             if suggestedChapters.isEmpty {
-                Text("Assign Livbojen chapters after you select focus areas.")
+                Text(LocalizedString("assessment_recommendation_assign_after_selection", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
             } else {
@@ -183,7 +184,7 @@ struct AssessmentRecommendationView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                     }
-                    Text("Tap Assign to send chapters to Livbojen.")
+                    Text(LocalizedString("assessment_recommendation_tap_assign_hint", lang))
                         .font(.caption)
                         .foregroundColor(AppColors.textSecondary)
                         .padding(.top, 4)
@@ -200,7 +201,7 @@ struct AssessmentRecommendationView: View {
             Button {
                 onGoToPlanBuilder(resolvedSelection)
             } label: {
-                Text("Go to plan builder")
+                Text(LocalizedString("assessment_recommendation_go_to_plan_builder", lang))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -214,7 +215,7 @@ struct AssessmentRecommendationView: View {
             Button {
                 onAssignChapters()
             } label: {
-                Text("Assign chapters (picker)")
+                Text(LocalizedString("assessment_recommendation_assign_chapters_picker", lang))
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -224,7 +225,7 @@ struct AssessmentRecommendationView: View {
             }
             .disabled(!isClientLinked)
             if !isClientLinked {
-                Text("Link the client to Livbojen to assign chapters.")
+                Text(LocalizedString("assessment_recommendation_link_client_message", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }

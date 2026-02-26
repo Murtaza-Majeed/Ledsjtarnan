@@ -14,6 +14,7 @@ struct InsatskartraView: View {
     let ptsd: PTSDEvaluation
     let clientName: String
     @Environment(\.dismiss) var dismiss
+    @Environment(\.languageCode) var lang
 
     var body: some View {
         NavigationStack {
@@ -31,7 +32,7 @@ struct InsatskartraView: View {
                     }
 
                     // Intervention recommendations
-                    Text("Rekommenderade insatser")
+                    Text(LocalizedString("insatskarta_recommendations", lang))
                         .font(.title2.bold())
                         .padding(.horizontal)
 
@@ -44,11 +45,11 @@ struct InsatskartraView: View {
                 .padding(.vertical)
             }
             .background(AppColors.background)
-            .navigationTitle("Insatskarta — \(clientName)")
+            .navigationTitle(String(format: LocalizedString("insatskarta_title", lang), clientName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Stäng") { dismiss() }
+                    Button(LocalizedString("insatskarta_close", lang)) { dismiss() }
                 }
             }
         }
@@ -56,7 +57,7 @@ struct InsatskartraView: View {
 
     private var safetyFlagsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Säkerhetsåtgärder krävs", systemImage: "exclamationmark.triangle.fill")
+            Label(LocalizedString("insatskarta_safety_required", lang), systemImage: "exclamationmark.triangle.fill")
                 .font(.headline)
                 .foregroundColor(AppColors.onDanger)
                 .padding(.horizontal)
@@ -86,19 +87,19 @@ struct InsatskartraView: View {
 
     private var ptsdSummaryCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("STRESS — Traumabedömning", systemImage: "brain")
+            Label(LocalizedString("insatskarta_stress_trauma", lang), systemImage: "brain")
                 .font(.headline)
                 .foregroundColor(AppColors.textPrimary)
 
             HStack(spacing: 16) {
-                PTSDCriterionBadge(label: "B", met: ptsd.criterionBMet, description: "Påträngande")
-                PTSDCriterionBadge(label: "C", met: ptsd.criterionCMet, description: "Undvikande")
-                PTSDCriterionBadge(label: "D", met: ptsd.criterionDMet, description: "Kognition")
-                PTSDCriterionBadge(label: "E", met: ptsd.criterionEMet, description: "Reaktivitet")
+                PTSDCriterionBadge(label: "B", met: ptsd.criterionBMet, description: LocalizedString("insatskarta_criterion_b", lang))
+                PTSDCriterionBadge(label: "C", met: ptsd.criterionCMet, description: LocalizedString("insatskarta_criterion_c", lang))
+                PTSDCriterionBadge(label: "D", met: ptsd.criterionDMet, description: LocalizedString("insatskarta_criterion_d", lang))
+                PTSDCriterionBadge(label: "E", met: ptsd.criterionEMet, description: LocalizedString("insatskarta_criterion_e", lang))
             }
 
             HStack {
-                Text("Totalpoäng symtom:")
+                Text(LocalizedString("insatskarta_total_symptom_score", lang))
                     .font(.subheadline)
                     .foregroundColor(AppColors.textSecondary)
                 Text("\(ptsd.totalSymptomScore)")
@@ -106,12 +107,12 @@ struct InsatskartraView: View {
             }
 
             if ptsd.probablePTSD {
-                Label("Sannolik PTSD — alla kriterier uppfyllda", systemImage: "exclamationmark.triangle")
+                Label(LocalizedString("insatskarta_ptsd_probable", lang), systemImage: "exclamationmark.triangle")
                     .font(.subheadline.bold())
                     .foregroundColor(.red)
             } else if ptsd.partialPTSD {
                 let metCount = [ptsd.criterionBMet, ptsd.criterionCMet, ptsd.criterionDMet, ptsd.criterionEMet].filter { $0 }.count
-                Label("Partiell PTSD — \(metCount) av 4 kriterier uppfyllda", systemImage: "exclamationmark.circle")
+                Label(String(format: LocalizedString("insatskarta_ptsd_partial", lang), metCount), systemImage: "exclamationmark.circle")
                     .font(.subheadline)
                     .foregroundColor(.orange)
             }

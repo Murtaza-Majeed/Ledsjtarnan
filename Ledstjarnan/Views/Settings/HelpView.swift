@@ -12,27 +12,27 @@ struct HelpView: View {
     
     var body: some View {
         List {
-            Section("Get support") {
+            Section(LocalizedString("settings_section_help", appState.languageCode)) {
                 NavigationLink(destination: ContactSupportView(appState: appState)) {
-                    SettingsRow(icon: "envelope.fill", title: "Contact Support", color: AppColors.primary)
+                    SettingsRow(icon: "envelope.fill", title: LocalizedString("settings_contact_support", appState.languageCode), color: AppColors.primary)
                 }
                 NavigationLink(destination: StatusUpdatesView()) {
-                    SettingsRow(icon: "exclamationmark.triangle.fill", title: "Status & Updates", color: AppColors.primary)
+                    SettingsRow(icon: "exclamationmark.triangle.fill", title: LocalizedString("status_updates_title", appState.languageCode), color: AppColors.primary)
                 }
             }
             
-            Section("Guides") {
+            Section(LocalizedString("help_user_guide", appState.languageCode)) {
                 NavigationLink(destination: FAQView()) {
-                    SettingsRow(icon: "questionmark.circle.fill", title: "FAQs", color: AppColors.primary)
+                    SettingsRow(icon: "questionmark.circle.fill", title: LocalizedString("settings_faq", appState.languageCode), color: AppColors.primary)
                 }
                 NavigationLink(destination: PrivacyAccessView()) {
-                    SettingsRow(icon: "lock.shield", title: "Privacy & Access", color: AppColors.primary)
+                    SettingsRow(icon: "lock.shield", title: LocalizedString("settings_privacy_access", appState.languageCode), color: AppColors.primary)
                 }
             }
         }
         .listStyle(.insetGrouped)
         .background(AppColors.background)
-        .navigationTitle("Help")
+        .navigationTitle(LocalizedString("help_title", appState.languageCode))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

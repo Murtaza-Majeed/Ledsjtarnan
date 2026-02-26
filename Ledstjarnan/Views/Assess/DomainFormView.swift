@@ -152,10 +152,10 @@ struct DomainFormView: View {
                     .background(AppColors.primary.opacity(0.12))
                     .cornerRadius(12)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(domain.title)
+                    Text(domain.title(lang: lang))
                         .font(.title3.weight(.semibold))
                         .foregroundColor(AppColors.textPrimary)
-                    Text(domain.subtitle)
+                    Text(domain.subtitle(lang: lang))
                         .font(.footnote)
                         .foregroundColor(AppColors.textSecondary)
                     let count = interviewQuestionCount
@@ -501,7 +501,7 @@ struct DomainFormView: View {
                 .font(.headline)
             let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
             LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(domain.needsOptions, id: \.self) { option in
+                ForEach(domain.needsOptions(lang: lang), id: \.self) { option in
                     SelectableChip(title: option, isSelected: selectedNeeds.contains(option)) {
                         if selectedNeeds.contains(option) {
                             selectedNeeds.remove(option)
