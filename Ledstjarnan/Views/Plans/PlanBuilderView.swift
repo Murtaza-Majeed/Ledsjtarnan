@@ -35,11 +35,12 @@ struct PlanBuilderView: View {
     private let planService = PlanService()
     private let livbojenService = LivbojenService()
     private let assessmentService = AssessmentService()
+    @EnvironmentObject private var logicStore: LogicReferenceStore
     
     private var lang: String { appState.languageCode }
     
     private var focusOptions: [FocusOption] {
-        AssessmentDefinition.domains.map { FocusOption(key: $0.key, title: $0.title, subtitle: $0.subtitle, icon: $0.icon) }
+        AssessmentDefinition.salutogenicDomains(from: logicStore).map { FocusOption(key: $0.key, title: $0.title, subtitle: $0.subtitle, icon: $0.icon) }
     }
     
     private var focusSelectionDescription: String {

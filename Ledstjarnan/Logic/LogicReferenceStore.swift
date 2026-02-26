@@ -30,7 +30,22 @@ final class LogicReferenceStore: ObservableObject {
         "severeMentalHealth": "ALLVARLIG_PSYKISK_OHALSA",
         "trauma": "TRAUMA"
     ]
-    private let traumaPseudoDomain = LogicAssessmentDomain(
+
+    private static let domainIcons: [String: String] = [
+        "health": "heart.text.square",
+        "education": "book.closed.fill",
+        "social": "person.2.fill",
+        "independence": "house.fill",
+        "relationships": "link",
+        "identity": "sparkles",
+        "substance": "cross.vial",
+        "attachment": "figure.2.arms.open",
+        "mentalHealth": "brain.head.profile",
+        "severeMentalHealth": "exclamationmark.triangle.fill",
+        "trauma": "shield.lefthalf.filled"
+    ]
+
+        private let traumaPseudoDomain = LogicAssessmentDomain(
         id: UUID(),
         dimensionId: UUID(),
         code: "TRAUMA",
@@ -163,5 +178,21 @@ final class LogicReferenceStore: ObservableObject {
         return reference.assessmentDomains
             .filter { $0.dimensionId == dimension.id }
             .sorted { $0.code < $1.code }
+    }
+
+    func appKey(forDomainCode code: String) -> String? {
+        domainLogicCodes.first { $0.value == code }?.key
+    }
+
+    func icon(forAppKey key: String) -> String {
+        Self.domainIcons[key] ?? "questionmark.circle"
+    }
+
+    func domainScoreType(forAppKey key: String) -> DomainScore.ScoreType {
+        guard let domain = domain(forAppKey: key) else { return .salutogenic }
+        if let dim = reference.scoringDimensions.first(where: { $0.id == domain.dimensionId }) {
+            return dim.scaleDirection == .inverted ? .salutogenic : .pathogenic
+        }
+        return .salutogenic
     }
 }

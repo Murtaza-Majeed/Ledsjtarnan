@@ -36,21 +36,33 @@ struct AssessmentFormView: View {
     private let assessmentService = AssessmentService()
     private let clientService = ClientService()
     private let chapterSuggestionMap: [String: [String]] = [
-        "KROPP_HÄLSA": ["Kropp & Hälsa – KrisKlar", "Sömn & rutiner"],
-        "UTBILDNING_ARBETE": ["Utbildning & arbete – Startplan", "Struktur i vardagen"],
-        "SOCIAL_KOMPETENS": ["Relationer & kommunikation", "DBT-färdigheter"],
-        "SJALVSTANDIGHET_VARDAG": ["Självständighet – Budget basics", "Vardag & ADL"],
-        "RELATIONER_NATVERK": ["Nätverk & stödpersoner", "Familjekarta"],
-        "IDENTITET_UTVECKLING": ["Identitet & framtidstro", "Min berättelse"],
-        "ALKOHOL_DROGER": ["Livlinan – Återfallsprevention", "Motivationsplan A-CRA"],
-        "ANKNYTNING_RELATIONER": ["Trygga relationer", "Signs of Safety"],
-        "PSYKISK_OHALSA": ["Må bra-plan", "Känslohantering"],
-        "ALLVARLIG_PSYKISK_OHALSA": ["Krisplan & säkerhet", "Psykologkontakt"],
-        "TRAUMA": ["Traumasäker start", "Livlinan – PTSD-stöd"]
+        "health": ["Kropp & Hälsa – KrisKlar", "Sömn & rutiner"],
+        "education": ["Utbildning & arbete – Startplan", "Struktur i vardagen"],
+        "social": ["Relationer & kommunikation", "DBT-färdigheter"],
+        "independence": ["Självständighet – Budget basics", "Vardag & ADL"],
+        "relationships": ["Nätverk & stödpersoner", "Familjekarta"],
+        "identity": ["Identitet & framtidstro", "Min berättelse"],
+        "substance": ["Livlinan – Återfallsprevention", "Motivationsplan A-CRA"],
+        "attachment": ["Trygga relationer", "Signs of Safety"],
+        "mentalHealth": ["Må bra-plan", "Känslohantering"],
+        "severeMentalHealth": ["Krisplan & säkerhet", "Psykologkontakt"],
+        "trauma": ["Traumasäker start", "Livlinan – PTSD-stöd"]
     ]
 
+    private var salutogenicDefinitions: [AssessmentDomainDefinition] {
+        AssessmentDefinition.salutogenicDomains(from: logicStore)
+    }
+
+    private var salutogenicModuleInfos: [DomainModuleInfo] {
+        AssessmentDefinition.salutogenicModuleInfos(from: logicStore)
+    }
+
+    private var pathogenicModuleInfos: [DomainModuleInfo] {
+        AssessmentDefinition.pathogenicModuleInfos(from: logicStore)
+    }
+
     private var requiredSalutogenicScaleKeys: [String] {
-        AssessmentDefinition.domains.flatMap { domain in
+        salutogenicDefinitions.flatMap { domain in
             domain.questions.compactMap { question -> String? in
                 if case .scale = question.type {
                     return "\(domain.key).\(question.key)"
@@ -61,14 +73,14 @@ struct AssessmentFormView: View {
     }
 
     private var requiredProblemScoreKeys: [String] {
-            AssessmentDefinition.pathogenicModules
+        pathogenicModuleInfos
             .filter { $0.usesStandardIMPScores }
-            .flatMap { module in
+            .flatMap { info in
                 [
                     ProblemQuestionKeys.clientScore,
                     ProblemQuestionKeys.importance,
                     ProblemQuestionKeys.staffAssessment
-                ].map { "\(module.key).\($0)" }
+                ].map { "\(info.key).\($0)" }
             }
     }
 
@@ -90,11 +102,11 @@ struct AssessmentFormView: View {
 
     private var isBaseline: Bool { assessmentType == "baseline" }
     private var domainScores: [AssessmentDomainScore] {
-        AssessmentDefinition.scores(from: answers)
+        AssessmentDefinition.scores(from: answers, domains: salutogenicDefinitions)
     }
 
     private var summaryDomains: [AssessmentSummaryDomain] {
-        AssessmentDefinition.domains.map { domain in
+        salutogenicDefinitions.map { domain in
             let score = domainScores.first { $0.domain.id == domain.id }
             return AssessmentSummaryDomain(
                 domainKey: domain.key,
@@ -107,12 +119,12 @@ struct AssessmentFormView: View {
 
     private var problemSummaryDomains: [AssessmentSummaryDomain] {
         let lookup = Dictionary(uniqueKeysWithValues: buildDomainScores(from: answers).map { ($0.domainKey, $0) })
-        return AssessmentDefinition.pathogenicModules.map { module in
-            let score = lookup[module.key]
+        return pathogenicModuleInfos.map { info in
+            let score = lookup[info.key]
             let valueText = score.map { "\($0.iScore)/5" } ?? "—"
             return AssessmentSummaryDomain(
-                domainKey: module.key,
-                title: module.title,
+                domainKey: info.key,
+                title: info.title,
                 valueText: valueText,
                 isCompleted: score != nil
             )
@@ -235,26 +247,24 @@ struct AssessmentFormView: View {
             }
             .padding(.horizontal)
 
-            ForEach(AssessmentDefinition.domains, id: \.key) { domain in
-                let logicDomain = logicStore.domain(forAppKey: domain.key)
-                let questionList = questionsForDomain(domain)
+            ForEach(salutogenicDefinitions, id: \.key) { domain in
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: domain.icon)
                             .foregroundColor(AppColors.primary)
                             .font(.title3)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(logicDomain?.label ?? domain.title)
+                            Text(domain.title)
                                 .font(.headline)
                                 .foregroundColor(AppColors.textPrimary)
-                            Text(logicDomain?.description ?? domain.subtitle)
+                            Text(domain.subtitle)
                                 .font(.subheadline)
                                 .foregroundColor(AppColors.textSecondary)
                         }
                         Spacer()
                     }
 
-                    ForEach(questionList, id: \.key) { q in
+                    ForEach(domain.questions, id: \.key) { q in
                         questionView(domainKey: domain.key, question: q)
                     }
                 }
@@ -487,49 +497,7 @@ struct AssessmentFormView: View {
         }
     }
 
-    private func questionsForDomain(_ domain: AssessmentDomainDefinition) -> [AssessmentQuestion] {
-        let slots = logicStore.scoreSlots(forAppKey: domain.key)
-        guard !slots.isEmpty else { return domain.questions }
-        return slots.compactMap { slot in
-            question(from: slot)
-        }
-    }
 
-    private func question(from slot: LogicDomainScoreSlot) -> AssessmentQuestion? {
-        let helpText = slot.description
-        switch slot.slotCode {
-        case "I":
-            return AssessmentQuestion(
-                key: DomainQuestionKeys.clientScore,
-                label: slot.label,
-                helpText: helpText,
-                type: .scale(slot.scaleMin, slot.scaleMax)
-            )
-        case "I_STAFF":
-            return AssessmentQuestion(
-                key: DomainQuestionKeys.staffAssessment,
-                label: slot.label,
-                helpText: helpText,
-                type: .scale(slot.scaleMin, slot.scaleMax)
-            )
-        case "M":
-            return AssessmentQuestion(
-                key: DomainQuestionKeys.importance,
-                label: slot.label,
-                helpText: helpText,
-                type: .scale(slot.scaleMin, slot.scaleMax)
-            )
-        case "P":
-            return AssessmentQuestion(
-                key: DomainQuestionKeys.priority,
-                label: slot.label,
-                helpText: helpText ?? "Styr vilka områden som prioriteras i planen.",
-                type: .priority
-            )
-        default:
-            return nil
-        }
-    }
 
     @ViewBuilder
     private func questionView(domainKey: String, question: AssessmentQuestion) -> some View {
@@ -835,7 +803,7 @@ struct AssessmentFormView: View {
             ptsd: ptsd,
             problemScores: domainScores.filter { $0.scoreType == .pathogenic }
         )
-        let recommendations = ScoringEngine.buildRecommendations(domainScores: domainScores, ptsd: ptsd)
+        let recommendations = ScoringEngine.buildRecommendations(domainScores: domainScores, ptsd: ptsd, store: logicStore)
 
         if persist {
             try await assessmentService.saveSummaryFields(
@@ -859,8 +827,8 @@ struct AssessmentFormView: View {
         var results: [DomainScore] = []
         let ptsdEvaluation = ptsd ?? ScoringEngine.evaluatePTSD(answers: data)
 
-        for module in AssessmentDefinition.salutogenicModules {
-            let base = "\(module.key)."
+        for info in salutogenicModuleInfos {
+            let base = "\(info.key)."
             let clientKey = base + DomainQuestionKeys.clientScore
             let importanceKey = base + DomainQuestionKeys.importance
             let staffKey = base + DomainQuestionKeys.staffAssessment
@@ -875,23 +843,23 @@ struct AssessmentFormView: View {
             guard hasScores else { continue }
 
             results.append(DomainScore(
-                domainKey: module.key,
+                domainKey: info.key,
                 iScore: intAnswer(forKey: clientKey, defaultValue: 3, in: data),
                 iScoreStaff: intAnswer(forKey: staffKey, defaultValue: 3, in: data),
                 mScore: intAnswer(forKey: importanceKey, defaultValue: 3, in: data),
                 pScore: intAnswer(forKey: priorityKey, defaultValue: 2, in: data),
                 notes: noteValue,
-                scoreType: module.scoreType
+                scoreType: info.scoreType
             ))
         }
 
-        for module in AssessmentDefinition.pathogenicModules where module.usesStandardIMPScores {
-            let prefix = "\(module.key)."
+        for info in pathogenicModuleInfos where info.usesStandardIMPScores {
+            let prefix = "\(info.key)."
             let clientKey = prefix + ProblemQuestionKeys.clientScore
             let importanceKey = prefix + ProblemQuestionKeys.importance
             let staffKey = prefix + ProblemQuestionKeys.staffAssessment
             let priorityKey = prefix + ProblemQuestionKeys.priority
-            let note = collectProblemNotes(for: module, in: data)
+            let note = collectProblemNotes(for: info, in: data)
 
             let hasScoringData = data[clientKey] != nil ||
                 data[importanceKey] != nil ||
@@ -900,29 +868,29 @@ struct AssessmentFormView: View {
             guard hasScoringData else { continue }
 
             results.append(DomainScore(
-                domainKey: module.key,
+                domainKey: info.key,
                 iScore: intAnswer(forKey: clientKey, defaultValue: 1, in: data),
                 iScoreStaff: intAnswer(forKey: staffKey, defaultValue: 1, in: data),
                 mScore: intAnswer(forKey: importanceKey, defaultValue: 3, in: data),
                 pScore: intAnswer(forKey: priorityKey, defaultValue: 2, in: data),
                 notes: note,
-                scoreType: module.scoreType
+                scoreType: info.scoreType
             ))
         }
 
-        if let traumaModule = AssessmentDefinition.pathogenicModules.first(where: { !$0.usesStandardIMPScores }) {
-            let traumaPrefix = "\(traumaModule.key)."
+        if let traumaInfo = pathogenicModuleInfos.first(where: { !$0.usesStandardIMPScores }) {
+            let traumaPrefix = "\(traumaInfo.key)."
             let hasTraumaAnswers = data.keys.contains { $0.hasPrefix("trauma.") }
             if hasTraumaAnswers {
                 let priorityKey = traumaPrefix + ProblemQuestionKeys.priority
                 let traumaScore = DomainScore(
-                    domainKey: traumaModule.key,
+                    domainKey: traumaInfo.key,
                     iScore: traumaNeedScore(from: ptsdEvaluation),
                     iScoreStaff: traumaStaffScore(from: ptsdEvaluation),
                     mScore: 3,
                     pScore: intAnswer(forKey: priorityKey, defaultValue: 1, in: data),
                     notes: traumaNotes(from: ptsdEvaluation),
-                    scoreType: traumaModule.scoreType
+                    scoreType: traumaInfo.scoreType
                 )
                 results.append(traumaScore)
             }
@@ -959,8 +927,8 @@ struct AssessmentFormView: View {
         .joined(separator: "\n")
     }
 
-    private func collectProblemNotes(for module: AssessmentModule, in data: [String: AnyCodable]) -> String {
-        let prefix = "\(module.key)."
+    private func collectProblemNotes(for info: DomainModuleInfo, in data: [String: AnyCodable]) -> String {
+        let prefix = "\(info.key)."
         var noteValues: [String] = []
 
         if let manual = trimmedString(for: prefix + ProblemQuestionKeys.notes, in: data) {

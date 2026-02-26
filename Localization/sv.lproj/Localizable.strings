@@ -136,6 +136,12 @@
 "baseline_draft_notice" = "Baslinjen ligger kvar som utkast tills alla domäner är klara.";
 "baseline_finish_later" = "Spara och fortsätt senare";
 "baseline_finish_later_subtext" = "Sparar dina svar och tar dig tillbaka till Kartläggning.";
+"baseline_complete_button" = "Slutför baslinje";
+"baseline_complete_subtext" = "Alla domäner är klara. Slutför baslinjen och se rekommendationer.";
+"baseline_timeline_description" = "Baslinje slutförd: %1$d/%2$d domäner.";
+"baseline_complete_button" = "Slutför baslinje";
+"baseline_complete_subtext" = "Alla domäner är klara. Slutför baslinjen och se rekommendationer.";
+"baseline_timeline_description" = "Baslinje slutförd: %1$d/%2$d domäner.";
 "baseline_retry" = "Försök igen";
 "baseline_error_no_unit" = "Ingen enhet kopplad.";
 "baseline_section_salutogenic" = "Salutogena kapital";

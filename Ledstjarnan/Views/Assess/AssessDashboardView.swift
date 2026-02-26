@@ -54,11 +54,11 @@ struct AssessDashboardView: View {
                 FollowUpDomainsView(appState: appState, client: context.client)
             }
             .navigationDestination(item: $recentNavigation) { context in
-                AssessmentFormView(
-                    appState: appState,
-                    client: context.client,
-                    assessmentType: context.type
-                )
+                if context.type == "baseline" {
+                    BaselineDomainsView(appState: appState, client: context.client)
+                } else {
+                    FollowUpDomainsView(appState: appState, client: context.client)
+                }
             }
             .task {
                 await loadData()

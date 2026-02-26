@@ -22,6 +22,7 @@ struct FollowUpComparisonView: View {
     @State private var errorMessage: String?
 
     private let assessmentService = AssessmentService()
+    @EnvironmentObject private var logicStore: LogicReferenceStore
     
     private var lang: String { appState.languageCode }
 
@@ -77,7 +78,7 @@ struct FollowUpComparisonView: View {
                                 .padding(.horizontal)
                         }
 
-                        ForEach(AssessmentDefinition.domains, id: \.key) { domain in
+                        ForEach(AssessmentDefinition.salutogenicDomains(from: logicStore), id: \.key) { domain in
                             if let base = baselineScores.first(where: { $0.domain.key == domain.key }),
                                let foll = followupScores.first(where: { $0.domain.key == domain.key }) {
                                 DomainComparisonRow(
@@ -129,8 +130,8 @@ struct FollowUpComparisonView: View {
             let baselineAnswers = try await answersDict(for: baseline.id)
             let followAnswers = try await answersDict(for: selectedFollowup.id)
 
-            let baseScores = AssessmentDefinition.scores(from: baselineAnswers)
-            let follScores = AssessmentDefinition.scores(from: followAnswers)
+            let domains = AssessmentDefinition.salutogenicDomains(from: logicStore); let baseScores = AssessmentDefinition.scores(from: baselineAnswers, domains: domains)
+            let follScores = AssessmentDefinition.scores(from: followAnswers, domains: domains)
 
             await MainActor.run {
                 self.baseline = baseline

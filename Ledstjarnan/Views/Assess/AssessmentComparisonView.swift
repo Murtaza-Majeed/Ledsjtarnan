@@ -12,6 +12,7 @@ struct AssessmentComparisonView: View {
     @Environment(\.languageCode) var lang
 
     private let assessmentService = AssessmentService()
+    @EnvironmentObject private var logicStore: LogicReferenceStore
 
     var body: some View {
         ScrollView {
@@ -273,7 +274,7 @@ struct AssessmentComparisonView: View {
     // MARK: - Comparison Data
 
     private var salutogenicComparisons: [AssessmentDomainComparison] {
-        AssessmentDefinition.domains.map { domain in
+        AssessmentDefinition.salutogenicDomains(from: logicStore).map { domain in
             let baseScore = baselineAnswers["\(domain.key).staffNeedScore"]?.value as? Int ?? 3
             let currScore = currentAnswers["\(domain.key).staffNeedScore"]?.value as? Int ?? 3
             return AssessmentDomainComparison(
@@ -287,12 +288,12 @@ struct AssessmentComparisonView: View {
     }
 
     private var problemComparisons: [AssessmentDomainComparison] {
-        AssessmentDefinition.pathogenicModules.map { module in
-            let baseScore = baselineAnswers["\(module.key).staffNeedScore"]?.value as? Int ?? 1
-            let currScore = currentAnswers["\(module.key).staffNeedScore"]?.value as? Int ?? 1
+        AssessmentDefinition.pathogenicModuleInfos(from: logicStore).map { info in
+            let baseScore = baselineAnswers["\(info.key).staffNeedScore"]?.value as? Int ?? 1
+            let currScore = currentAnswers["\(info.key).staffNeedScore"]?.value as? Int ?? 1
             return AssessmentDomainComparison(
-                domainKey: module.key,
-                domainTitle: module.title,
+                domainKey: info.key,
+                domainTitle: info.title,
                 baselineScore: baseScore,
                 currentScore: currScore,
                 isSalutogenic: false

@@ -25,9 +25,7 @@ struct FollowUpDomainsView: View {
     private let assessmentService = AssessmentService()
     private let clientService = ClientService()
     private let domains = BaselineDomainFlowConfig.salutogenicDomains
-    private let moduleLookup: [String: AssessmentModule] = {
-        Dictionary(uniqueKeysWithValues: AssessmentDefinition.salutogenicModules.map { ($0.key, $0) })
-    }()
+    @EnvironmentObject private var logicStore: LogicReferenceStore
 
     private var baselineDateText: String {
         guard let baseline = baselineCompletedDate else { return "—" }
@@ -57,7 +55,7 @@ struct FollowUpDomainsView: View {
             let now = currentScore(for: domain.key)
             return AssessmentSummaryDomain(
                 domainKey: domain.key,
-                title: moduleLookup[domain.key]?.title ?? domain.title(lang: appState.languageCode),
+                title: logicStore.domain(forAppKey: domain.key)?.label ?? domain.title(lang: appState.languageCode),
                 valueText: now.map { "\($0)/5" } ?? "—",
                 isCompleted: now != nil
             )
@@ -67,7 +65,7 @@ struct FollowUpDomainsView: View {
     private var summaryComparisonDomains: [FollowUpSummaryDomain] {
         domains.map { domain in
             FollowUpSummaryDomain(
-                title: moduleLookup[domain.key]?.title ?? domain.title(lang: appState.languageCode),
+                title: logicStore.domain(forAppKey: domain.key)?.label ?? domain.title(lang: appState.languageCode),
                 previousScore: baselineScores[domain.key],
                 currentScore: currentScore(for: domain.key)
             )
@@ -204,10 +202,10 @@ struct FollowUpDomainsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(moduleLookup[domain.key]?.title ?? domain.title(lang: appState.languageCode))
+                            Text(logicStore.domain(forAppKey: domain.key)?.label ?? domain.title(lang: appState.languageCode))
                                 .font(.headline)
-                            if let subtitle = moduleLookup[domain.key]?.subtitle {
-                                Text(subtitle)
+                            if let desc = logicStore.domain(forAppKey: domain.key)?.description {
+                                Text(desc)
                                     .font(.caption)
                                     .foregroundColor(AppColors.textSecondary)
                             }

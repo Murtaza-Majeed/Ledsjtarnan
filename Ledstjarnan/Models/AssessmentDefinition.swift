@@ -2,86 +2,12 @@
 //  AssessmentDefinition.swift
 //  Ledstjarnan
 //
-//  In-app definition of assessment domains and questions (minimal set for MVP).
+//  Domain definitions and scoring helpers driven by LogicReferenceStore.
 //
 
 import Foundation
 
-enum AssessmentModuleCategory: String {
-    case salutogenic
-    case pathogenic
-}
-
-struct AssessmentModule {
-    let key: String
-    let title: String
-    let subtitle: String
-    let icon: String
-    let category: AssessmentModuleCategory
-    let scoreType: DomainScore.ScoreType
-    let clientPrompt: String
-    let importancePrompt: String
-    let staffPrompt: String
-    let notesLabel: String
-    let usesStandardIMPScores: Bool
-
-    init(
-        key: String,
-        title: String,
-        subtitle: String,
-        icon: String,
-        category: AssessmentModuleCategory,
-        scoreType: DomainScore.ScoreType,
-        clientPrompt: String,
-        importancePrompt: String,
-        staffPrompt: String,
-        notesLabel: String,
-        usesStandardIMPScores: Bool = true
-    ) {
-        self.key = key
-        self.title = title
-        self.subtitle = subtitle
-        self.icon = icon
-        self.category = category
-        self.scoreType = scoreType
-        self.clientPrompt = clientPrompt
-        self.importancePrompt = importancePrompt
-        self.staffPrompt = staffPrompt
-        self.notesLabel = notesLabel
-        self.usesStandardIMPScores = usesStandardIMPScores
-    }
-
-    fileprivate func asAssessmentDomain() -> AssessmentDomainDefinition {
-        AssessmentDomainDefinition(
-            key: key,
-            title: title,
-            subtitle: subtitle,
-            icon: icon,
-            questions: [
-                AssessmentQuestion(
-                    key: DomainQuestionKeys.clientScore,
-                    label: clientPrompt,
-                    type: .scale(1, 5)
-                ),
-                AssessmentQuestion(
-                    key: DomainQuestionKeys.importance,
-                    label: importancePrompt,
-                    type: .scale(1, 5)
-                ),
-                AssessmentQuestion(
-                    key: DomainQuestionKeys.staffAssessment,
-                    label: staffPrompt,
-                    type: .scale(1, 5)
-                ),
-                AssessmentQuestion(
-                    key: DomainQuestionKeys.notes,
-                    label: notesLabel,
-                    type: .text
-                )
-            ]
-        )
-    }
-}
+// MARK: - Answer Key Constants
 
 enum DomainQuestionKeys {
     static let clientScore = "clientScore"
@@ -99,181 +25,15 @@ enum ProblemQuestionKeys {
     static let priority = "priorityScore"
 }
 
-struct AssessmentDefinition {
-    static let domains: [AssessmentDomainDefinition] = salutogenicModules.map { $0.asAssessmentDomain() }
-    
-    static func scores(from answers: [String: AnyCodable]) -> [AssessmentDomainScore] {
-        domains.map { domain in
-            var total = 0
-            var count = 0
-            domain.questions.forEach { question in
-                guard case let .scale(_, _) = question.type else { return }
-                let key = "\(domain.key).\(question.key)"
-                if let value = answers[key]?.value as? Int {
-                    total += value
-                    count += 1
-                }
-            }
-            let average = count > 0 ? Double(total) / Double(count) : nil
-            return AssessmentDomainScore(domain: domain, average: average, answeredCount: count)
-        }
-    }
+// MARK: - View-Model Types
 
-    static let salutogenicModules: [AssessmentModule] = [
-        AssessmentModule(
-            key: "health",
-            title: "Kropp & hälsa",
-            subtitle: "Fysisk hälsa, medicin, livsstil, stress & återhämtning",
-            icon: "heart.text.square",
-            category: .salutogenic,
-            scoreType: .salutogenic,
-            clientPrompt: "Hur nöjd har du varit med kropp och hälsa de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med kropp och hälsa just nu?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser inom kropp och hälsa?",
-            notesLabel: "Anteckningar (hälsa)"
-        ),
-        AssessmentModule(
-            key: "education",
-            title: "Utbildning & arbete",
-            subtitle: "Utbildning, arbete, ekonomi & dagstruktur",
-            icon: "book.closed",
-            category: .salutogenic,
-            scoreType: .salutogenic,
-            clientPrompt: "Hur nöjd har du varit med din livssituation och ekonomi de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med utbildning, arbete eller ekonomi?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser inom utbildning och arbete?",
-            notesLabel: "Anteckningar (utbildning & arbete)"
-        ),
-        AssessmentModule(
-            key: "social",
-            title: "Social kompetens",
-            subtitle: "Kommunikation, känsloreglering, DBT-färdigheter & sociala arenor",
-            icon: "person.2.fill",
-            category: .salutogenic,
-            scoreType: .salutogenic,
-            clientPrompt: "Hur nöjd har du varit med kommunikation och känslohantering de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med social kompetens och relationer?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser inom social kompetens?",
-            notesLabel: "Anteckningar (social kompetens)"
-        ),
-        AssessmentModule(
-            key: "independence",
-            title: "Självständighet & vardag",
-            subtitle: "Ekonomi, boende, ADL-färdigheter & vardagsstruktur",
-            icon: "house",
-            category: .salutogenic,
-            scoreType: .salutogenic,
-            clientPrompt: "Hur nöjd har du varit med boende, vardag och trygghet de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få stöd med självständighet och vardag?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser inom självständighet och vardag?",
-            notesLabel: "Anteckningar (självständighet)"
-        ),
-        AssessmentModule(
-            key: "relationships",
-            title: "Relationer & nätverk",
-            subtitle: "Relationer, nätverk, stödpersoner & hantering av ensamhet",
-            icon: "person.3.fill",
-            category: .salutogenic,
-            scoreType: .salutogenic,
-            clientPrompt: "Hur nöjd har du varit med relationer och nätverk de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med relationer, nätverk eller ensamhet?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser inom relationer och nätverk?",
-            notesLabel: "Anteckningar (relationer & nätverk)"
-        ),
-        AssessmentModule(
-            key: "identity",
-            title: "Identitet & utveckling",
-            subtitle: "KASAM, värderingar, kultur/andlighet & framtidstro",
-            icon: "sparkles",
-            category: .salutogenic,
-            scoreType: .salutogenic,
-            clientPrompt: "Hur nöjd har du varit med identitet, mening och framtidstro de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få stöd inom identitet, mening eller framtidsplaner?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser inom identitet och utveckling?",
-            notesLabel: "Anteckningar (identitet & utveckling)"
-        )
-    ]
-
-    static let pathogenicModules: [AssessmentModule] = [
-        AssessmentModule(
-            key: "substance",
-            title: "Alkohol & droger",
-            subtitle: "ASI kriterium E – konsumtion, historik, risk",
-            icon: "cross.vial",
-            category: .pathogenic,
-            scoreType: .pathogenic,
-            clientPrompt: "Hur oroad eller besvärad har du varit över alkohol/drogkonsumtion de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med alkohol och droger just nu?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser för alkohol och droger?",
-            notesLabel: "Anteckningar (alkohol & droger)"
-        ),
-        AssessmentModule(
-            key: "attachment",
-            title: "Anknytning & relationer",
-            subtitle: "Nätverk, våldsutsatthet, familjekonflikter",
-            icon: "figure.2.arms.open",
-            category: .pathogenic,
-            scoreType: .pathogenic,
-            clientPrompt: "Hur oroad eller besvärad har du varit över familj och umgänge de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med anknytning och relationer?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser för anknytning och relationer?",
-            notesLabel: "Anteckningar (anknytning & relationer)"
-        ),
-        AssessmentModule(
-            key: "mentalHealth",
-            title: "Psykisk ohälsa",
-            subtitle: "Diagnoser, symtom, funktionsnivå",
-            icon: "brain.head.profile",
-            category: .pathogenic,
-            scoreType: .pathogenic,
-            clientPrompt: "Hur oroad eller besvärad har du varit över din psykiska hälsa de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med psykisk hälsa?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser för psykisk hälsa?",
-            notesLabel: "Anteckningar (psykisk hälsa)"
-        ),
-        AssessmentModule(
-            key: "severeMentalHealth",
-            title: "Allvarlig psykisk ohälsa",
-            subtitle: "Suicid, självskada, akuta risker",
-            icon: "exclamationmark.triangle.fill",
-            category: .pathogenic,
-            scoreType: .pathogenic,
-            clientPrompt: "Hur oroad eller besvärad har du varit över allvarliga psykiska symtom de senaste 30 dagarna?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med allvarliga psykiska symtom?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser för allvarlig psykisk ohälsa?",
-            notesLabel: "Anteckningar (allvarlig psykisk ohälsa)"
-        ),
-        AssessmentModule(
-            key: "trauma",
-            title: "Trauma & säkerhet",
-            subtitle: "STRESS, PTSD, dissociation & skydd",
-            icon: "shield.lefthalf.filled",
-            category: .pathogenic,
-            scoreType: .pathogenic,
-            clientPrompt: "Hur påverkad upplever du dig av traumatiska minnen eller symtom just nu?",
-            importancePrompt: "Hur viktigt är det för dig att få hjälp med trauma eller trygghet?",
-            staffPrompt: "Hur stort bedömer behandlaren behovet av insatser för trauma och säkerhet?",
-            notesLabel: "Anteckningar (trauma & säkerhet)",
-            usesStandardIMPScores: false
-        )
-    ]
-
-    static let allModules: [AssessmentModule] = salutogenicModules + pathogenicModules
-
-    static func module(for key: String) -> AssessmentModule? {
-        allModules.first { $0.key == key }
-    }
-}
-
-struct AssessmentDomainDefinition {
+struct AssessmentDomainDefinition: Identifiable {
     let key: String
     let title: String
     let subtitle: String
     let icon: String
     let questions: [AssessmentQuestion]
-}
 
-extension AssessmentDomainDefinition: Identifiable {
     var id: String { key }
 }
 
@@ -282,12 +42,12 @@ struct AssessmentDomainScore: Identifiable {
     let domain: AssessmentDomainDefinition
     let average: Double?
     let answeredCount: Int
-    
+
     var formattedAverage: String {
         guard let average else { return "—" }
         return String(format: "%.1f", average)
     }
-    
+
     var interpretation: String {
         guard let avg = average else { return "Needs rating" }
         switch avg {
@@ -316,5 +76,141 @@ struct AssessmentQuestion {
         case scale(Int, Int)
         case text
         case priority
+    }
+}
+
+// MARK: - Module Info (bridge for scoring pipeline)
+
+struct DomainModuleInfo {
+    let key: String
+    let title: String
+    let subtitle: String
+    let icon: String
+    let scoreType: DomainScore.ScoreType
+    let usesStandardIMPScores: Bool
+}
+
+// MARK: - Factory (builds definitions from LogicReferenceStore)
+
+enum AssessmentDefinition {
+
+    static func salutogenicDomains(from store: LogicReferenceStore) -> [AssessmentDomainDefinition] {
+        store.salutogenicDomains.compactMap { domain -> AssessmentDomainDefinition? in
+            guard let appKey = store.appKey(forDomainCode: domain.code) else { return nil }
+            let questions = buildQuestions(from: store.scoreSlots(forAppKey: appKey))
+            return AssessmentDomainDefinition(
+                key: appKey,
+                title: domain.label,
+                subtitle: domain.description ?? "",
+                icon: store.icon(forAppKey: appKey),
+                questions: questions
+            )
+        }
+    }
+
+    static func salutogenicModuleInfos(from store: LogicReferenceStore) -> [DomainModuleInfo] {
+        store.salutogenicDomains.compactMap { domain -> DomainModuleInfo? in
+            guard let appKey = store.appKey(forDomainCode: domain.code) else { return nil }
+            return DomainModuleInfo(
+                key: appKey,
+                title: domain.label,
+                subtitle: domain.description ?? "",
+                icon: store.icon(forAppKey: appKey),
+                scoreType: .salutogenic,
+                usesStandardIMPScores: true
+            )
+        }
+    }
+
+    static func pathogenicModuleInfos(from store: LogicReferenceStore) -> [DomainModuleInfo] {
+        var infos: [DomainModuleInfo] = store.problemDomains.map { pd in
+            DomainModuleInfo(
+                key: pd.appKey,
+                title: pd.title,
+                subtitle: pd.subtitle ?? "",
+                icon: pd.icon ?? store.icon(forAppKey: pd.appKey),
+                scoreType: .pathogenic,
+                usesStandardIMPScores: true
+            )
+        }
+        infos.append(DomainModuleInfo(
+            key: "trauma",
+            title: store.domain(forAppKey: "trauma")?.label ?? "Trauma & säkerhet",
+            subtitle: store.domain(forAppKey: "trauma")?.description ?? "STRESS, PTSD, dissociation & skydd",
+            icon: store.icon(forAppKey: "trauma"),
+            scoreType: .pathogenic,
+            usesStandardIMPScores: false
+        ))
+        return infos
+    }
+
+    static func allModuleInfos(from store: LogicReferenceStore) -> [DomainModuleInfo] {
+        salutogenicModuleInfos(from: store) + pathogenicModuleInfos(from: store)
+    }
+
+    static func moduleInfo(forKey key: String, from store: LogicReferenceStore) -> DomainModuleInfo? {
+        allModuleInfos(from: store).first { $0.key == key }
+    }
+
+    static func scores(
+        from answers: [String: AnyCodable],
+        domains: [AssessmentDomainDefinition]
+    ) -> [AssessmentDomainScore] {
+        domains.map { domain in
+            var total = 0
+            var count = 0
+            domain.questions.forEach { question in
+                guard case .scale = question.type else { return }
+                let key = "\(domain.key).\(question.key)"
+                if let value = answers[key]?.value as? Int {
+                    total += value
+                    count += 1
+                }
+            }
+            let average = count > 0 ? Double(total) / Double(count) : nil
+            return AssessmentDomainScore(domain: domain, average: average, answeredCount: count)
+        }
+    }
+
+    // MARK: - Private Helpers
+
+    private static func buildQuestions(from slots: [LogicDomainScoreSlot]) -> [AssessmentQuestion] {
+        slots.compactMap { question(from: $0) }
+    }
+
+    private static func question(from slot: LogicDomainScoreSlot) -> AssessmentQuestion? {
+        let helpText = slot.description
+        switch slot.slotCode {
+        case "I", "CLIENT", "SCORE":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.clientScore,
+                label: slot.label,
+                helpText: helpText,
+                type: .scale(slot.scaleMin, slot.scaleMax)
+            )
+        case "I_STAFF", "STAFF", "SCORE_STAFF":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.staffAssessment,
+                label: slot.label,
+                helpText: helpText,
+                type: .scale(slot.scaleMin, slot.scaleMax)
+            )
+        case "M":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.importance,
+                label: slot.label,
+                helpText: helpText,
+                type: .scale(slot.scaleMin, slot.scaleMax)
+            )
+        case "P":
+            return AssessmentQuestion(
+                key: DomainQuestionKeys.priority,
+                label: slot.label,
+                helpText: helpText,
+                type: .priority
+            )
+        default:
+            return nil
+        }
     }
 }

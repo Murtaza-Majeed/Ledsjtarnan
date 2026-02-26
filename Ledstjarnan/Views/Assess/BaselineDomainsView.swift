@@ -22,14 +22,23 @@ struct BaselineDomainsView: View {
     @State private var saveError: String?
     @State private var isSavingDraft = false
     @State private var selectedDomain: BaselineDomain?
+    @State private var isCompleting = false
+    @State private var showRecommendations = false
+    @State private var recommendations: [InterventionRecommendation] = []
+    @State private var safetyFlags: [SafetyFlag] = []
+    @State private var ptsdEval: PTSDEvaluation?
+    @State private var domainScoresResult: [DomainScore] = []
 
     private let assessmentService = AssessmentService()
+    private let clientService = ClientService()
 
     private var completedCount: Int {
         BaselineDomainFlowConfig.allDomains.filter { status(for: $0) == .completed }.count
     }
 
     private var totalCount: Int { BaselineDomainFlowConfig.allDomains.count }
+    private var allDomainsCompleted: Bool { completedCount == totalCount && totalCount > 0 }
+    private var isAlreadyCompleted: Bool { assessment?.status == "completed" }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -56,7 +65,13 @@ struct BaselineDomainsView: View {
                     }
                     .padding(.vertical, 16)
                 }
-                finishLaterButton
+                if isAlreadyCompleted {
+                    // Already completed; no action needed
+                } else if allDomainsCompleted {
+                    completeBaselineButton
+                } else {
+                    finishLaterButton
+                }
             }
         }
         .background(AppColors.background.ignoresSafeArea())
@@ -72,6 +87,21 @@ struct BaselineDomainsView: View {
                     answers: $answers
                 )
             }
+        }
+        .sheet(isPresented: $showRecommendations, onDismiss: { dismiss() }) {
+            AssessmentRecommendationView(
+                client: client,
+                assessmentType: "baseline",
+                focusSuggestions: recommendations
+                    .sorted { $0.needLevel.rawValue > $1.needLevel.rawValue }
+                    .map { AssessmentRecommendationFocus(domainKey: $0.domainKey, title: $0.domainTitle, needLevel: $0.needLevel) },
+                suggestedChapters: [],
+                isClientLinked: client.isLinked,
+                onClose: { showRecommendations = false },
+                onGoToPlanBuilder: { _ in showRecommendations = false },
+                onAssignChapters: { showRecommendations = false },
+                onOpenInsatskarta: nil
+            )
         }
     }
 
@@ -295,6 +325,173 @@ struct BaselineDomainsView: View {
                 isSavingDraft = false
             }
         }
+    }
+
+    private var completeBaselineButton: some View {
+        VStack(spacing: 10) {
+            Button(action: { Task { await completeBaseline() } }) {
+                HStack {
+                    if isCompleting {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppColors.onPrimary))
+                    }
+                    Text(LocalizedString("baseline_complete_button", lang))
+                        .font(.headline)
+                        .foregroundColor(AppColors.onPrimary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(AppColors.primary)
+                .cornerRadius(16)
+            }
+            .disabled(isCompleting)
+            Text(LocalizedString("baseline_complete_subtext", lang))
+                .font(.caption)
+                .foregroundColor(AppColors.textSecondary)
+        }
+        .padding()
+        .background(AppColors.background.ignoresSafeArea(edges: .bottom))
+    }
+
+    private func completeBaseline() async {
+        guard let assessment else { return }
+        isCompleting = true
+        saveError = nil
+        do {
+            let payloads = AssessmentAnswerPayloadBuilder.payloads(from: answers, assessmentId: assessment.id)
+            try await assessmentService.upsertAnswers(payloads)
+
+            let now = Date()
+            try await assessmentService.updateAssessment(
+                id: assessment.id,
+                status: "completed",
+                completedAt: now,
+                notes: nil
+            )
+
+            let ptsd = ScoringEngine.evaluatePTSD(answers: answers)
+            let scores = buildDomainScores(from: answers, ptsd: ptsd)
+            let flags = ScoringEngine.evaluateSafetyFlags(
+                answers: answers,
+                ptsd: ptsd,
+                problemScores: scores.filter { $0.scoreType == .pathogenic }
+            )
+            let recs = ScoringEngine.buildRecommendations(
+                domainScores: scores,
+                ptsd: ptsd,
+                store: logicStore
+            )
+
+            try await assessmentService.saveSummaryFields(
+                assessmentId: assessment.id,
+                ptsdScore: ptsd.totalSymptomScore,
+                ptsdProbable: ptsd.probablePTSD,
+                safetyFlags: flags,
+                recommendations: recs,
+                domainScores: scores
+            )
+
+            if let unitId = appState.currentUnit?.id,
+               let staffId = appState.currentStaffProfile?.id {
+                try? await clientService.createTimelineEvent(
+                    clientId: client.id,
+                    unitId: unitId,
+                    eventType: "assessment_completed",
+                    title: LocalizedString("assessment_timeline_title_baseline", lang),
+                    description: String(format: LocalizedString("baseline_timeline_description", lang), completedCount, totalCount),
+                    staffId: staffId
+                )
+            }
+
+            await MainActor.run {
+                self.recommendations = recs
+                self.safetyFlags = flags
+                self.ptsdEval = ptsd
+                self.domainScoresResult = scores
+                self.isCompleting = false
+                self.showRecommendations = true
+            }
+        } catch {
+            await MainActor.run {
+                saveError = error.localizedDescription
+                isCompleting = false
+            }
+        }
+    }
+
+    private func buildDomainScores(from data: [String: AnyCodable], ptsd: PTSDEvaluation) -> [DomainScore] {
+        var results: [DomainScore] = []
+
+        for info in AssessmentDefinition.salutogenicModuleInfos(from: logicStore) {
+            let base = "\(info.key)."
+            let clientKey = base + DomainQuestionKeys.clientScore
+            let readinessKey = DomainAnswerKey.readiness(info.key)
+            let importanceKey = base + DomainQuestionKeys.importance
+            let staffKey = base + DomainQuestionKeys.staffAssessment
+            let noteKey = DomainAnswerKey.notes(info.key)
+            let noteValue = (data[noteKey]?.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            let readinessScore = data[readinessKey]?.value as? Int
+            let clientScore = data[clientKey]?.value as? Int
+            let iScore = clientScore ?? readinessScore ?? 3
+
+            results.append(DomainScore(
+                domainKey: info.key,
+                iScore: iScore,
+                iScoreStaff: (data[staffKey]?.value as? Int) ?? 3,
+                mScore: (data[importanceKey]?.value as? Int) ?? 3,
+                pScore: 2,
+                notes: noteValue,
+                scoreType: info.scoreType
+            ))
+        }
+
+        for info in AssessmentDefinition.pathogenicModuleInfos(from: logicStore) where info.usesStandardIMPScores {
+            let prefix = "\(info.key)."
+            let clientKey = prefix + ProblemQuestionKeys.clientScore
+            let readinessKey = DomainAnswerKey.readiness(info.key)
+            let importanceKey = prefix + ProblemQuestionKeys.importance
+            let staffKey = prefix + ProblemQuestionKeys.staffAssessment
+            let noteKey = DomainAnswerKey.notes(info.key)
+            let noteValue = (data[noteKey]?.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            let readinessScore = data[readinessKey]?.value as? Int
+            let clientScore = data[clientKey]?.value as? Int
+            let iScore = clientScore ?? readinessScore ?? 1
+
+            results.append(DomainScore(
+                domainKey: info.key,
+                iScore: iScore,
+                iScoreStaff: (data[staffKey]?.value as? Int) ?? 1,
+                mScore: (data[importanceKey]?.value as? Int) ?? 3,
+                pScore: 2,
+                notes: noteValue,
+                scoreType: info.scoreType
+            ))
+        }
+
+        let hasTraumaAnswers = data.keys.contains { $0.hasPrefix("trauma.") }
+        if hasTraumaAnswers {
+            let traumaNeed: Int
+            switch ptsd.totalSymptomScore {
+            case 0: traumaNeed = 1
+            case 1...8: traumaNeed = 2
+            case 9...20: traumaNeed = 3
+            case 21...35: traumaNeed = 4
+            default: traumaNeed = 5
+            }
+            results.append(DomainScore(
+                domainKey: "trauma",
+                iScore: traumaNeed,
+                iScoreStaff: ptsd.probablePTSD ? 5 : (ptsd.requiresPsychologist ? 4 : 2),
+                mScore: 3,
+                pScore: 1,
+                notes: "",
+                scoreType: .pathogenic
+            ))
+        }
+
+        return results
     }
 
     private func displayDomains(in domains: [BaselineDomain]) -> [BaselineDisplayDomain] {

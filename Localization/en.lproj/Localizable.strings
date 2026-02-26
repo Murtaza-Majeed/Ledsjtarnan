@@ -136,6 +136,9 @@
 "baseline_draft_notice" = "Baseline stays in draft until all domains are completed.";
 "baseline_finish_later" = "Finish later";
 "baseline_finish_later_subtext" = "Saves your progress and returns to the Assess dashboard.";
+"baseline_complete_button" = "Complete baseline";
+"baseline_complete_subtext" = "All domains are complete. Finalise the baseline and view recommendations.";
+"baseline_timeline_description" = "Baseline completed: %1$d/%2$d domains.";
 "baseline_retry" = "Retry";
 "baseline_error_no_unit" = "No unit connected.";
 "baseline_section_salutogenic" = "Salutogenic capital";

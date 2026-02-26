@@ -316,12 +316,13 @@ final class ScoringEngine {
 
     static func buildRecommendations(
         domainScores: [DomainScore],
-        ptsd: PTSDEvaluation
+        ptsd: PTSDEvaluation,
+        store: LogicReferenceStore? = nil
     ) -> [InterventionRecommendation] {
         let recs = domainScores.map { score in
             InterventionRecommendation(
                 domainKey: score.domainKey,
-                domainTitle: domainTitle(for: score.domainKey),
+                domainTitle: domainTitle(for: score.domainKey, store: store),
                 needLevel: score.needLevel,
                 interventions: interventions(for: score),
                 isUrgent: score.needLevel == .high,
@@ -332,9 +333,9 @@ final class ScoringEngine {
         return recs.sorted { $0.isUrgent && !$1.isUrgent }
     }
 
-    static func domainTitle(for key: String) -> String {
-        if let module = AssessmentDefinition.module(for: key) {
-            return module.title
+    static func domainTitle(for key: String, store: LogicReferenceStore? = nil) -> String {
+        if let store, let info = AssessmentDefinition.moduleInfo(forKey: key, from: store) {
+            return info.title
         }
         return key.capitalized
     }
