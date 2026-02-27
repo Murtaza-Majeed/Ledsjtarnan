@@ -615,6 +615,10 @@
 "followup_domains_score_comparison" = "Prev: %1$@   Now: %2$@";
 "followup_domains_review_summary" = "Review summary";
 "followup_domains_missing_count" = "%d domains missing";
+"followup_domains_draft_notice" = "The follow-up remains a draft until all domains are complete.";
+"followup_complete_subtext" = "All domains are complete. Review summary and finalise.";
+"followup_view_comparison" = "View comparison";
+"followup_timeline_description" = "Follow-up completed: %1$d/%2$d domains.";
 "followup_domains_loading" = "Loading follow-up…";
 "followup_domains_error" = "Select a unit first.";
 

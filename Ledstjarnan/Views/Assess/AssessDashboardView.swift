@@ -55,9 +55,9 @@ struct AssessDashboardView: View {
             }
             .navigationDestination(item: $recentNavigation) { context in
                 if context.type == "baseline" {
-                    BaselineDomainsView(appState: appState, client: context.client)
+                    BaselineDomainsView(appState: appState, client: context.client, openAssessmentId: context.assessmentId)
                 } else {
-                    FollowUpDomainsView(appState: appState, client: context.client)
+                    FollowUpDomainsView(appState: appState, client: context.client, openAssessmentId: context.assessmentId)
                 }
             }
             .task {
@@ -220,7 +220,7 @@ struct AssessDashboardView: View {
 
                 Button {
                     if let client = selectedSummary?.client {
-                        followUpNavigation = AssessmentNavigationContext(client: client, type: "followup")
+                        followUpNavigation = AssessmentNavigationContext(client: client, type: "followup", assessmentId: nil)
                     }
                 } label: {
                     Text(LocalizedString("assessment_start_followup", lang))
@@ -255,7 +255,7 @@ struct AssessDashboardView: View {
                     ForEach(recentAssessments) { assessment in
                         Button {
                             if let client = clientsLookup[assessment.clientId] {
-                                recentNavigation = AssessmentNavigationContext(client: client, type: assessment.assessmentType)
+                                recentNavigation = AssessmentNavigationContext(client: client, type: assessment.assessmentType, assessmentId: assessment.id)
                             }
                         } label: {
                             HStack {
@@ -424,4 +424,5 @@ private struct AssessmentNavigationContext: Identifiable, Hashable {
     let id = UUID()
     let client: Client
     let type: String
+    let assessmentId: String?
 }

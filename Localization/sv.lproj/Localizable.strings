@@ -618,6 +618,10 @@
 "followup_domains_score_comparison" = "Förra: %1$@   Nu: %2$@";
 "followup_domains_review_summary" = "Granska sammanfattning";
 "followup_domains_missing_count" = "%d domäner saknas";
+"followup_domains_draft_notice" = "Uppföljningen ligger kvar som utkast tills alla domäner är klara.";
+"followup_complete_subtext" = "Alla domäner är klara. Granska sammanfattning och slutför.";
+"followup_view_comparison" = "Visa jämförelse";
+"followup_timeline_description" = "Uppföljning slutförd: %1$d/%2$d domäner.";
 "followup_domains_loading" = "Laddar uppföljning…";
 "followup_domains_error" = "Välj en enhet först.";
 

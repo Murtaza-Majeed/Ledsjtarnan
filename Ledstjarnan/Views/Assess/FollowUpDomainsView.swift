@@ -11,24 +11,44 @@ struct FollowUpDomainsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var appState: AppState
     let client: Client
+    var openAssessmentId: String? = nil
+    @EnvironmentObject private var logicStore: LogicReferenceStore
 
     @State private var assessment: Assessment?
     @State private var answers: [String: AnyCodable] = [:]
     @State private var baselineScores: [String: Int] = [:]
+    @State private var baselineAnswers: [String: AnyCodable] = [:]
     @State private var isLoading = true
     @State private var loadError: String?
+    @State private var saveError: String?
     @State private var selectedDomain: BaselineDomain?
     @State private var showSummary = false
     @State private var staffNote: String = ""
     @State private var isFinishing = false
+    @State private var baselineCompletion: Date?
+    @State private var baselineAssessment: Assessment?
+    @State private var showComparison = false
+    @State private var recommendations: [InterventionRecommendation] = []
+    @State private var domainScoresResult: [DomainScore] = []
 
     private let assessmentService = AssessmentService()
     private let clientService = ClientService()
-    private let domains = BaselineDomainFlowConfig.salutogenicDomains
-    @EnvironmentObject private var logicStore: LogicReferenceStore
+
+    private var lang: String { appState.languageCode }
+
+    private var allDomains: [BaselineDomain] { BaselineDomainFlowConfig.allDomains }
+    private var salutogenicDomains: [BaselineDomain] { BaselineDomainFlowConfig.salutogenicDomains }
+    private var pathogenicDomains: [BaselineDomain] { BaselineDomainFlowConfig.pathogenicDomains }
+
+    private var completedCount: Int {
+        allDomains.filter { domainStatus(for: $0) == .completed }.count
+    }
+    private var totalCount: Int { allDomains.count }
+    private var allDomainsCompleted: Bool { completedCount == totalCount && totalCount > 0 }
+    private var isAlreadyCompleted: Bool { assessment?.status == "completed" }
 
     private var baselineDateText: String {
-        guard let baseline = baselineCompletedDate else { return "—" }
+        guard let baseline = baselineCompletion else { return "—" }
         return Self.dateFormatter.string(from: baseline)
     }
 
@@ -37,35 +57,10 @@ struct FollowUpDomainsView: View {
         return Self.dateFormatter.string(from: date)
     }
 
-    private var baselineCompletedDate: Date? {
-        baselineCompletion
-    }
-
-    @State private var baselineCompletion: Date?
-
-    private var missingDomainCount: Int {
-        domains.reduce(0) { count, domain in
-            let now = currentScore(for: domain.key)
-            return now == nil ? count + 1 : count
-        }
-    }
-
-    private var summaryDomains: [AssessmentSummaryDomain] {
-        domains.map { domain in
-            let now = currentScore(for: domain.key)
-            return AssessmentSummaryDomain(
-                domainKey: domain.key,
-                title: logicStore.domain(forAppKey: domain.key)?.label ?? domain.title(lang: appState.languageCode),
-                valueText: now.map { "\($0)/5" } ?? "—",
-                isCompleted: now != nil
-            )
-        }
-    }
-
     private var summaryComparisonDomains: [FollowUpSummaryDomain] {
-        domains.map { domain in
+        allDomains.map { domain in
             FollowUpSummaryDomain(
-                title: logicStore.domain(forAppKey: domain.key)?.label ?? domain.title(lang: appState.languageCode),
+                title: domain.title(lang: lang),
                 previousScore: baselineScores[domain.key],
                 currentScore: currentScore(for: domain.key)
             )
@@ -82,22 +77,36 @@ struct FollowUpDomainsView: View {
         VStack(spacing: 0) {
             topBar
             if isLoading {
-                ProgressView(LocalizedString("followup_domains_loading", appState.languageCode))
+                ProgressView(LocalizedString("followup_domains_loading", lang))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let loadError {
-                ErrorStateView(message: loadError, lang: appState.languageCode) {
+                ErrorStateView(message: loadError, lang: lang) {
                     Task { await loadData() }
                 }
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
+                        if let saveError {
+                            Text(saveError)
+                                .font(.footnote)
+                                .foregroundColor(AppColors.danger)
+                                .padding(.horizontal)
+                        }
                         headerCard
+                        progressCard
                         instructions
-                        domainList
+                        domainSection(
+                            title: LocalizedString("baseline_section_salutogenic", lang),
+                            domains: salutogenicDomains
+                        )
+                        domainSection(
+                            title: LocalizedString("baseline_section_pathogenic", lang),
+                            domains: pathogenicDomains
+                        )
                     }
                     .padding(.vertical, 24)
                 }
-                reviewButton
+                bottomButton
             }
         }
         .background(AppColors.background.ignoresSafeArea())
@@ -115,7 +124,9 @@ struct FollowUpDomainsView: View {
                 )
             }
         }
-        .sheet(isPresented: $showSummary) {
+        .sheet(isPresented: $showSummary, onDismiss: {
+            if isAlreadyCompleted { dismiss() }
+        }) {
             FollowUpSummaryView(
                 client: client,
                 followUpDate: assessment?.createdAt,
@@ -127,34 +138,39 @@ struct FollowUpDomainsView: View {
                 onFinish: {
                     Task { await finishFollowUp() }
                 },
-                canFinish: missingDomainCount == 0,
+                canFinish: allDomainsCompleted,
                 isFinishing: isFinishing
+            )
+        }
+        .sheet(isPresented: $showComparison, onDismiss: { dismiss() }) {
+            FollowUpComparisonView(
+                appState: appState,
+                client: client,
+                initialBaseline: baselineAssessment,
+                initialFollowup: assessment,
+                initialBaselineAnswers: baselineAnswers,
+                initialFollowupAnswers: answers
             )
         }
     }
 
-    private var followUpNotesSummary: String {
-        var collected: [String] = []
-        for domain in domains {
-            let notesKey = DomainAnswerKey.notes(domain.key)
-            if let note = answers[notesKey]?.value as? String,
-               !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                collected.append("\(domain.title(lang: appState.languageCode)): \(note)")
-            }
-        }
-        return collected.isEmpty ? LocalizedString("summary_no_notes", appState.languageCode) : collected.joined(separator: "\n")
-    }
+    // MARK: - Top Bar
 
     private var topBar: some View {
         HStack {
             Button { dismiss() } label: {
-                Label(LocalizedString("general_back", appState.languageCode), systemImage: "chevron.left")
+                Label(LocalizedString("general_back", lang), systemImage: "chevron.left")
                     .font(.subheadline.weight(.semibold))
             }
             .tint(AppColors.textPrimary)
             Spacer()
-            Text(LocalizedString("followup_domains_assessment_title", appState.languageCode))
-                .font(.headline)
+            VStack(spacing: 2) {
+                Text(LocalizedString("followup_domains_assessment_title", lang))
+                    .font(.headline)
+                Text(client.displayName)
+                    .font(.caption)
+                    .foregroundColor(AppColors.textSecondary)
+            }
             Spacer()
             Spacer().frame(width: 44)
         }
@@ -162,14 +178,16 @@ struct FollowUpDomainsView: View {
         .background(AppColors.mainSurface)
     }
 
+    // MARK: - Header & Progress
+
     private var headerCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(client.displayName)
                 .font(.title3.bold())
-            Text(String(format: LocalizedString("followup_domains_baseline_date", appState.languageCode), baselineDateText))
+            Text(String(format: LocalizedString("followup_domains_baseline_date", lang), baselineDateText))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
-            Text(String(format: LocalizedString("followup_domains_followup_date", appState.languageCode), followupDateText))
+            Text(String(format: LocalizedString("followup_domains_followup_date", lang), followupDateText))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
@@ -180,69 +198,141 @@ struct FollowUpDomainsView: View {
         .padding(.horizontal)
     }
 
+    private var progressCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(String(format: LocalizedString("baseline_progress", lang), completedCount, totalCount))
+                .font(.subheadline.weight(.semibold))
+            ProgressView(value: Double(completedCount), total: Double(totalCount))
+                .accentColor(AppColors.primary)
+            if isAlreadyCompleted {
+                Label(
+                    String(format: LocalizedString("baseline_completed_label", lang), formattedDate(assessment?.completedAt)),
+                    systemImage: "checkmark.seal.fill"
+                )
+                .font(.caption)
+                .foregroundColor(AppColors.success)
+            } else {
+                Text(LocalizedString("followup_domains_draft_notice", lang))
+                    .font(.caption)
+                    .foregroundColor(AppColors.textSecondary)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(AppColors.secondarySurface)
+        .cornerRadius(20)
+        .padding(.horizontal)
+    }
+
     private var instructions: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(LocalizedString("followup_domains_update_instruction", appState.languageCode))
+            Text(LocalizedString("followup_domains_update_instruction", lang))
                 .font(.subheadline)
-            Text(LocalizedString("followup_domains_previous_score_hint", appState.languageCode))
+            Text(LocalizedString("followup_domains_previous_score_hint", lang))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
         }
         .padding(.horizontal)
     }
 
-    private var domainList: some View {
+    // MARK: - Domain Sections
+
+    private func domainSection(title: String, domains: [BaselineDomain]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(LocalizedString("followup_domains_section_title", appState.languageCode))
-                .font(.headline)
+            Text(title)
+                .font(.title3.bold())
                 .padding(.horizontal)
-            ForEach(domains) { domain in
-                Button {
-                    selectedDomain = domain
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(logicStore.domain(forAppKey: domain.key)?.label ?? domain.title(lang: appState.languageCode))
-                                .font(.headline)
-                            if let desc = logicStore.domain(forAppKey: domain.key)?.description {
-                                Text(desc)
-                                    .font(.caption)
-                                    .foregroundColor(AppColors.textSecondary)
-                            }
-                            Text(String(format: LocalizedString("followup_domains_score_comparison", appState.languageCode), formattedScore(baselineScores[domain.key]), formattedScore(currentScore(for: domain.key))))
-                                .font(.caption)
-                                .foregroundColor(AppColors.textSecondary)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(AppColors.textSecondary)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColors.mainSurface)
-                    .cornerRadius(18)
-                    .padding(.horizontal)
+            VStack(spacing: 12) {
+                ForEach(domains) { domain in
+                    domainRow(domain)
                 }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private func domainRow(_ domain: BaselineDomain) -> some View {
+        let status = domainStatus(for: domain)
+        return Button {
+            selectedDomain = domain
+        } label: {
+            HStack(spacing: 16) {
+                Image(systemName: domain.icon)
+                    .font(.title2)
+                    .foregroundColor(AppColors.primary)
+                    .frame(width: 44, height: 44)
+                    .background(AppColors.primary.opacity(0.12))
+                    .cornerRadius(12)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(domain.title(lang: lang))
+                        .font(.headline)
+                        .foregroundColor(AppColors.textPrimary)
+                    Text(String(format: LocalizedString("followup_domains_score_comparison", lang), formattedScore(baselineScores[domain.key]), formattedScore(currentScore(for: domain.key))))
+                        .font(.caption)
+                        .foregroundColor(AppColors.textSecondary)
+                    Text(status.localizedLabel)
+                        .font(.caption2)
+                        .foregroundColor(statusColor(for: status))
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(AppColors.textSecondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(AppColors.mainSurface)
+            .cornerRadius(18)
+        }
+        .disabled(assessment == nil)
+    }
+
+    // MARK: - Bottom Button
+
+    private var bottomButton: some View {
+        Group {
+            if isAlreadyCompleted {
+                viewComparisonButton
+            } else if allDomainsCompleted {
+                completeFollowUpButton
+            } else {
+                saveAndFinishLaterButton
             }
         }
     }
 
-    private var reviewButton: some View {
+    private var completeFollowUpButton: some View {
         VStack(spacing: 10) {
-            Button {
-                showSummary = true
-            } label: {
-                Text(LocalizedString("followup_domains_review_summary", appState.languageCode))
+            Button(action: { showSummary = true }) {
+                Text(LocalizedString("followup_domains_review_summary", lang))
                     .font(.headline)
+                    .foregroundColor(AppColors.onPrimary)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(missingDomainCount == 0 ? AppColors.primary : AppColors.secondarySurface)
-                    .foregroundColor(missingDomainCount == 0 ? AppColors.onPrimary : AppColors.textPrimary)
+                    .background(AppColors.primary)
                     .cornerRadius(16)
             }
-            .disabled(missingDomainCount > 0)
-            if missingDomainCount > 0 {
-                Text(String(format: LocalizedString("followup_domains_missing_count", appState.languageCode), missingDomainCount))
+            Text(LocalizedString("followup_complete_subtext", lang))
+                .font(.caption)
+                .foregroundColor(AppColors.textSecondary)
+        }
+        .padding()
+        .background(AppColors.background.ignoresSafeArea(edges: .bottom))
+    }
+
+    private var saveAndFinishLaterButton: some View {
+        VStack(spacing: 10) {
+            Button(action: { Task { await saveDraftAndDismiss() } }) {
+                Text(LocalizedString("baseline_finish_later", lang))
+                    .font(.headline)
+                    .foregroundColor(AppColors.primary)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(AppColors.secondarySurface)
+                    .cornerRadius(16)
+            }
+            let remaining = totalCount - completedCount
+            if remaining > 0 {
+                Text(String(format: LocalizedString("followup_domains_missing_count", lang), remaining))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
             }
@@ -251,39 +341,88 @@ struct FollowUpDomainsView: View {
         .background(AppColors.background.ignoresSafeArea(edges: .bottom))
     }
 
-    private func formattedScore(_ value: Int?) -> String {
-        if let value {
-            return "\(value)/5"
+    private var viewComparisonButton: some View {
+        VStack(spacing: 10) {
+            Button(action: { showComparison = true }) {
+                Text(LocalizedString("followup_view_comparison", lang))
+                    .font(.headline)
+                    .foregroundColor(AppColors.primary)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(AppColors.secondarySurface)
+                    .cornerRadius(16)
+            }
         }
-        return "—/5"
+        .padding()
+        .background(AppColors.background.ignoresSafeArea(edges: .bottom))
+    }
+
+    // MARK: - Status helpers
+
+    private func domainStatus(for domain: BaselineDomain) -> DomainCompletionStatus {
+        let statusKey = DomainAnswerKey.status(domain.key)
+        if let value = answers[statusKey]?.value as? String, value == "completed" {
+            return .completed
+        }
+        let prefix = "\(domain.key)."
+        let hasAnyAnswer = answers.keys.contains(where: { $0.hasPrefix(prefix) })
+        return hasAnyAnswer ? .inProgress : .notStarted
+    }
+
+    private func statusColor(for status: DomainCompletionStatus) -> Color {
+        switch status {
+        case .notStarted: return AppColors.textSecondary
+        case .inProgress: return Color.orange
+        case .completed: return AppColors.success
+        }
     }
 
     private func currentScore(for domainKey: String) -> Int? {
-        if let value = answers[DomainAnswerKey.readiness(domainKey)]?.value as? Int {
-            return value
-        }
-        return nil
+        answers[DomainAnswerKey.readiness(domainKey)]?.value as? Int
     }
+
+    private func formattedScore(_ value: Int?) -> String {
+        value.map { "\($0)/5" } ?? "—/5"
+    }
+
+    private func formattedDate(_ date: Date?) -> String {
+        guard let date else { return "--" }
+        return Self.dateFormatter.string(from: date)
+    }
+
+    // MARK: - Data Loading
 
     private func loadData() async {
         guard let unitId = appState.currentUnit?.id else {
             await MainActor.run {
-                loadError = LocalizedString("followup_domains_error", appState.languageCode)
+                loadError = LocalizedString("followup_domains_error", lang)
                 isLoading = false
             }
             return
         }
         do {
             let assessments = try await assessmentService.getAssessments(clientId: client.id)
+
             let baseline = assessments
                 .filter { $0.assessmentType == "baseline" && $0.status == "completed" }
                 .sorted(by: { ($0.completedAt ?? Date.distantPast) > ($1.completedAt ?? Date.distantPast) })
                 .first
-            let baselineScores = parseDomainScores(from: baseline)
-            let followUpExisting = assessments.first { $0.assessmentType == "followup" && $0.status != "archived" }
+
+            let scores = parseDomainScores(from: baseline)
+            var blAnswers: [String: AnyCodable] = [:]
+            if scores.isEmpty, let baseline {
+                let answerList = try await assessmentService.getAssessmentAnswers(assessmentId: baseline.id)
+                for ans in answerList {
+                    let key = "\(ans.domainKey).\(ans.questionKey)"
+                    if let v = ans.value { blAnswers[key] = v }
+                }
+            }
+
             let currentAssessment: Assessment
-            if let followUp = followUpExisting {
-                currentAssessment = followUp
+            if let openId = openAssessmentId, let openAssessment = assessments.first(where: { $0.id == openId && $0.assessmentType == "followup" }) {
+                currentAssessment = openAssessment
+            } else if let draft = assessments.first(where: { $0.assessmentType == "followup" && ($0.status == "draft" || $0.status == "in_progress") }) {
+                currentAssessment = draft
             } else {
                 let staffId = appState.currentStaffProfile?.id
                 currentAssessment = try await assessmentService.createAssessment(
@@ -293,17 +432,31 @@ struct FollowUpDomainsView: View {
                     createdByStaffId: staffId
                 )
             }
+
             let answerList = try await assessmentService.getAssessmentAnswers(assessmentId: currentAssessment.id)
             var dict: [String: AnyCodable] = [:]
             for ans in answerList {
                 let key = "\(ans.domainKey).\(ans.questionKey)"
                 if let v = ans.value { dict[key] = v }
             }
+
+            var resolvedScores = scores
+            if resolvedScores.isEmpty {
+                for domain in allDomains {
+                    let readinessKey = DomainAnswerKey.readiness(domain.key)
+                    if let val = blAnswers[readinessKey]?.value as? Int {
+                        resolvedScores[domain.key] = val
+                    }
+                }
+            }
+
             await MainActor.run {
                 self.assessment = currentAssessment
                 self.answers = dict
-                self.baselineScores = baselineScores
+                self.baselineScores = resolvedScores
+                self.baselineAnswers = blAnswers
                 self.baselineCompletion = baseline?.completedAt
+                self.baselineAssessment = baseline
                 self.isLoading = false
                 self.staffNote = currentAssessment.notes ?? ""
             }
@@ -315,16 +468,30 @@ struct FollowUpDomainsView: View {
         }
     }
 
-private func parseDomainScores(from assessment: Assessment?) -> [String: Int] {
+    private func parseDomainScores(from assessment: Assessment?) -> [String: Int] {
         guard let dict = assessment?.domainScores else { return [:] }
         var result: [String: Int] = [:]
-        for domain in domains {
+        for domain in allDomains {
             if let scoreDict = dict[domain.key]?.value as? [String: Any],
                let score = scoreDict["iScore"] as? Int {
                 result[domain.key] = score
             }
         }
         return result
+    }
+
+    // MARK: - Actions
+
+    private func saveDraftAndDismiss() async {
+        guard let assessment else { return }
+        saveError = nil
+        let payloads = AssessmentAnswerPayloadBuilder.payloads(from: answers, assessmentId: assessment.id)
+        do {
+            try await assessmentService.upsertAnswers(payloads)
+            await MainActor.run { dismiss() }
+        } catch {
+            await MainActor.run { saveError = error.localizedDescription }
+        }
     }
 
     private func saveDraftNote() async {
@@ -337,16 +504,17 @@ private func parseDomainScores(from assessment: Assessment?) -> [String: Int] {
                 notes: staffNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : staffNote
             )
         } catch {
-            await MainActor.run {
-                loadError = error.localizedDescription
-            }
+            await MainActor.run { saveError = error.localizedDescription }
         }
     }
 
     private func finishFollowUp() async {
-        guard missingDomainCount == 0, let assessment else { return }
+        guard allDomainsCompleted, let assessment else { return }
         await MainActor.run { isFinishing = true }
         do {
+            let payloads = AssessmentAnswerPayloadBuilder.payloads(from: answers, assessmentId: assessment.id)
+            try await assessmentService.upsertAnswers(payloads)
+
             let now = Date()
             try await assessmentService.updateAssessment(
                 id: assessment.id,
@@ -354,28 +522,129 @@ private func parseDomainScores(from assessment: Assessment?) -> [String: Int] {
                 completedAt: now,
                 notes: staffNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : staffNote
             )
+
+            let ptsd = ScoringEngine.evaluatePTSD(answers: answers)
+            let scores = buildDomainScores(from: answers, ptsd: ptsd)
+            let flags = ScoringEngine.evaluateSafetyFlags(
+                answers: answers,
+                ptsd: ptsd,
+                problemScores: scores.filter { $0.scoreType == .pathogenic }
+            )
+            let recs = ScoringEngine.buildRecommendations(
+                domainScores: scores,
+                ptsd: ptsd,
+                store: logicStore
+            )
+
+            try await assessmentService.saveSummaryFields(
+                assessmentId: assessment.id,
+                ptsdScore: ptsd.totalSymptomScore,
+                ptsdProbable: ptsd.probablePTSD,
+                safetyFlags: flags,
+                recommendations: recs,
+                domainScores: scores
+            )
+
             if let unitId = appState.currentUnit?.id,
                let staffId = appState.currentStaffProfile?.id {
                 try? await clientService.createTimelineEvent(
                     clientId: client.id,
                     unitId: unitId,
                     eventType: "followup_completed",
-                    title: LocalizedString("assessment_timeline_title_followup", appState.languageCode),
-                    description: "Follow-up recorded \(Self.dateFormatter.string(from: now)).",
+                    title: LocalizedString("assessment_timeline_title_followup", lang),
+                    description: String(format: LocalizedString("followup_timeline_description", lang), completedCount, totalCount),
                     staffId: staffId
                 )
             }
+
             await MainActor.run {
-                isFinishing = false
-                showSummary = false
-                dismiss()
+                self.recommendations = recs
+                self.domainScoresResult = scores
+                self.isFinishing = false
+                self.showSummary = false
+                self.showComparison = true
             }
         } catch {
             await MainActor.run {
-                loadError = error.localizedDescription
+                saveError = error.localizedDescription
                 isFinishing = false
             }
         }
+    }
+
+    private func buildDomainScores(from data: [String: AnyCodable], ptsd: PTSDEvaluation) -> [DomainScore] {
+        var results: [DomainScore] = []
+
+        for info in AssessmentDefinition.salutogenicModuleInfos(from: logicStore) {
+            let base = "\(info.key)."
+            let clientKey = base + DomainQuestionKeys.clientScore
+            let readinessKey = DomainAnswerKey.readiness(info.key)
+            let importanceKey = base + DomainQuestionKeys.importance
+            let staffKey = base + DomainQuestionKeys.staffAssessment
+            let noteKey = DomainAnswerKey.notes(info.key)
+            let noteValue = (data[noteKey]?.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            let readinessScore = data[readinessKey]?.value as? Int
+            let clientScore = data[clientKey]?.value as? Int
+            let iScore = clientScore ?? readinessScore ?? 3
+
+            results.append(DomainScore(
+                domainKey: info.key,
+                iScore: iScore,
+                iScoreStaff: (data[staffKey]?.value as? Int) ?? 3,
+                mScore: (data[importanceKey]?.value as? Int) ?? 3,
+                pScore: 2,
+                notes: noteValue,
+                scoreType: info.scoreType
+            ))
+        }
+
+        for info in AssessmentDefinition.pathogenicModuleInfos(from: logicStore) where info.usesStandardIMPScores {
+            let prefix = "\(info.key)."
+            let clientKey = prefix + ProblemQuestionKeys.clientScore
+            let readinessKey = DomainAnswerKey.readiness(info.key)
+            let importanceKey = prefix + ProblemQuestionKeys.importance
+            let staffKey = prefix + ProblemQuestionKeys.staffAssessment
+            let noteKey = DomainAnswerKey.notes(info.key)
+            let noteValue = (data[noteKey]?.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            let readinessScore = data[readinessKey]?.value as? Int
+            let clientScore = data[clientKey]?.value as? Int
+            let iScore = clientScore ?? readinessScore ?? 1
+
+            results.append(DomainScore(
+                domainKey: info.key,
+                iScore: iScore,
+                iScoreStaff: (data[staffKey]?.value as? Int) ?? 1,
+                mScore: (data[importanceKey]?.value as? Int) ?? 3,
+                pScore: 2,
+                notes: noteValue,
+                scoreType: info.scoreType
+            ))
+        }
+
+        let hasTraumaAnswers = data.keys.contains { $0.hasPrefix("trauma.") }
+        if hasTraumaAnswers {
+            let traumaNeed: Int
+            switch ptsd.totalSymptomScore {
+            case 0: traumaNeed = 1
+            case 1...8: traumaNeed = 2
+            case 9...20: traumaNeed = 3
+            case 21...35: traumaNeed = 4
+            default: traumaNeed = 5
+            }
+            results.append(DomainScore(
+                domainKey: "trauma",
+                iScore: traumaNeed,
+                iScoreStaff: ptsd.probablePTSD ? 5 : (ptsd.requiresPsychologist ? 4 : 2),
+                mScore: 3,
+                pScore: 1,
+                notes: "",
+                scoreType: .pathogenic
+            ))
+        }
+
+        return results
     }
 }
 

@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct FollowUpComparisonView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var appState: AppState
     let client: Client
+    var initialBaseline: Assessment? = nil
+    var initialFollowup: Assessment? = nil
+    var initialBaselineAnswers: [String: AnyCodable]? = nil
+    var initialFollowupAnswers: [String: AnyCodable]? = nil
 
     @State private var baseline: Assessment?
     @State private var followups: [Assessment] = []
@@ -23,85 +28,129 @@ struct FollowUpComparisonView: View {
 
     private let assessmentService = AssessmentService()
     @EnvironmentObject private var logicStore: LogicReferenceStore
-    
+
     private var lang: String { appState.languageCode }
 
-    var body: some View {
-        Group {
-            if isLoading {
-                ProgressView(LocalizedString("general_loading", lang))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let errorMessage {
-                Text(errorMessage)
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.danger)
-                    .padding()
-            } else if baseline == nil || followups.isEmpty {
-                VStack(spacing: 12) {
-                    Text(LocalizedString("followup_comparison_no_pair", lang))
-                        .font(.subheadline)
-                        .foregroundColor(AppColors.textSecondary)
-                    Text(LocalizedString("followup_comparison_complete_message", lang))
-                        .font(.footnote)
-                        .foregroundColor(AppColors.textSecondary)
-                        .multilineTextAlignment(.center)
-                }
-                .padding()
-            } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        if let baselineDate = baseline?.completedAt {
-                            Text(String(format: LocalizedString("followup_comparison_baseline_completed", lang), format(date: baselineDate)))
-                                .font(.footnote)
-                                .foregroundColor(AppColors.textSecondary)
-                                .padding(.horizontal)
-                        }
+    private var salutogenicDomains: [AssessmentDomainDefinition] {
+        AssessmentDefinition.salutogenicDomains(from: logicStore)
+    }
 
-                        if !followups.isEmpty {
-                            Picker(LocalizedString("followup_comparison_followup_label", lang), selection: $selectedFollowupId) {
-                                ForEach(followups) { a in
-                                    Text(followupLabel(for: a))
-                                        .tag(Optional(a.id))
+    var body: some View {
+        NavigationStack {
+            Group {
+                if isLoading {
+                    ProgressView(LocalizedString("general_loading", lang))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let errorMessage {
+                    Text(errorMessage)
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.danger)
+                        .padding()
+                } else if baseline == nil || followups.isEmpty {
+                    VStack(spacing: 12) {
+                        Text(LocalizedString("followup_comparison_no_pair", lang))
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.textSecondary)
+                        Text(LocalizedString("followup_comparison_complete_message", lang))
+                            .font(.footnote)
+                            .foregroundColor(AppColors.textSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            if let baselineDate = baseline?.completedAt {
+                                Text(String(format: LocalizedString("followup_comparison_baseline_completed", lang), format(date: baselineDate)))
+                                    .font(.footnote)
+                                    .foregroundColor(AppColors.textSecondary)
+                                    .padding(.horizontal)
+                            }
+
+                            if followups.count > 1 {
+                                Picker(LocalizedString("followup_comparison_followup_label", lang), selection: $selectedFollowupId) {
+                                    ForEach(followups) { a in
+                                        Text(followupLabel(for: a))
+                                            .tag(Optional(a.id))
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .padding(.horizontal)
+                                .onChange(of: selectedFollowupId) { _, newId in
+                                    if let newId, let fu = followups.first(where: { $0.id == newId }) {
+                                        Task { await loadScoresForFollowup(fu) }
+                                    }
                                 }
                             }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal)
-                        }
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(LocalizedString("followup_comparison_domain_comparison", lang))
-                                .font(.headline)
-                                .padding(.horizontal)
-                            Text(LocalizedString("followup_comparison_scale_description", lang))
-                                .font(.caption)
-                                .foregroundColor(AppColors.textSecondary)
-                                .padding(.horizontal)
-                        }
+                            comparisonSection(
+                                title: LocalizedString("baseline_section_salutogenic", lang),
+                                domainKeys: BaselineDomainFlowConfig.salutogenicDomains.map(\.key)
+                            )
 
-                        ForEach(AssessmentDefinition.salutogenicDomains(from: logicStore), id: \.key) { domain in
-                            if let base = baselineScores.first(where: { $0.domain.key == domain.key }),
-                               let foll = followupScores.first(where: { $0.domain.key == domain.key }) {
-                                DomainComparisonRow(
-                                    title: domain.title,
-                                    baseline: base.average,
-                                    followup: foll.average,
-                                    lang: lang
-                                )
-                                .padding(.horizontal)
-                            }
-                        }
+                            comparisonSection(
+                                title: LocalizedString("baseline_section_pathogenic", lang),
+                                domainKeys: BaselineDomainFlowConfig.pathogenicDomains.map(\.key)
+                            )
 
-                        Spacer(minLength: 24)
+                            Spacer(minLength: 24)
+                        }
+                        .padding(.vertical, 16)
                     }
-                    .padding(.vertical, 16)
+                }
+            }
+            .background(AppColors.background)
+            .navigationTitle(LocalizedString("followup_comparison_title", lang))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(LocalizedString("general_close", lang)) { dismiss() }
+                }
+            }
+            .task {
+                if let bl = initialBaseline, let fu = initialFollowup {
+                    let blA = initialBaselineAnswers ?? [:]
+                    let fuA = initialFollowupAnswers ?? [:]
+                    await MainActor.run {
+                        self.baseline = bl
+                        self.followups = [fu]
+                        self.selectedFollowupId = fu.id
+                        self.baselineScores = scoresFromReadiness(blA, fallbackAssessment: bl)
+                        self.followupScores = scoresFromReadiness(fuA, fallbackAssessment: fu)
+                        self.isLoading = false
+                    }
+                } else {
+                    await loadData()
                 }
             }
         }
-        .background(AppColors.background)
-        .navigationTitle(LocalizedString("followup_comparison_title", lang))
-        .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await loadData()
+    }
+
+    @ViewBuilder
+    private func comparisonSection(title: String, domainKeys: [String]) -> some View {
+        let matchedRows: [(String, Double?, Double?)] = domainKeys.map { key in
+            let domainTitle = BaselineDomainFlowConfig.allDomains.first(where: { $0.key == key })?.title(lang: lang)
+                ?? logicStore.domain(forAppKey: key)?.label
+                ?? key
+            let base = baselineScores.first(where: { $0.domain.key == key })?.average
+            let foll = followupScores.first(where: { $0.domain.key == key })?.average
+            return (domainTitle, base, foll)
+        }
+        if !matchedRows.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.headline)
+                    .padding(.horizontal)
+                ForEach(matchedRows, id: \.0) { row in
+                    DomainComparisonRow(
+                        title: row.0,
+                        baseline: row.1,
+                        followup: row.2,
+                        lang: lang
+                    )
+                    .padding(.horizontal)
+                }
+            }
         }
     }
 
@@ -113,10 +162,12 @@ struct FollowUpComparisonView: View {
             let assessments = try await assessmentService.getAssessments(clientId: client.id)
 
             let baselines = assessments.filter { $0.assessmentType == "baseline" && $0.status == "completed" }
-            let followupsAll = assessments.filter { $0.assessmentType == "followup" && $0.status == "completed" }
+            let followupsAll = assessments
+                .filter { $0.assessmentType == "followup" && $0.status == "completed" }
+                .sorted(by: { ($0.completedAt ?? $0.createdAt ?? Date.distantPast) > ($1.completedAt ?? $1.createdAt ?? Date.distantPast) })
 
             guard let baseline = baselines.sorted(by: { ($0.completedAt ?? $0.createdAt ?? Date.distantPast) < ($1.completedAt ?? $1.createdAt ?? Date.distantPast) }).first,
-                  !followupsAll.isEmpty else {
+                  let latestFollowUp = followupsAll.first else {
                 await MainActor.run {
                     self.baseline = baselines.first
                     self.followups = followupsAll
@@ -125,18 +176,16 @@ struct FollowUpComparisonView: View {
                 return
             }
 
-            let selectedFollowup = followupsAll.sorted(by: { ($0.completedAt ?? $0.createdAt ?? Date.distantPast) > ($1.completedAt ?? $1.createdAt ?? Date.distantPast) }).first!
-
             let baselineAnswers = try await answersDict(for: baseline.id)
-            let followAnswers = try await answersDict(for: selectedFollowup.id)
+            let followAnswers = try await answersDict(for: latestFollowUp.id)
 
-            let domains = AssessmentDefinition.salutogenicDomains(from: logicStore); let baseScores = AssessmentDefinition.scores(from: baselineAnswers, domains: domains)
-            let follScores = AssessmentDefinition.scores(from: followAnswers, domains: domains)
+            let baseScores = scoresFromReadiness(baselineAnswers, fallbackAssessment: baseline)
+            let follScores = scoresFromReadiness(followAnswers, fallbackAssessment: latestFollowUp)
 
             await MainActor.run {
                 self.baseline = baseline
                 self.followups = followupsAll
-                self.selectedFollowupId = selectedFollowup.id
+                self.selectedFollowupId = latestFollowUp.id
                 self.baselineScores = baseScores
                 self.followupScores = follScores
                 self.isLoading = false
@@ -146,6 +195,51 @@ struct FollowUpComparisonView: View {
                 self.errorMessage = error.localizedDescription
                 self.isLoading = false
             }
+        }
+    }
+
+    private func loadScoresForFollowup(_ followup: Assessment) async {
+        do {
+            guard let baseline else { return }
+            let baselineAnswers = try await answersDict(for: baseline.id)
+            let followAnswers = try await answersDict(for: followup.id)
+            let baseScores = scoresFromReadiness(baselineAnswers, fallbackAssessment: baseline)
+            let follScores = scoresFromReadiness(followAnswers, fallbackAssessment: followup)
+            await MainActor.run {
+                self.baselineScores = baseScores
+                self.followupScores = follScores
+            }
+        } catch {
+            await MainActor.run { errorMessage = error.localizedDescription }
+        }
+    }
+
+    /// Build domain scores from readiness values (domain form), with fallback to assessment.domain_scores JSONB.
+    private func scoresFromReadiness(_ answers: [String: AnyCodable], fallbackAssessment: Assessment? = nil) -> [AssessmentDomainScore] {
+        BaselineDomainFlowConfig.allDomains.map { domain in
+            let key = domain.key
+            let readinessKey = DomainAnswerKey.readiness(key)
+            var value = answers[readinessKey]?.value as? Int
+            if value == nil, let dict = fallbackAssessment?.domainScores, let entry = dict[key] {
+                if let scoreDict = entry.value as? [String: AnyCodable], let iScoreAny = scoreDict["iScore"] {
+                    value = iScoreAny.value as? Int
+                }
+                if value == nil, let scoreDict = entry.value as? [String: Any], let i = scoreDict["iScore"] as? Int {
+                    value = i
+                }
+            }
+            let def = AssessmentDomainDefinition(
+                key: key,
+                title: domain.title(lang: lang),
+                subtitle: domain.subtitle(lang: lang),
+                icon: domain.icon,
+                questions: []
+            )
+            return AssessmentDomainScore(
+                domain: def,
+                average: value.map { Double($0) },
+                answeredCount: value != nil ? 1 : 0
+            )
         }
     }
 
@@ -161,9 +255,9 @@ struct FollowUpComparisonView: View {
 
     private func followupLabel(for a: Assessment) -> String {
         if let completed = a.completedAt {
-            return "Follow-up \(format(date: completed))"
+            return "Uppföljning \(format(date: completed))"
         }
-        return "Follow-up"
+        return "Uppföljning"
     }
 
     private func format(date: Date) -> String {
@@ -186,7 +280,6 @@ private struct DomainComparisonRow: View {
 
     private var deltaColor: Color {
         guard let d = delta else { return AppColors.textSecondary }
-        // Lower need (followup < baseline) is good → green
         if d < -0.2 { return .green }
         if d > 0.2 { return .red }
         return AppColors.textSecondary

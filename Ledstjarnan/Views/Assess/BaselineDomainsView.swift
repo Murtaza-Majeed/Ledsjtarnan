@@ -11,6 +11,7 @@ struct BaselineDomainsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var appState: AppState
     let client: Client
+    var openAssessmentId: String? = nil
     @EnvironmentObject private var logicStore: LogicReferenceStore
     
     private var lang: String { appState.languageCode }
@@ -28,6 +29,7 @@ struct BaselineDomainsView: View {
     @State private var safetyFlags: [SafetyFlag] = []
     @State private var ptsdEval: PTSDEvaluation?
     @State private var domainScoresResult: [DomainScore] = []
+    @State private var showInsatskarta = false
 
     private let assessmentService = AssessmentService()
     private let clientService = ClientService()
@@ -100,7 +102,11 @@ struct BaselineDomainsView: View {
                 onClose: { showRecommendations = false },
                 onGoToPlanBuilder: { _ in showRecommendations = false },
                 onAssignChapters: { showRecommendations = false },
-                onOpenInsatskarta: nil
+                onOpenInsatskarta: nil,
+                insatskartaRecommendations: recommendations,
+                insatskartaSafetyFlags: safetyFlags,
+                insatskartaPTSD: ptsdEval,
+                insatskartaClientName: client.displayName
             )
         }
     }
@@ -269,7 +275,21 @@ struct BaselineDomainsView: View {
         loadError = nil
         do {
             let list = try await assessmentService.getAssessments(clientId: client.id)
-            let existing = list.first { $0.assessmentType == "baseline" && $0.status != "completed" }
+            if let openId = openAssessmentId, let openAssessment = list.first(where: { $0.id == openId }) {
+                let fetchedAnswers = try await answersDictionary(assessmentId: openAssessment.id)
+                await MainActor.run {
+                    self.assessment = openAssessment
+                    self.answers = fetchedAnswers
+                    self.isLoading = false
+                }
+                return
+            }
+            let baselines = list.filter { $0.assessmentType == "baseline" }
+            let completed = baselines.filter { $0.status == "completed" }
+                .sorted(by: { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) })
+                .first
+            let draft = baselines.first { $0.status != "completed" }
+            let existing = completed ?? draft
             if let assessment = existing {
                 let fetchedAnswers = try await answersDictionary(assessmentId: assessment.id)
                 await MainActor.run {

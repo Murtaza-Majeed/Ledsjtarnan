@@ -42,8 +42,14 @@ struct AssessmentRecommendationView: View {
     let onGoToPlanBuilder: (Set<String>) -> Void
     let onAssignChapters: () -> Void
     let onOpenInsatskarta: (() -> Void)?
+    /// When provided, the "Öppna Insatskarta" button presents InsatskartraView in a sheet from this view (so it opens on top).
+    var insatskartaRecommendations: [InterventionRecommendation]? = nil
+    var insatskartaSafetyFlags: [SafetyFlag]? = nil
+    var insatskartaPTSD: PTSDEvaluation? = nil
+    var insatskartaClientName: String? = nil
 
     @State private var selectedDomains: Set<String> = []
+    @State private var showInsatskartaSheet = false
     @Environment(\.languageCode) var lang
 
     private var headerSubtitle: String {
@@ -62,6 +68,21 @@ struct AssessmentRecommendationView: View {
         selectedDomains.isEmpty ? defaultSelection : selectedDomains
     }
 
+    private var canShowInsatskarta: Bool {
+        if let r = insatskartaRecommendations, let s = insatskartaSafetyFlags, let p = insatskartaPTSD, let n = insatskartaClientName, !n.isEmpty {
+            return true
+        }
+        return onOpenInsatskarta != nil
+    }
+
+    private func openInsatskarta() {
+        if insatskartaRecommendations != nil, insatskartaSafetyFlags != nil, insatskartaPTSD != nil, let n = insatskartaClientName, !n.isEmpty {
+            showInsatskartaSheet = true
+        } else {
+            onOpenInsatskarta?()
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -69,15 +90,6 @@ struct AssessmentRecommendationView: View {
                     headerCard
                     focusList
                     chapterSuggestions
-                    if let onOpenInsatskarta {
-                        Button(LocalizedString("assessment_recommendation_open_insatskarta", lang)) {
-                            onOpenInsatskarta()
-                        }
-                        .font(.subheadline)
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .foregroundColor(AppColors.primary)
-                    }
                 }
                 .padding(24)
             }
@@ -93,6 +105,16 @@ struct AssessmentRecommendationView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(LocalizedString("general_close", lang)) { onClose() }
                 }
+            }
+        }
+        .fullScreenCover(isPresented: $showInsatskartaSheet) {
+            if let recs = insatskartaRecommendations, let flags = insatskartaSafetyFlags, let ptsd = insatskartaPTSD, let name = insatskartaClientName {
+                InsatskartraView(
+                    recommendations: recs,
+                    safetyFlags: flags,
+                    ptsd: ptsd,
+                    clientName: name
+                )
             }
         }
     }
@@ -228,6 +250,17 @@ struct AssessmentRecommendationView: View {
                 Text(LocalizedString("assessment_recommendation_link_client_message", lang))
                     .font(.caption)
                     .foregroundColor(AppColors.textSecondary)
+            }
+            if canShowInsatskarta {
+                Button {
+                    openInsatskarta()
+                } label: {
+                    Text(LocalizedString("assessment_recommendation_open_insatskarta", lang))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(AppColors.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
             }
         }
     }
