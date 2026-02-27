@@ -76,10 +76,10 @@ struct ClientsListView: View {
                 }
             }
             .navigationDestination(item: $navigationClient) { client in
-                ClientProfileView(appState: appState, client: client) {
+                ClientProfileView(appState: appState, client: client, onDeleted: {
                     navigationClient = nil
                     loadClients()
-                }
+                }, onDismiss: { navigationClient = nil })
             }
             .task {
                 loadClients()
@@ -171,7 +171,7 @@ struct ClientsListView: View {
                                 loadClients()
                             }
                         ) {
-                            ClientListCard(summary: summary)
+                            ClientListCard(summary: summary, lang: lang)
                         }
                         .buttonStyle(.plain)
                     }
@@ -216,6 +216,7 @@ struct ClientsListView: View {
 
 private struct ClientListCard: View {
     let summary: ClientListSummary
+    let lang: String
     
     private static let followUpFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -225,9 +226,9 @@ private struct ClientListCard: View {
     
     private var followUpText: String {
         guard let date = summary.nextFollowUpDate else {
-            return "Next: Follow-up —"  // This will need appState to localize properly
+            return LocalizedString("clients_next_followup_none", lang)
         }
-        return "Next: Follow-up " + Self.followUpFormatter.string(from: date)
+        return String(format: LocalizedString("clients_next_followup", lang), Self.followUpFormatter.string(from: date))
     }
     
     private var followUpColor: Color {

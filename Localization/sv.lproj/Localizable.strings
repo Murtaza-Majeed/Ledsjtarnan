@@ -852,3 +852,7 @@
 "general_new" = "Ny";
 "general_done" = "Klar";
 "general_loading" = "Laddar…";
+
+"client_profile_history_baseline_followup" = "Baslinje och uppföljning";
+"insatskarta_no_data" = "Ingen Insatskartadata för denna kartläggning.";
+"followup_view" = "Visa uppföljning";

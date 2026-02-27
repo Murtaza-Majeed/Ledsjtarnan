@@ -849,3 +849,7 @@
 "general_new" = "New";
 "general_done" = "Done";
 "general_loading" = "Loading…";
+
+"client_profile_history_baseline_followup" = "Baseline \& follow-up";
+"insatskarta_no_data" = "No Insatskarta data for this assessment.";
+"followup_view" = "View follow-up";

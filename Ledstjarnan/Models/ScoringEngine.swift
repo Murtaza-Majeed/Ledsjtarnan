@@ -102,7 +102,7 @@ struct SafetyFlag: Identifiable {
     let message: String
     let requiresImmediateAction: Bool
 
-    enum FlagType {
+    enum FlagType: String, CaseIterable {
         case suicidalIdeation
         case suicideAttempt
         case ptsdSymptoms

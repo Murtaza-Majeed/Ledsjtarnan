@@ -154,6 +154,8 @@ struct AnyCodable: Codable {
             value = boolValue
         } else if let arrayValue = try? container.decode([String].self) {
             value = arrayValue
+        } else if let dictValue = try? container.decode([String: AnyCodable].self) {
+            value = dictValue
         } else {
             value = ""
         }
@@ -172,6 +174,8 @@ struct AnyCodable: Codable {
             try container.encode(boolValue)
         } else if let arrayValue = value as? [String] {
             try container.encode(arrayValue)
+        } else if let dictValue = value as? [String: AnyCodable] {
+            try container.encode(dictValue)
         }
     }
 }

@@ -102,12 +102,22 @@ struct BaselineDomainsView: View {
                 onClose: { showRecommendations = false },
                 onGoToPlanBuilder: { _ in showRecommendations = false },
                 onAssignChapters: { showRecommendations = false },
-                onOpenInsatskarta: nil,
+                onOpenInsatskarta: { showInsatskarta = true },
                 insatskartaRecommendations: recommendations,
                 insatskartaSafetyFlags: safetyFlags,
                 insatskartaPTSD: ptsdEval,
                 insatskartaClientName: client.displayName
             )
+        }
+        .sheet(isPresented: $showInsatskarta) {
+            if let ptsd = ptsdEval {
+                InsatskartraView(
+                    recommendations: recommendations,
+                    safetyFlags: safetyFlags,
+                    ptsd: ptsd,
+                    clientName: client.displayName
+                )
+            }
         }
     }
 

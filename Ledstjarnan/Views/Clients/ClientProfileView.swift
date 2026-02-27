@@ -14,20 +14,41 @@ struct ClientProfileView: View {
     @ObservedObject var appState: AppState
     let client: Client
     let onDeleted: (() -> Void)?
+    /// Called when user taps back (so list can clear navigationClient if needed).
+    let onDismiss: (() -> Void)?
+    
+    @EnvironmentObject private var logicStore: LogicReferenceStore
     
     @State private var detail: ClientDetail?
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showDeleteConfirm = false
     @State private var isDeletingClient = false
+    @State private var assessments: [Assessment] = []
+    @State private var assessmentForInsatskarta: Assessment?
+    @State private var showInsatskartaNoData = false
     
     private let clientService = ClientService()
+    private let assessmentService = AssessmentService()
     private var lang: String { appState.languageCode }
+    
+    private var latestCompletedWithInsatskarta: Assessment? {
+        assessments
+            .filter { $0.status == "completed" && $0.interventionSummary != nil && !(($0.interventionSummary ?? [:]).isEmpty) }
+            .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
+            .first
+    }
+    
+    /// Use detail's client when loaded so link status and data stay fresh (e.g. after returning from Link screen).
+    private var effectiveClient: Client {
+        detail?.client ?? client
+    }
 
-    init(appState: AppState, client: Client, onDeleted: (() -> Void)? = nil) {
+    init(appState: AppState, client: Client, onDeleted: (() -> Void)? = nil, onDismiss: (() -> Void)? = nil) {
         self._appState = ObservedObject(initialValue: appState)
         self.client = client
         self.onDeleted = onDeleted
+        self.onDismiss = onDismiss
     }
     
     var body: some View {
@@ -52,6 +73,8 @@ struct ClientProfileView: View {
         }
         .background(AppColors.background.ignoresSafeArea())
         .task { await loadDetail() }
+        .task { await loadAssessments() }
+        .onAppear { Task { await loadDetail() } }
         .navigationBarBackButtonHidden(true)
         .confirmationDialog(
             LocalizedString("client_profile_delete_confirm", lang),
@@ -65,11 +88,71 @@ struct ClientProfileView: View {
         } message: {
             Text(LocalizedString("client_profile_delete_warning", lang))
         }
+        .fullScreenCover(isPresented: $showInsatskartaNoData) {
+            NavigationStack {
+                VStack(spacing: 16) {
+                    Text(LocalizedString("insatskarta_no_data", lang))
+                        .font(.headline)
+                        .foregroundColor(AppColors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    Button(LocalizedString("insatskarta_close", lang)) {
+                        showInsatskartaNoData = false
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppColors.primary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(AppColors.background)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(LocalizedString("insatskarta_close", lang)) {
+                            showInsatskartaNoData = false
+                        }
+                    }
+                }
+            }
+        }
+        .fullScreenCover(item: $assessmentForInsatskarta) { assessment in
+            if let (recs, flags, ptsd) = parseInsatskartaData(assessment: assessment) {
+                InsatskartraView(
+                    recommendations: recs,
+                    safetyFlags: flags,
+                    ptsd: ptsd,
+                    clientName: client.displayName
+                )
+            } else {
+                NavigationStack {
+                    VStack(spacing: 16) {
+                        Text(LocalizedString("insatskarta_no_data", lang))
+                            .font(.headline)
+                            .foregroundColor(AppColors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Button(LocalizedString("insatskarta_close", lang)) {
+                            assessmentForInsatskarta = nil
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(AppColors.primary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppColors.background)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(LocalizedString("insatskarta_close", lang)) {
+                                assessmentForInsatskarta = nil
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private var topBar: some View {
         HStack {
             Button {
+                onDismiss?()
                 dismiss()
             } label: {
                 HStack(spacing: 6) {
@@ -99,7 +182,7 @@ struct ClientProfileView: View {
             Text(LocalizedString("client_profile_unit", lang).replacingOccurrences(of: "%@", with: unitDisplayName))
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
-            Text("Link: \(client.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang))")
+            Text("Link: \(effectiveClient.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang))")
                 .font(.subheadline)
                 .foregroundColor(AppColors.textSecondary)
             
@@ -113,8 +196,8 @@ struct ClientProfileView: View {
                     style: (detail?.activePlan != nil) ? .active : .inactive
                 )
                 StatusPill(
-                    text: client.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang),
-                    style: client.isLinked ? .active : .alert
+                    text: effectiveClient.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang),
+                    style: effectiveClient.isLinked ? .active : .alert
                 )
             }
         }
@@ -123,6 +206,96 @@ struct ClientProfileView: View {
         .background(AppColors.mainSurface)
         .cornerRadius(24)
         .shadow(color: AppColors.shadow(0.05), radius: 12, x: 0, y: 6)
+    }
+    
+    private var assessmentsCard: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text(LocalizedString("client_profile_assessments", lang))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(AppColors.textPrimary)
+                Spacer()
+                StatusPill(
+                    text: (detail?.hasBaseline == true) ? LocalizedString("clients_status_baseline", lang) : LocalizedString("client_profile_no_assessments", lang),
+                    style: (detail?.hasBaseline == true) ? .active : .inactive
+                )
+            }
+            .padding(.horizontal)
+            .padding(.top, 14)
+            .padding(.bottom, 10)
+            
+            Divider().padding(.leading, 16)
+            
+            // Visa baslinje
+            NavigationLink(destination: BaselineDomainsView(appState: appState, client: client)) {
+                HStack(spacing: 12) {
+                    Image(systemName: "doc.text")
+                        .foregroundColor(AppColors.primary)
+                        .frame(width: 24)
+                    Text(LocalizedString("baseline_view", lang))
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.textPrimary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(AppColors.mutedNeutral)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+            
+            Divider().padding(.leading, 52)
+            
+            // Visa uppföljning
+            NavigationLink(destination: FollowUpDomainsView(appState: appState, client: client)) {
+                HStack(spacing: 12) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .foregroundColor(AppColors.primary)
+                        .frame(width: 24)
+                    Text(LocalizedString("followup_view", lang))
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.textPrimary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(AppColors.mutedNeutral)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+            
+            Divider().padding(.leading, 52)
+            
+            // Visa Insatskarta
+            Button {
+                if let assessment = latestCompletedWithInsatskarta {
+                    assessmentForInsatskarta = assessment
+                } else {
+                    showInsatskartaNoData = true
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "map")
+                        .foregroundColor(AppColors.primary)
+                        .frame(width: 24)
+                    Text(LocalizedString("assessment_form_view_insatskarta", lang))
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.primary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(AppColors.mutedNeutral)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+        }
+        .background(AppColors.mainSurface)
+        .cornerRadius(18)
     }
     
     private var quickActions: some View {
@@ -135,21 +308,13 @@ struct ClientProfileView: View {
                 title: LocalizedString("client_profile_link_title", lang),
                 subtitle: LocalizedString("client_profile_link_code_description", lang),
                 badge: QuickActionRow.Badge(
-                    text: client.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang),
-                    style: client.isLinked ? .active : .alert
+                    text: effectiveClient.isLinked ? LocalizedString("clients_status_linked", lang) : LocalizedString("clients_status_not_linked", lang),
+                    style: effectiveClient.isLinked ? .active : .alert
                 ),
-                destination: ClientLinkingView(appState: appState, client: client)
+                destination: ClientLinkingView(appState: appState, client: effectiveClient)
             )
             
-            QuickActionRow(
-                title: LocalizedString("client_profile_assessments", lang),
-                subtitle: LocalizedString("client_profile_assessments_title", lang),
-                badge: QuickActionRow.Badge(
-                    text: (detail?.hasBaseline == true) ? LocalizedString("clients_status_baseline", lang) : LocalizedString("client_profile_no_assessments", lang),
-                    style: (detail?.hasBaseline == true) ? .active : .inactive
-                ),
-                destination: ClientAssessmentsView(appState: appState, client: client)
-            )
+            assessmentsCard
             
             QuickActionRow(
                 title: LocalizedString("client_profile_plans", lang),
@@ -242,6 +407,67 @@ struct ClientProfileView: View {
         }
     }
 
+    private func loadAssessments() async {
+        do {
+            let list = try await assessmentService.getAssessments(clientId: client.id)
+            await MainActor.run { assessments = list }
+        } catch {
+            // Non-critical — card still shows navigation links
+        }
+    }
+    
+    private func parseInsatskartaData(assessment: Assessment) -> ([InterventionRecommendation], [SafetyFlag], PTSDEvaluation)? {
+        guard let summary = assessment.interventionSummary, !summary.isEmpty else { return nil }
+        var recommendations: [InterventionRecommendation] = []
+        for (domainKey, anyVal) in summary {
+            let dict: [String: Any]
+            if let d = anyVal.value as? [String: AnyCodable] {
+                dict = d.mapValues(\.value)
+            } else if let d = anyVal.value as? [String: Any] {
+                dict = d
+            } else {
+                continue
+            }
+            let needLevelRaw = dict["needLevel"] as? String ?? ""
+            let needLevel = NeedLevel(rawValue: needLevelRaw) ?? .low
+            let interventionRaw = dict["interventions"] as? [String] ?? []
+            let interventions = interventionRaw.compactMap { Intervention(rawValue: $0) }
+            let isUrgent = dict["isUrgent"] as? Bool ?? false
+            let notes = dict["notes"] as? String ?? ""
+            let domainTitle = AssessmentDefinition.moduleInfo(forKey: domainKey, from: logicStore)?.title ?? domainKey.capitalized
+            recommendations.append(InterventionRecommendation(
+                domainKey: domainKey,
+                domainTitle: domainTitle,
+                needLevel: needLevel,
+                interventions: interventions.isEmpty ? [.miljoterapeutiskVardag] : interventions,
+                isUrgent: isUrgent,
+                notes: notes
+            ))
+        }
+        let flags: [SafetyFlag] = (assessment.safetyFlags ?? []).compactMap { flagDict in
+            let d: [String: Any]
+            if let wrapped = flagDict as? [String: AnyCodable] {
+                d = wrapped.mapValues(\.value)
+            } else {
+                d = flagDict.mapValues(\.value)
+            }
+            guard let typeRaw = d["type"] as? String,
+                  let type = SafetyFlag.FlagType(rawValue: typeRaw),
+                  let message = d["message"] as? String else { return nil }
+            let requiresAction = d["requiresAction"] as? Bool ?? false
+            return SafetyFlag(type: type, message: message, requiresImmediateAction: requiresAction)
+        }
+        var ptsd = PTSDEvaluation()
+        ptsd.totalSymptomScore = assessment.ptsdTotalScore ?? 0
+        if assessment.ptsdProbable == true {
+            ptsd.criterionBMet = true
+            ptsd.criterionCMet = true
+            ptsd.criterionDMet = true
+            ptsd.criterionEMet = true
+        }
+        return (recommendations.sorted { $0.isUrgent && !$1.isUrgent }, flags, ptsd)
+    }
+    
     private func deleteClientRecord() async {
         guard !isDeletingClient else { return }
         await MainActor.run {
@@ -940,65 +1166,45 @@ private struct UnlinkConfirmationSheet: View {
 private struct ClientAssessmentsView: View {
     @ObservedObject var appState: AppState
     let client: Client
+    @EnvironmentObject private var logicStore: LogicReferenceStore
     
     @State private var assessments: [Assessment] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var selectedAssessment: Assessment?
+    @State private var assessmentForInsatskarta: Assessment?
+    @State private var showInsatskartaNoData = false
     
     private let assessmentService = AssessmentService()
+    
+    private var lang: String { appState.languageCode }
+    
+    private var latestCompletedWithInsatskarta: Assessment? {
+        assessments
+            .filter { $0.status == "completed" && $0.interventionSummary != nil && !(($0.interventionSummary ?? [:]).isEmpty) }
+            .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
+            .first
+    }
     
     var body: some View {
         List {
             Section {
-                NavigationLink(destination: AssessmentFormView(appState: appState, client: client, assessmentType: "baseline")) {
-                    Label(LocalizedString("baseline_start", appState.languageCode), systemImage: "doc.text")
+                NavigationLink(destination: BaselineDomainsView(appState: appState, client: client)) {
+                    Label(LocalizedString("baseline_view", appState.languageCode), systemImage: "doc.text")
                 }
-                NavigationLink(destination: AssessmentFormView(appState: appState, client: client, assessmentType: "followup")) {
-                    Label(LocalizedString("followup_start", appState.languageCode), systemImage: "chart.line.uptrend.xyaxis")
+                NavigationLink(destination: FollowUpDomainsView(appState: appState, client: client)) {
+                    Label(LocalizedString("followup_view", appState.languageCode), systemImage: "chart.line.uptrend.xyaxis")
                 }
-            }
-            
-            Section(header: Text(LocalizedString("client_profile_history", appState.languageCode))) {
-                if isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, alignment: .center)
-                } else if let errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(AppColors.danger)
-                } else if assessments.isEmpty {
-                    Text(LocalizedString("client_profile_no_assessments", appState.languageCode))
-                        .foregroundColor(AppColors.textSecondary)
-                } else {
-                    ForEach(assessments) { assessment in
-                        Button {
-                            if assessment.status == "completed" {
-                                selectedAssessment = assessment
-                            }
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(assessment.isBaseline ? LocalizedString("comparison_baseline", appState.languageCode) : LocalizedString("comparison_followup", appState.languageCode))
-                                        .font(.subheadline.weight(.semibold))
-                                    Text(assessment.assessmentDate ?? "—")
-                                        .font(.caption)
-                                        .foregroundColor(AppColors.textSecondary)
-                                }
-                                Spacer()
-                                if assessment.status == "completed" {
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(AppColors.mutedNeutral)
-                                } else {
-                                    Text(LocalizedString("client_profile_draft", appState.languageCode))
-                                        .font(.caption)
-                                        .foregroundColor(.orange)
-                                }
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(assessment.status != "completed")
+                Button {
+                    if let assessment = latestCompletedWithInsatskarta {
+                        assessmentForInsatskarta = assessment
+                    } else {
+                        showInsatskartaNoData = true
                     }
+                } label: {
+                    Label(LocalizedString("assessment_form_view_insatskarta", appState.languageCode), systemImage: "map")
                 }
+                .foregroundColor(AppColors.primary)
             }
         }
         .navigationTitle(LocalizedString("client_profile_assessments_title", appState.languageCode))
@@ -1007,6 +1213,117 @@ private struct ClientAssessmentsView: View {
         .sheet(item: $selectedAssessment) { assessment in
             AssessmentDetailSheet(client: client, assessment: assessment)
         }
+        .fullScreenCover(isPresented: $showInsatskartaNoData) {
+            NavigationStack {
+                VStack(spacing: 16) {
+                    Text(LocalizedString("insatskarta_no_data", lang))
+                        .font(.headline)
+                        .foregroundColor(AppColors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    Button(LocalizedString("insatskarta_close", lang)) {
+                        showInsatskartaNoData = false
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppColors.primary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(AppColors.background)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(LocalizedString("insatskarta_close", lang)) {
+                            showInsatskartaNoData = false
+                        }
+                    }
+                }
+            }
+        }
+        .fullScreenCover(item: $assessmentForInsatskarta) { assessment in
+            if let (recs, flags, ptsd) = parseInsatskartaData(assessment: assessment, store: logicStore) {
+                InsatskartraView(
+                    recommendations: recs,
+                    safetyFlags: flags,
+                    ptsd: ptsd,
+                    clientName: client.displayName
+                )
+            } else {
+                NavigationStack {
+                    VStack(spacing: 16) {
+                        Text(LocalizedString("insatskarta_no_data", lang))
+                            .font(.headline)
+                            .foregroundColor(AppColors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Button(LocalizedString("insatskarta_close", lang)) {
+                            assessmentForInsatskarta = nil
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(AppColors.primary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppColors.background)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(LocalizedString("insatskarta_close", lang)) {
+                                assessmentForInsatskarta = nil
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func parseInsatskartaData(assessment: Assessment, store: LogicReferenceStore) -> ([InterventionRecommendation], [SafetyFlag], PTSDEvaluation)? {
+        guard let summary = assessment.interventionSummary, !summary.isEmpty else { return nil }
+        var recommendations: [InterventionRecommendation] = []
+        for (domainKey, anyVal) in summary {
+            let dict: [String: Any]
+            if let d = anyVal.value as? [String: AnyCodable] {
+                dict = d.mapValues(\.value)
+            } else if let d = anyVal.value as? [String: Any] {
+                dict = d
+            } else {
+                continue
+            }
+            let needLevelRaw = dict["needLevel"] as? String ?? ""
+            let needLevel = NeedLevel(rawValue: needLevelRaw) ?? .low
+            let interventionRaw = dict["interventions"] as? [String] ?? []
+            let interventions = interventionRaw.compactMap { Intervention(rawValue: $0) }
+            let isUrgent = dict["isUrgent"] as? Bool ?? false
+            let notes = dict["notes"] as? String ?? ""
+            let domainTitle = AssessmentDefinition.moduleInfo(forKey: domainKey, from: store)?.title ?? domainKey.capitalized
+            recommendations.append(InterventionRecommendation(
+                domainKey: domainKey,
+                domainTitle: domainTitle,
+                needLevel: needLevel,
+                interventions: interventions.isEmpty ? [.miljoterapeutiskVardag] : interventions,
+                isUrgent: isUrgent,
+                notes: notes
+            ))
+        }
+        let flags: [SafetyFlag] = (assessment.safetyFlags ?? []).compactMap { flagDict in
+            let d: [String: Any]
+            if let wrapped = flagDict as? [String: AnyCodable] {
+                d = wrapped.mapValues(\.value)
+            } else {
+                d = flagDict.mapValues(\.value)
+            }
+            guard let typeRaw = d["type"] as? String,
+                  let type = SafetyFlag.FlagType(rawValue: typeRaw),
+                  let message = d["message"] as? String else { return nil }
+            let requiresAction = d["requiresAction"] as? Bool ?? false
+            return SafetyFlag(type: type, message: message, requiresImmediateAction: requiresAction)
+        }
+        var ptsd = PTSDEvaluation()
+        ptsd.totalSymptomScore = assessment.ptsdTotalScore ?? 0
+        if assessment.ptsdProbable == true {
+            ptsd.criterionBMet = true
+            ptsd.criterionCMet = true
+            ptsd.criterionDMet = true
+            ptsd.criterionEMet = true
+        }
+        return (recommendations.sorted { $0.isUrgent && !$1.isUrgent }, flags, ptsd)
     }
     
     private func loadAssessments() async {
